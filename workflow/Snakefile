@@ -144,7 +144,7 @@ rule ipdSummary:
         #bai=rules.index.output.bai,
         pbi=rules.index.output.pbi,
     output:
-        csv=temp("temp/{sm}/ipdSummary.{scatteritem}.csv.gz"),
+        csv=pipe("temp/{sm}/ipdSummary.{scatteritem}.csv"),
     resources:
         mem=1000,
     threads: 4
@@ -164,10 +164,28 @@ rule ipdSummary:
         """
 
 
+rule compress_csv:
+    input:
+        csv=rules.ipdSummary.output.csv,
+    output:
+        csv=f"{rules.ipdSummary.output.csv}.gz",
+    resources:
+        mem=1000,
+    threads: 4
+    conda:
+        "envs/env.yml"
+    log:
+        "logs/{sm}/ipdSummary.{scatteritem}.log",
+    shell:
+        """
+        bgzip -@ {threads} {input.csv} > {output.csv} 2> {log}
+        """
+
+
 rule gmm:
     input:
         actc=rules.actc.output.bam,
-        csv=rules.ipdSummary.output.csv,
+        csv=rules.compress_csv.output.csv,
     output:
         bed=temp("temp/{sm}/ipdSummary.{scatteritem}.bed"),
     resources:
