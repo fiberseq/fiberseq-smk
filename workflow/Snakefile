@@ -112,7 +112,7 @@ rule index:
     shell:
         """
         pbindex {input.ccs} &> {log}
-        samtools index {input.ccs} &>> {log}
+        #samtools index {input.ccs} &>> {log}
         """
 
 
