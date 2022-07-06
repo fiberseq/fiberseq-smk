@@ -34,7 +34,7 @@ rule ccs:
         chunk=get_chunk,
     shell:
         """
-        ccs {input.bam} {output.bam} --hifi-kinetics -j {threads} --chunk {params.chunk}
+        ccs {input.bam} {output.bam} --hifi-kinetics -j {threads} --chunk {params.chunk} &> {log}
         """
 
 
@@ -52,7 +52,7 @@ rule zmws:
         "logs/{sm}/zmw.{scatteritem}.log",
     shell:
         """
-        bamsieve --show-zmws {input.bam} > {output.txt}
+        bamsieve --show-zmws {input.bam} > {output.txt} &> {log}
         """
 
 
@@ -71,7 +71,7 @@ rule subreads:
         "logs/{sm}/subreads.{scatteritem}.log",
     shell:
         """
-        bamsieve --whitelist {input.txt} {input.bam} {output.bam}
+        bamsieve --whitelist {input.txt} {input.bam} {output.bam} &> {log}
         """
 
 
@@ -90,7 +90,7 @@ rule actc:
         "logs/{sm}/actc.{scatteritem}.log",
     shell:
         """
-        actc -j {threads} {input.subreads} {input.ccs} {output.bam}
+        actc -j {threads} {input.subreads} {input.ccs} {output.bam} &> {log}
         """
 
 
@@ -109,8 +109,8 @@ rule ccs_fasta:
         "logs/{sm}/ccs.fasta.{scatteritem}.log",
     shell:
         """
-        samtools fasta -@ {threads} {input.ccs} > {output.fasta}
-        samtools faidx {output.fasta}
+        samtools fasta -@ {threads} {input.ccs} > {output.fasta} &> {log}
+        samtools faidx {output.fasta} &>> {log}
         """
 
 
@@ -136,7 +136,7 @@ rule ipdSummary:
             --numWorkers {threads} \
             --quiet --identify m6A \
             --csv {output.csv} \
-            {input.actc}
+            {input.actc} &> {log}
         """
 
 
@@ -157,7 +157,7 @@ rule gmm:
         gmm=workflow.source_path("scripts/per_molecule_train_gmm.v3.py"),
     shell:
         """
-        python {params.gmm} {input.csv} {input.actc} {output.bed}
+        python {params.gmm} {input.csv} {input.actc} {output.bed} &> {log}
         """
 
 
