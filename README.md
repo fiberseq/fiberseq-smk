@@ -8,7 +8,7 @@ A Snakemake workflow for `<description>`
 # Usage 
 
 ```
-snakemake --cores 10 -p --set-scatter chunks=20   --show-failed-logs -n
+snakemake --cores 10 -p --set-scatter chunks=2  --show-failed-logs --configfile .test/config.yml -n
 ```
 # TODO
 
