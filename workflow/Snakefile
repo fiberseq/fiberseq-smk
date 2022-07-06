@@ -133,7 +133,7 @@ rule ipdSummary:
     shell:
         """
         ipdSummary \
-            --reference $tmp_ref \
+            --reference {input.ccs_fasta} \
             --pvalue 0.001 \
             --numWorkers {threads} \
             --quiet --identify m6A \
