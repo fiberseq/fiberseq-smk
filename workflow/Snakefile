@@ -18,6 +18,7 @@ wildcard_constraints:
 rule all:
     input:
         expand("results/{sm}/unaligned.m6a.bam", sm=list(config.keys())),
+        expand("results/{sm}/unaligned.m6a.bam.pbi", sm=list(config.keys())),
 
 
 rule ccs:
