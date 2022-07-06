@@ -7,17 +7,17 @@
 include: "rules/common.smk"
 
 
-rule all:
-    input:
-        "results/a/gather.txt",
-
-
 scattergather:
     chunks=20,
 
 
 wildcard_constraints:
     sm="|".join(config.keys()),
+
+
+rule all:
+    input:
+        expand("results/{sm}/unaligned.m6a.bam", sm=list(config.keys())),
 
 
 rule ccs:
@@ -199,14 +199,19 @@ rule gmm:
         gmm=workflow.source_path("scripts/push_m6a_to_bam.py"),
     shell:
         """
-        python {params.gmm} {input.csv} {input.ccs} > {output.bam} 2> {log}
+        python {params.gmm} --threads {threads} {input.csv} {input.ccs} > {output.bam} 2> {log}
         """
 
 
-rule gather:
+rule merge:
     input:
-        gather.chunks(rules.gmm.output, allow_missing=True),
+        bam=gather.chunks(rules.gmm.output.bam, allow_missing=True),
     output:
-        "results/{sm}/gather.txt",
+        bam="results/{sm}/unaligned.m6a.bam",
+    conda:
+        "envs/env.yml"
+    log:
+        "logs/{sm}/samtools.cat.log",
+    threads: 4
     shell:
-        "cat {input} > {output}"
+        "samtools cat -@ {threads} -o {output.bam} {input.bam} 2> {log}"
