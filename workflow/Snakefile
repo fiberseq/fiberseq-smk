@@ -54,7 +54,7 @@ rule zmws:
         "logs/{sm}/zmw.{scatteritem}.log",
     shell:
         """
-        bamsieve --show-zmws {input.bam} > {output.txt} &> {log}
+        bamsieve --show-zmws {input.bam} > {output.txt} 2> {log}
         """
 
 
@@ -111,8 +111,8 @@ rule ccs_fasta:
         "logs/{sm}/ccs.fasta.{scatteritem}.log",
     shell:
         """
-        samtools fasta -@ {threads} {input.ccs} > {output.fasta} &> {log}
-        samtools faidx {output.fasta} &>> {log}
+        samtools fasta -@ {threads} {input.ccs} > {output.fasta} 2> {log}
+        samtools faidx {output.fasta} 2>> {log}
         """
 
 
