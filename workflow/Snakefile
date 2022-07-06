@@ -96,6 +96,26 @@ rule actc:
         """
 
 
+rule index:
+    input:
+        ccs=rules.ccs.output.bam,
+    output:
+        bai=f"{rules.ccs.output.bam}.bai",
+        pbi=f"{rules.ccs.output.bam}.pbi",
+    resources:
+        mem=8000,
+    threads: 1
+    conda:
+        "envs/env.yml"
+    log:
+        "logs/{sm}/index.{scatteritem}.log",
+    shell:
+        """
+        pbindex {input.ccs} &> {log}
+        samtools index {input.ccs} &>> {log}
+        """
+
+
 rule ccs_fasta:
     input:
         ccs=rules.ccs.output.bam,
@@ -119,6 +139,8 @@ rule ccs_fasta:
 rule ipdSummary:
     input:
         ccs_fasta=rules.ccs_fasta.output.fasta,
+        bai=rules.index.output.bai,
+        pbi=rules.index.output.pbi,
         fai=rules.ccs_fasta.output.fai,
         actc=rules.actc.output.bam,
     output:
