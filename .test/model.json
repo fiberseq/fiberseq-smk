@@ -1,0 +1,112 @@
+{
+    "class" : "HiddenMarkovModel",
+    "name" : "None",
+    "start" : {
+        "class" : "State",
+        "distribution" : null,
+        "name" : "None-start",
+        "weight" : 1.0
+    },
+    "end" : {
+        "class" : "State",
+        "distribution" : null,
+        "name" : "None-end",
+        "weight" : 1.0
+    },
+    "states" : [
+        {
+            "class" : "State",
+            "distribution" : {
+                "class" : "Distribution",
+                "dtype" : "numpy.bool_",
+                "name" : "DiscreteDistribution",
+                "parameters" : [
+                    {
+                        "False" : 0.7633330005885464,
+                        "True" : 0.2366669994114537
+                    }
+                ],
+                "frozen" : false
+            },
+            "name" : "s0",
+            "weight" : 1.0
+        },
+        {
+            "class" : "State",
+            "distribution" : {
+                "class" : "Distribution",
+                "dtype" : "numpy.bool_",
+                "name" : "DiscreteDistribution",
+                "parameters" : [
+                    {
+                        "False" : 0.9107633052984909,
+                        "True" : 0.08923669470150872
+                    }
+                ],
+                "frozen" : false
+            },
+            "name" : "s1",
+            "weight" : 1.0
+        },
+        {
+            "class" : "State",
+            "distribution" : null,
+            "name" : "None-start",
+            "weight" : 1.0
+        },
+        {
+            "class" : "State",
+            "distribution" : null,
+            "name" : "None-end",
+            "weight" : 1.0
+        }
+    ],
+    "end_index" : 3,
+    "start_index" : 2,
+    "silent_index" : 2,
+    "edges" : [
+        [
+            2,
+            0,
+            0.8412304651006451,
+            0.5,
+            null
+        ],
+        [
+            2,
+            1,
+            0.15876953489935486,
+            0.5,
+            null
+        ],
+        [
+            0,
+            0,
+            0.3223040030571177,
+            0.5,
+            null
+        ],
+        [
+            0,
+            1,
+            0.6776959969428824,
+            0.5,
+            null
+        ],
+        [
+            1,
+            0,
+            0.23459795007616824,
+            0.5,
+            null
+        ],
+        [
+            1,
+            1,
+            0.7654020499238318,
+            0.5,
+            null
+        ]
+    ],
+    "distribution ties" : []
+}

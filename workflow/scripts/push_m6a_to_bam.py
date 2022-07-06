@@ -6,9 +6,6 @@ from tqdm import tqdm
 import pandas as pd
 import numpy as np
 from sklearn.mixture import GaussianMixture
-from sklearn.preprocessing import normalize
-import time
-import multiprocessing as mp
 import argparse
 import logging
 import tqdm
@@ -36,9 +33,9 @@ def coordinateConversion_MMTag(sequence, base, modification_coords):
 
 def apply_gmm(csv, bam, out, min_prediction_value=0.99999999, min_number_of_calls=25):
     for rec in tqdm.tqdm(bam.fetch(until_eof=True), total=csv.index.unique().shape[0]):
-        x = 1
         if not rec.query_name in csv.index:
             logging.debug(f"Missing {rec.query_name}")
+            out.write(rec)
             continue
         molecule_df = csv.loc[rec.query_name]
         # ec = molecule_df["coverage"].mean()  # effective coverage
