@@ -219,7 +219,7 @@ rule merge:
         """
 
 
-rule merge:
+rule index_merge:
     input:
         bam=rules.merge.output.bam,
     output:
