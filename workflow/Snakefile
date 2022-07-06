@@ -147,7 +147,7 @@ rule ipdSummary:
         csv=pipe("temp/{sm}/ipdSummary.{scatteritem}.csv"),
     resources:
         mem=1000,
-    threads: 4
+    threads: config.get("threads", 16)
     conda:
         "envs/env.yml"
     log:
