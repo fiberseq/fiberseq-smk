@@ -1,4 +1,28 @@
-# Main entrypoint of the workflow. 
-# Please follow the best practices: 
+# Main entrypoint of the workflow.
+# Please follow the best practices:
 # https://snakemake.readthedocs.io/en/stable/snakefiles/best_practices.html,
-# in particular regarding the standardized folder structure mentioned there. 
+# in particular regarding the standardized folder structure mentioned there.
+
+
+rule all:
+    input:
+        "b.txt",
+
+
+rule example_rule:
+    input:
+        "a.txt",
+    output:
+        "b.txt",
+    resources:
+        mem=config.get("mem", 16),
+    threads: config.get("threads", 16)
+    conda:
+        "envs/env.yml"
+    log:
+        "logs/example_rule.log",
+    params:
+        script=workflow.source_path("scripts/a.py"),
+    shell:
+        """
+        """
