@@ -33,6 +33,8 @@ rule ccs:
         "envs/env.yml"
     log:
         "logs/{sm}/ccs.{scatteritem}.log",
+    benchmark:
+        "benchmarks/{sm}/ccs.{scatteritem}.tbl"
     params:
         chunk=get_chunk,
     shell:
@@ -53,6 +55,8 @@ rule zmws:
         "envs/env.yml"
     log:
         "logs/{sm}/zmw.{scatteritem}.log",
+    benchmark:
+        "benchmarks/{sm}/zmw.{scatteritem}.tbl"
     shell:
         """
         bamsieve --show-zmws {input.bam} > {output.txt} 2> {log}
@@ -72,6 +76,8 @@ rule subreads:
         "envs/env.yml"
     log:
         "logs/{sm}/subreads.{scatteritem}.log",
+    benchmark:
+        "benchmarks/{sm}/subreads.{scatteritem}.tbl"
     shell:
         """
         bamsieve --whitelist {input.txt} {input.bam} {output.bam} &> {log}
@@ -91,6 +97,8 @@ rule actc:
         "envs/env.yml"
     log:
         "logs/{sm}/actc.{scatteritem}.log",
+    benchmark:
+        "benchmarks/{sm}/actc.{scatteritem}.tbl"
     shell:
         """
         actc -j {threads} {input.subreads} {input.ccs} {output.bam} 2> {log}
@@ -110,6 +118,8 @@ rule index:
         "envs/env.yml"
     log:
         "logs/{sm}/index.{scatteritem}.log",
+    benchmark:
+        "benchmarks/{sm}/index.{scatteritem}.tbl"
     shell:
         """
         pbindex {input.ccs} &> {log}
@@ -130,6 +140,8 @@ rule ccs_fasta:
         "envs/env.yml"
     log:
         "logs/{sm}/ccs.fasta.{scatteritem}.log",
+    benchmark:
+        "benchmarks/{sm}/ccs_fasta.{scatteritem}.tbl"
     shell:
         """
         samtools fasta -@ {threads} {input.ccs} > {output.fasta} 2> {log}
@@ -153,6 +165,8 @@ rule ipdSummary:
         "envs/env.yml"
     log:
         "logs/{sm}/ipdSummary.{scatteritem}.log",
+    benchmark:
+        "benchmarks/{sm}/ipdSummary.{scatteritem}.tbl"
     shell:
         """
         ipdSummary \
@@ -169,7 +183,7 @@ rule compress_csv:
     input:
         csv=rules.ipdSummary.output.csv,
     output:
-        csv=f"{rules.ipdSummary.output.csv}.gz",
+        csv=temp(f"{rules.ipdSummary.output.csv}.gz"),
     resources:
         mem=1000,
     threads: 4
@@ -177,6 +191,8 @@ rule compress_csv:
         "envs/env.yml"
     log:
         "logs/{sm}/ipdSummary.{scatteritem}.log",
+    benchmark:
+        "benchmarks/{sm}/compress_csv.{scatteritem}.tbl"
     shell:
         """
         bgzip -@ {threads} {input.csv} > {output.csv} 2> {log}
@@ -198,6 +214,8 @@ rule gmm:
         "logs/{sm}/gmm.{scatteritem}.log",
     params:
         gmm=workflow.source_path("scripts/push_m6a_to_bam.py"),
+    benchmark:
+        "benchmarks/{sm}/gmm.{scatteritem}.tbl"
     shell:
         """
         python {params.gmm} --threads {threads} {input.csv} {input.ccs} > {output.bam} 2> {log}
@@ -214,6 +232,8 @@ rule merge:
     log:
         "logs/{sm}/samtools.cat.log",
     threads: 4
+    benchmark:
+        "benchmarks/{sm}/merge.tbl"
     shell:
         """
         samtools cat -@ {threads} -o {output.bam} {input.bam} 2> {log}
@@ -229,6 +249,8 @@ rule index_merge:
         "envs/env.yml"
     log:
         "logs/{sm}/samtools.cat.log",
+    benchmark:
+        "benchmarks/{sm}/index.tbl"
     threads: 1
     shell:
         """
