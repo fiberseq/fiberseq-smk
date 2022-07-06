@@ -214,4 +214,22 @@ rule merge:
         "logs/{sm}/samtools.cat.log",
     threads: 4
     shell:
-        "samtools cat -@ {threads} -o {output.bam} {input.bam} 2> {log}"
+        """
+        samtools cat -@ {threads} -o {output.bam} {input.bam} 2> {log}
+        """
+
+
+rule merge:
+    input:
+        bam=rules.merge.output.bam,
+    output:
+        pbi=f"{rules.merge.output.bam}.pbi",
+    conda:
+        "envs/env.yml"
+    log:
+        "logs/{sm}/samtools.cat.log",
+    threads: 1
+    shell:
+        """
+        pbindx {input.bam} &> {log}
+        """
