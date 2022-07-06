@@ -184,10 +184,10 @@ rule compress_csv:
 
 rule gmm:
     input:
-        actc=rules.actc.output.bam,
+        ccs=rules.ccs.output.bam,
         csv=rules.ipdSummary.output.csv,
     output:
-        bed=temp("temp/{sm}/ipdSummary.{scatteritem}.bed"),
+        bam=temp("temp/{sm}/gmm.{scatteritem}.bam"),
     resources:
         mem=1000,
     threads: 4
@@ -196,10 +196,10 @@ rule gmm:
     log:
         "logs/{sm}/gmm.{scatteritem}.log",
     params:
-        gmm=workflow.source_path("scripts/per_molecule_train_gmm.v3.py"),
+        gmm=workflow.source_path("scripts/push_m6a_to_bam.py"),
     shell:
         """
-        python {params.gmm} {input.csv} {input.actc} {output.bed} &> {log}
+        python {params.gmm} {input.csv} {input.ccs} > {output.bam} 2> {log}
         """
 
 
