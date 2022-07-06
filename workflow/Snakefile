@@ -1,9 +1,3 @@
-# Main entrypoint of the workflow.
-# Please follow the best practices:
-# https://snakemake.readthedocs.io/en/stable/snakefiles/best_practices.html,
-# in particular regarding the standardized folder structure mentioned there.
-
-
 include: "rules/common.smk"
 
 
@@ -25,9 +19,9 @@ rule ccs:
     input:
         bam=get_subreads,
     output:
-        bam="temp/{sm}/ccs.{scatteritem}.bam",
+        bam=temp("temp/{sm}/ccs.{scatteritem}.bam"),
     resources:
-        mem=8000,
+        mem_mb=8000,
     threads: config.get("threads", 16)
     conda:
         "envs/env.yml"
@@ -49,7 +43,7 @@ rule zmws:
     output:
         txt=temp("temp/{sm}/zmw.{scatteritem}.txt"),
     resources:
-        mem=2000,
+        mem_mb=1000,
     threads: 1
     conda:
         "envs/env.yml"
@@ -70,7 +64,7 @@ rule subreads:
     output:
         bam=temp("temp/{sm}/subreads.{scatteritem}.bam"),
     resources:
-        mem=2000,
+        mem_mb=2000,
     threads: 1
     conda:
         "envs/env.yml"
@@ -91,7 +85,7 @@ rule actc:
     output:
         bam=temp("temp/{sm}/actc.{scatteritem}.bam"),
     resources:
-        mem=8000,
+        mem_mb=4000,
     threads: config.get("threads", 16)
     conda:
         "envs/env.yml"
@@ -112,7 +106,7 @@ rule index:
         #bai=temp(f"{rules.actc.output.bam}.bai"),
         pbi=temp(f"{rules.actc.output.bam}.pbi"),
     resources:
-        mem=8000,
+        mem_mb=1000,
     threads: 1
     conda:
         "envs/env.yml"
@@ -134,7 +128,7 @@ rule ccs_fasta:
         fasta=temp("temp/{sm}/ccs.{scatteritem}.fasta"),
         fai=temp("temp/{sm}/ccs.{scatteritem}.fasta.fai"),
     resources:
-        mem=1000,
+        mem_mb=1000,
     threads: 4
     conda:
         "envs/env.yml"
@@ -158,8 +152,6 @@ rule ipdSummary:
         pbi=rules.index.output.pbi,
     output:
         csv=temp("temp/{sm}/ipdSummary.{scatteritem}.csv"),
-    resources:
-        mem=1000,
     threads: config.get("threads", 16)
     conda:
         "envs/env.yml"
@@ -185,7 +177,7 @@ rule compress_csv:
     output:
         csv=temp(f"{rules.ipdSummary.output.csv}.gz"),
     resources:
-        mem=1000,
+        mem_mb=1000,
     threads: 4
     conda:
         "envs/env.yml"
@@ -205,8 +197,6 @@ rule gmm:
         csv=rules.ipdSummary.output.csv,
     output:
         bam=temp("temp/{sm}/gmm.{scatteritem}.bam"),
-    resources:
-        mem=1000,
     threads: 4
     conda:
         "envs/env.yml"
@@ -231,6 +221,8 @@ rule merge:
         "envs/env.yml"
     log:
         "logs/{sm}/samtools.cat.log",
+    resources:
+        mem_mb=2000,
     threads: 4
     benchmark:
         "benchmarks/{sm}/merge.tbl"
@@ -247,6 +239,8 @@ rule index_merge:
         pbi=f"{rules.merge.output.bam}.pbi",
     conda:
         "envs/env.yml"
+    resources:
+        mem_mb=2000,
     log:
         "logs/{sm}/samtools.cat.log",
     benchmark:
