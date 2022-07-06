@@ -232,5 +232,5 @@ rule index_merge:
     threads: 1
     shell:
         """
-        pbindx {input.bam} &> {log}
+        pbindex {input.bam} &> {log}
         """
