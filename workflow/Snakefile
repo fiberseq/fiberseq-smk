@@ -92,7 +92,7 @@ rule actc:
         "logs/{sm}/actc.{scatteritem}.log",
     shell:
         """
-        actc -j {threads} {input.subreads} {input.ccs} - | samtools sort - > {output.bam} 2> {log}
+        actc -j {threads} {input.subreads} {input.ccs} {output.bam} 2> {log}
         """
 
 
@@ -100,7 +100,7 @@ rule index:
     input:
         ccs=rules.actc.output.bam,
     output:
-        bai=temp(f"{rules.actc.output.bam}.bai"),
+        #bai=temp(f"{rules.actc.output.bam}.bai"),
         pbi=temp(f"{rules.actc.output.bam}.pbi"),
     resources:
         mem=8000,
@@ -112,7 +112,7 @@ rule index:
     shell:
         """
         pbindex {input.ccs} &> {log}
-        samtools index {input.ccs} &>> {log}
+        #samtools index {input.ccs} &>> {log}
         """
 
 
@@ -141,7 +141,7 @@ rule ipdSummary:
         ccs_fasta=rules.ccs_fasta.output.fasta,
         fai=rules.ccs_fasta.output.fai,
         actc=rules.actc.output.bam,
-        bai=rules.index.output.bai,
+        #bai=rules.index.output.bai,
         pbi=rules.index.output.pbi,
     output:
         csv=temp("temp/{sm}/ipdSummary.{scatteritem}.csv.gz"),
