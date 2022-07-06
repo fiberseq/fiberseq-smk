@@ -144,7 +144,7 @@ rule ipdSummary:
         #bai=rules.index.output.bai,
         pbi=rules.index.output.pbi,
     output:
-        csv=pipe("temp/{sm}/ipdSummary.{scatteritem}.csv"),
+        csv=temp("temp/{sm}/ipdSummary.{scatteritem}.csv"),
     resources:
         mem=1000,
     threads: config.get("threads", 16)
@@ -185,7 +185,7 @@ rule compress_csv:
 rule gmm:
     input:
         actc=rules.actc.output.bam,
-        csv=rules.compress_csv.output.csv,
+        csv=rules.ipdSummary.output.csv,
     output:
         bed=temp("temp/{sm}/ipdSummary.{scatteritem}.bed"),
     resources:
