@@ -2,6 +2,9 @@
 # Please follow the best practices:
 # https://snakemake.readthedocs.io/en/stable/snakefiles/best_practices.html,
 # in particular regarding the standardized folder structure mentioned there.
+config = {"a": ".test/subreads.bam"}
+
+
 include: "rules/common.smk"
 
 
@@ -11,16 +14,16 @@ rule all:
 
 
 scattergather:
-    chunks=2,
+    chunks=20,
 
 
 wildcard_constraints:
-    sm="|".join(["a"]),
+    sm="|".join(config.keys()),
 
 
 rule ccs:
     input:
-        bam=".test/subreads.bam",
+        bam=get_subreads,
     output:
         bam="temp/{sm}/ccs.{scatteritem}.bam",
     resources:
@@ -58,7 +61,7 @@ rule zmws:
 
 rule subreads:
     input:
-        bam=".test/subreads.bam",
+        bam=get_subreads,
         txt=rules.zmws.output.txt,
     output:
         bam=temp("temp/{sm}/subreads.{scatteritem}.bam"),
