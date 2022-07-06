@@ -100,8 +100,8 @@ rule index:
     input:
         ccs=rules.ccs.output.bam,
     output:
-        bai=f"{rules.ccs.output.bam}.bai",
-        pbi=f"{rules.ccs.output.bam}.pbi",
+        bai=temp(f"{rules.ccs.output.bam}.bai"),
+        pbi=temp(f"{rules.ccs.output.bam}.pbi"),
     resources:
         mem=8000,
     threads: 1
