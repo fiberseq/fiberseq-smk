@@ -5,7 +5,11 @@
 
 
 A Snakemake workflow for `<description>`
+# Usage 
 
+```
+snakemake --cores 10 -p --set-scatter chunks=20   --show-failed-logs -n
+```
 # TODO
 
 * Replace `<owner>` and `<repo>` everywhere in the template (also under .github/workflows) with the correct `<repo>` name and owning user or organization.

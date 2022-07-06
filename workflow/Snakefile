@@ -2,27 +2,169 @@
 # Please follow the best practices:
 # https://snakemake.readthedocs.io/en/stable/snakefiles/best_practices.html,
 # in particular regarding the standardized folder structure mentioned there.
+include: "rules/common.smk"
 
 
 rule all:
     input:
-        "b.txt",
+        "results/a/gather.txt",
 
 
-rule example_rule:
+scattergather:
+    chunks=2,
+
+
+wildcard_constraints:
+    sm="|".join(["a"]),
+
+
+rule ccs:
     input:
-        "a.txt",
+        bam=".test/subreads.bam",
     output:
-        "b.txt",
+        bam="temp/{sm}/ccs.{scatteritem}.bam",
     resources:
-        mem=config.get("mem", 16),
+        mem=8000,
     threads: config.get("threads", 16)
     conda:
         "envs/env.yml"
     log:
-        "logs/example_rule.log",
+        "logs/{sm}/ccs.{scatteritem}.log",
     params:
-        script=workflow.source_path("scripts/a.py"),
+        chunk=get_chunk,
     shell:
         """
+        ccs {input.bam} {output.bam} --hifi-kinetics -j {threads} --chunk {params.chunk} &> {log}
         """
+
+
+rule zmws:
+    input:
+        bam=rules.ccs.output.bam,
+    output:
+        txt=temp("temp/{sm}/zmw.{scatteritem}.txt"),
+    resources:
+        mem=2000,
+    threads: 1
+    conda:
+        "envs/env.yml"
+    log:
+        "logs/{sm}/zmw.{scatteritem}.log",
+    shell:
+        """
+        bamsieve --show-zmws {input.bam} > {output.txt} &> {log}
+        """
+
+
+rule subreads:
+    input:
+        bam=".test/subreads.bam",
+        txt=rules.zmws.output.txt,
+    output:
+        bam=temp("temp/{sm}/subreads.{scatteritem}.bam"),
+    resources:
+        mem=2000,
+    threads: 1
+    conda:
+        "envs/env.yml"
+    log:
+        "logs/{sm}/subreads.{scatteritem}.log",
+    shell:
+        """
+        bamsieve --whitelist {input.txt} {input.bam} {output.bam} &> {log}
+        """
+
+
+rule actc:
+    input:
+        ccs=rules.ccs.output.bam,
+        subreads=rules.subreads.output.bam,
+    output:
+        bam=temp("temp/{sm}/actc.{scatteritem}.bam"),
+    resources:
+        mem=8000,
+    threads: config.get("threads", 16)
+    conda:
+        "envs/env.yml"
+    log:
+        "logs/{sm}/actc.{scatteritem}.log",
+    shell:
+        """
+        actc -j {threads} {input.subreads} {input.ccs} {output.bam} &> {log}
+        """
+
+
+rule ccs_fasta:
+    input:
+        ccs=rules.ccs.output.bam,
+    output:
+        fasta=temp("temp/{sm}/ccs.{scatteritem}.fasta"),
+        fai=temp("temp/{sm}/ccs.{scatteritem}.fasta.fai"),
+    resources:
+        mem=1000,
+    threads: 4
+    conda:
+        "envs/env.yml"
+    log:
+        "logs/{sm}/ccs.fasta.{scatteritem}.log",
+    shell:
+        """
+        samtools fasta -@ {threads} {input.ccs} > {output.fasta} &> {log}
+        samtools faidx {output.fasta} &>> {log}
+        """
+
+
+rule ipdSummary:
+    input:
+        ccs_fasta=rules.ccs_fasta.output.fasta,
+        fai=rules.ccs_fasta.output.fai,
+        actc=rules.actc.output.bam,
+    output:
+        csv=temp("temp/{sm}/ipdSummary.{scatteritem}.csv.gz"),
+    resources:
+        mem=1000,
+    threads: 4
+    conda:
+        "envs/env.yml"
+    log:
+        "logs/{sm}/ipdSummary.{scatteritem}.log",
+    shell:
+        """
+        ipdSummary \
+            --reference $tmp_ref \
+            --pvalue 0.001 \
+            --numWorkers {threads} \
+            --quiet --identify m6A \
+            --csv {output.csv} \
+            {input.actc} &> {log}
+        """
+
+
+rule gmm:
+    input:
+        actc=rules.actc.output.bam,
+        csv=rules.ipdSummary.output.csv,
+    output:
+        bed=temp("temp/{sm}/ipdSummary.{scatteritem}.bed"),
+    resources:
+        mem=1000,
+    threads: 4
+    conda:
+        "envs/env.yml"
+    log:
+        "logs/{sm}/gmm.{scatteritem}.log",
+    params:
+        gmm=workflow.source_path("scripts/per_molecule_train_gmm.v3.py"),
+    shell:
+        """
+        python {params.gmm} {input.csv} {input.actc} {output.bed} &> {log}
+        """
+
+
+rule gather:
+    input:
+        gather.chunks(rules.gmm.output, allow_missing=True),
+    output:
+        "results/{sm}/gather.txt",
+    shell:
+        "cat {input} > {output}"
