@@ -98,10 +98,10 @@ rule actc:
 
 rule index:
     input:
-        ccs=rules.ccs.output.bam,
+        ccs=rules.actc.output.bam,
     output:
-        bai=temp(f"{rules.ccs.output.bam}.bai"),
-        pbi=temp(f"{rules.ccs.output.bam}.pbi"),
+        bai=temp(f"{rules.actc.output.bam}.bai"),
+        pbi=temp(f"{rules.actc.output.bam}.pbi"),
     resources:
         mem=8000,
     threads: 1
@@ -139,10 +139,10 @@ rule ccs_fasta:
 rule ipdSummary:
     input:
         ccs_fasta=rules.ccs_fasta.output.fasta,
-        bai=rules.index.output.bai,
-        pbi=rules.index.output.pbi,
         fai=rules.ccs_fasta.output.fai,
         actc=rules.actc.output.bam,
+        bai=rules.index.output.bai,
+        pbi=rules.index.output.pbi,
     output:
         csv=temp("temp/{sm}/ipdSummary.{scatteritem}.csv.gz"),
     resources:
