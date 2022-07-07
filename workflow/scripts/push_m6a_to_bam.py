@@ -45,8 +45,8 @@ def apply_gmm(csv, bam, out, min_prediction_value=0.99999999, min_number_of_call
             continue
 
         # convert to zero based
-        tpl = molecule_df.tpl.values - 1
-        ipdRatios = molecule_df.ipdRatio.values.reshape(-1, 1)
+        tpl = molecule_df.tpl.to_numpy() - 1
+        ipdRatios = molecule_df.ipdRatio.to_numpy().reshape(-1, 1)
 
         gmm = GaussianMixture(
             n_components=2, n_init=3, max_iter=500, covariance_type="full", tol=1e-5
