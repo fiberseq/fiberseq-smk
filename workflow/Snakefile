@@ -226,7 +226,6 @@ rule train_hmm:
         "logs/{sm}/train_hmm.log",
     params:
         nuc=workflow.source_path("scripts/add_nucleosomes.py"),
-        utils=workflow.source_path("scripts/hmmutils.py"),
     benchmark:
         "benchmarks/{sm}/train_hmm.tbl"
     threads: 1
@@ -248,7 +247,6 @@ rule nuc:
         "logs/{sm}/nuc.{scatteritem}.log",
     params:
         nuc=workflow.source_path("scripts/add_nucleosomes.py"),
-        utils=workflow.source_path("scripts/hmmutils.py"),
     benchmark:
         "benchmarks/{sm}/nuc.{scatteritem}.tbl"
     threads: 4
