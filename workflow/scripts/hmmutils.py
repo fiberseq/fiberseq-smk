@@ -24,6 +24,8 @@ def get_mods_from_rec(rec, mods=[("A", 0, "a"), ("T", 1, "a")], mask=True):
         if mod in rec.modified_bases:
             pos = np.array(rec.modified_bases[mod])[:, 0]
             positions.append(pos)
+    if len(positions) < 1:
+        return None
     methylated_positions = np.concatenate(positions)
     methylated_positions.sort(kind="mergesort")
 

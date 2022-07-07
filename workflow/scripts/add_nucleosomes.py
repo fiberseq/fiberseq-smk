@@ -81,6 +81,8 @@ def get_mods_from_rec(rec, mods=[("A", 0, "a"), ("T", 1, "a")], mask=True):
         if mod in rec.modified_bases:
             pos = np.array(rec.modified_bases[mod])[:, 0]
             positions.append(pos)
+    if len(positions) < 1:
+        return None, None, None
     methylated_positions = np.concatenate(positions)
     methylated_positions.sort(kind="mergesort")
 
@@ -227,6 +229,9 @@ def apply_hmm(bam, hmm, nuc_label, cutoff, out):
             AT_positions,
             methylated_positions,
         ) = get_mods_from_rec(rec, mask=True)
+        if binary is None:
+            out.write(rec)
+            continue
         # binary of m6A calls in AT space, and AT positions relative to 0-based fiber start
 
         simple_starts, simple_sizes, generated_terminal = simpleFind(
@@ -466,6 +471,8 @@ def main():
         training_set = []
         for idx, rec in enumerate(bam.fetch(until_eof=True)):
             mods, _AT_pos, _m6a_pos = get_mods_from_rec(rec, mask=True)
+            if mods is None:
+                continue
             training_set.append(mods)
             if idx >= args.num_train:
                 break
