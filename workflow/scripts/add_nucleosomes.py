@@ -8,7 +8,7 @@ import pomegranate as pom
 # from hmmutils import *
 
 
-def train_hmm(data, n_jobs=4):
+def train_hmm(data, n_jobs=1):
     model = pom.HiddenMarkovModel().from_samples(
         pom.DiscreteDistribution,
         n_components=2,

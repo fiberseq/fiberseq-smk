@@ -229,7 +229,7 @@ rule train_hmm:
         utils=workflow.source_path("scripts/hmmutils.py"),
     benchmark:
         "benchmarks/{sm}/train_hmm.tbl"
-    threads: 4
+    threads: 1
     shell:
         """
         python {params.nuc} --threads {threads} {input.bam} {output.model} 2> {log}
