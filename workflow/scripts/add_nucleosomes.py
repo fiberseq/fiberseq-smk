@@ -4,6 +4,7 @@ import numpy as np
 import argparse
 import logging
 import pomegranate as pom
+import array
 
 # from hmmutils import *
 
