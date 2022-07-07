@@ -268,7 +268,7 @@ rule nuc:
 rule merge:
     input:
         bam=gather.chunks(rules.nuc.output.bam, allow_missing=True),
-        bam=gather.chunks(rules.ccs.output.pbi, allow_missing=True),
+        pbi=gather.chunks(rules.ccs.output.pbi, allow_missing=True),
     output:
         bam="results/{sm}/unaligned.m6a.bam",
     conda:
