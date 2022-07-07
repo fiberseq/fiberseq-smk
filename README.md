@@ -22,6 +22,7 @@ snakemake --cores 10 -p --set-scatter chunks=2  --show-failed-logs --configfile 
 ```
 
 # Cluster usage
+
 ### Example:
 ```bash
 mkdir -p logs_cluster
@@ -45,6 +46,11 @@ snakemake \
 
 # TODO
 * Make an extract tool
+* Add a sample tag to the bam header.
+* Add a pipeline version to the bam header (git commit).
+* Add primrose
+* Add unknown case to end of fiber calls
+
 # Workflow
 
 ![alt text](./images/dag.png)

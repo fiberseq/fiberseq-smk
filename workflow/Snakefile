@@ -34,6 +34,7 @@ rule ccs:
         txt=temp("temp/{sm}/ccs.{scatteritem}.ccs_report.txt"),
     resources:
         mem_mb=8000,
+        disk_mb=2000,
     threads: config.get("threads", 8)
     conda:
         env
@@ -54,49 +55,6 @@ rule ccs:
         """
 
 
-# no longer used
-rule zmws:
-    input:
-        bam=rules.ccs.output.bam,
-    output:
-        txt=temp("temp/{sm}/zmw.{scatteritem}.txt"),
-    resources:
-        mem_mb=1000,
-    threads: 1
-    conda:
-        env
-    log:
-        "logs/{sm}/zmw.{scatteritem}.log",
-    benchmark:
-        "benchmarks/{sm}/zmw.{scatteritem}.tbl"
-    shell:
-        """
-        bamsieve --show-zmws {input.bam} > {output.txt} 2> {log}
-        """
-
-
-# no longer used
-rule subreads:
-    input:
-        bam=get_subreads,
-        txt=rules.zmws.output.txt,
-    output:
-        bam=temp("temp/{sm}/subreads.{scatteritem}.bam"),
-    resources:
-        mem_mb=2000,
-    threads: 1
-    conda:
-        env
-    log:
-        "logs/{sm}/subreads.{scatteritem}.log",
-    benchmark:
-        "benchmarks/{sm}/subreads.{scatteritem}.tbl"
-    shell:
-        """
-        bamsieve --whitelist {input.txt} {input.bam} {output.bam} &> {log}
-        """
-
-
 rule actc:
     input:
         ccs=rules.ccs.output.bam,
@@ -106,6 +64,7 @@ rule actc:
         fasta=temp("temp/{sm}/actc.{scatteritem}.fasta"),
     resources:
         mem_mb=4000,
+        disk_mb=2000,
     threads: config.get("threads", 8)
     conda:
         env
@@ -189,26 +148,6 @@ rule ipdSummary:
         """
 
 
-rule compress_csv:
-    input:
-        csv=rules.ipdSummary.output.csv,
-    output:
-        csv=temp(f"{rules.ipdSummary.output.csv}.gz"),
-    resources:
-        mem_mb=1000,
-    threads: 4
-    conda:
-        env
-    log:
-        "logs/{sm}/ipdSummary.{scatteritem}.log",
-    benchmark:
-        "benchmarks/{sm}/compress_csv.{scatteritem}.tbl"
-    shell:
-        """
-        bgzip -@ {threads} {input.csv} > {output.csv} 2> {log}
-        """
-
-
 rule gmm:
     input:
         ccs=rules.ccs.output.bam,
@@ -283,6 +222,7 @@ rule merge:
         "logs/{sm}/samtools.cat.log",
     resources:
         mem_mb=2000,
+        disk_mb=8000,
     threads: 4
     benchmark:
         "benchmarks/{sm}/merge.tbl"
@@ -301,6 +241,7 @@ rule index_merge:
         env
     resources:
         mem_mb=2000,
+        disk_mb=2000,
     log:
         "logs/{sm}/samtools.cat.log",
     benchmark:
