@@ -33,7 +33,7 @@ rule ccs:
         json=temp("temp/{sm}/ccs.{scatteritem}.zmw_metrics.json.gz"),
         txt=temp("temp/{sm}/ccs.{scatteritem}.ccs_report.txt"),
     resources:
-        mem_mb=8000,
+        mem_mb=16 * 1024,
     threads: config.get("threads", 8)
     conda:
         env
