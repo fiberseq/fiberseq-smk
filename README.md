@@ -15,6 +15,9 @@ mamba env update -n fiberseq-smk --file workflow/envs/env.yml
 # Add the SMRTlink tools to your path
 export PATH=$PATH:/path/to/smrtlink/tools
 ```
+
+# Usage
+```bash
 snakemake --cores 10 -p --set-scatter chunks=2  --show-failed-logs --configfile .test/config.yml -n
 ```
 
