@@ -34,7 +34,6 @@ rule ccs:
         txt=temp("temp/{sm}/ccs.{scatteritem}.ccs_report.txt"),
     resources:
         mem_mb=8000,
-        disk_mb=2000,
     threads: config.get("threads", 8)
     conda:
         env
@@ -62,9 +61,6 @@ rule actc:
     output:
         bam=temp("temp/{sm}/actc.{scatteritem}.bam"),
         fasta=temp("temp/{sm}/actc.{scatteritem}.fasta"),
-    resources:
-        mem_mb=4000,
-        disk_mb=2000,
     threads: config.get("threads", 8)
     conda:
         env
@@ -83,8 +79,6 @@ rule index:
         bam=rules.actc.output.bam,
     output:
         pbi=temp(f"{rules.actc.output.bam}.pbi"),
-    resources:
-        mem_mb=1000,
     threads: 1
     conda:
         env
@@ -104,8 +98,6 @@ rule ccs_fasta:
     output:
         fasta=temp("temp/{sm}/ccs.{scatteritem}.fasta"),
         fai=temp("temp/{sm}/ccs.{scatteritem}.fasta.fai"),
-    resources:
-        mem_mb=1000,
     threads: 4
     conda:
         env
@@ -221,8 +213,8 @@ rule merge:
     log:
         "logs/{sm}/samtools.cat.log",
     resources:
-        mem_mb=2000,
         disk_mb=8000,
+        time=120,
     threads: 4
     benchmark:
         "benchmarks/{sm}/merge.tbl"
@@ -239,9 +231,6 @@ rule index_merge:
         pbi=f"{rules.merge.output.bam}.pbi",
     conda:
         env
-    resources:
-        mem_mb=2000,
-        disk_mb=2000,
     log:
         "logs/{sm}/samtools.cat.log",
     benchmark:
