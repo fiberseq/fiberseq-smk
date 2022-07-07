@@ -34,7 +34,7 @@ rule ccs:
         txt=temp("temp/{sm}/ccs.{scatteritem}.ccs_report.txt"),
     resources:
         mem_mb=8000,
-    threads: config.get("threads", 16)
+    threads: config.get("threads", 8)
     conda:
         env
     log:
@@ -106,7 +106,7 @@ rule actc:
         fasta=temp("temp/{sm}/actc.{scatteritem}.fasta"),
     resources:
         mem_mb=4000,
-    threads: config.get("threads", 16)
+    threads: config.get("threads", 8)
     conda:
         env
     log:
@@ -170,7 +170,7 @@ rule ipdSummary:
         pbi=rules.index.output.pbi,
     output:
         csv=temp("temp/{sm}/ipdSummary.{scatteritem}.csv"),
-    threads: config.get("threads", 16)
+    threads: config.get("threads", 8)
     conda:
         env
     log:
