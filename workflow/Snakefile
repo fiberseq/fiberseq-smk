@@ -43,6 +43,7 @@ rule ccs:
         "benchmarks/{sm}/ccs.{scatteritem}.tbl"
     params:
         chunk=get_chunk,
+    priority: 0
     shell:
         """
         ccs {input.bam} {output.bam} \
@@ -68,6 +69,7 @@ rule actc:
         "logs/{sm}/actc.{scatteritem}.log",
     benchmark:
         "benchmarks/{sm}/actc.{scatteritem}.tbl"
+    priority: 10
     shell:
         """
         actc -j {threads} {input.subreads} {input.ccs} {output.bam} 2> {log}
@@ -86,6 +88,7 @@ rule index:
         "logs/{sm}/index.{scatteritem}.log",
     benchmark:
         "benchmarks/{sm}/index.{scatteritem}.tbl"
+    priority: 20
     shell:
         """
         pbindex {input.bam} &> {log}
@@ -105,6 +108,7 @@ rule ccs_fasta:
         "logs/{sm}/ccs.fasta.{scatteritem}.log",
     benchmark:
         "benchmarks/{sm}/ccs_fasta.{scatteritem}.tbl"
+    priority: 30
     shell:
         """
         samtools fasta -@ {threads} {input.ccs} > {output.fasta} 2> {log}
@@ -128,6 +132,7 @@ rule ipdSummary:
         "logs/{sm}/ipdSummary.{scatteritem}.log",
     benchmark:
         "benchmarks/{sm}/ipdSummary.{scatteritem}.tbl"
+    priority: 40
     shell:
         """
         ipdSummary \
@@ -155,6 +160,7 @@ rule gmm:
         gmm=workflow.source_path("scripts/push_m6a_to_bam.py"),
     benchmark:
         "benchmarks/{sm}/gmm.{scatteritem}.tbl"
+    priority: 50
     shell:
         """
         python {params.gmm} --threads {threads} {input.csv} {input.ccs} > {output.bam} 2> {log}
@@ -175,6 +181,7 @@ rule train_hmm:
     benchmark:
         "benchmarks/{sm}/train_hmm.tbl"
     threads: 1
+    priority: 60
     shell:
         """
         python {params.nuc} --threads {threads} {input.bam} {output.model} 2> {log}
@@ -196,6 +203,7 @@ rule nuc:
     benchmark:
         "benchmarks/{sm}/nuc.{scatteritem}.tbl"
     threads: 4
+    priority: 70
     shell:
         """
         python {params.nuc} -m {input.model} --threads {threads} {input.bam} {output.bam} 2> {log}
@@ -218,6 +226,7 @@ rule merge:
     threads: 4
     benchmark:
         "benchmarks/{sm}/merge.tbl"
+    priority: 100
     shell:
         """
         samtools cat -@ {threads} -o {output.bam} {input.bam} 2> {log}
@@ -236,6 +245,7 @@ rule index_merge:
     benchmark:
         "benchmarks/{sm}/index.tbl"
     threads: 1
+    priority: 100
     shell:
         """
         pbindex {input.bam} &> {log}
