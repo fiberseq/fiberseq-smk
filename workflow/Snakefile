@@ -5,6 +5,9 @@ scattergather:
     chunks=20,
 
 
+n_chunks = len(scatter.chunks("temp/{scatteritem}.fake"))
+
+
 wildcard_constraints:
     sm="|".join(config.keys()),
 
@@ -214,7 +217,7 @@ rule gmm:
 
 rule train_hmm:
     input:
-        bam=f"temp/{{sm}}/gmm.1-of-{2}.bam",
+        bam=f"temp/{{sm}}/gmm.1-of-{n_chunks}.bam",
     output:
         model=temp("temp/{sm}/hmm_model.json"),
     conda:
