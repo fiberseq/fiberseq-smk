@@ -97,6 +97,7 @@ rule actc:
         subreads=get_subreads,
     output:
         bam=temp("temp/{sm}/actc.{scatteritem}.bam"),
+        fasta=temp("temp/{sm}/actc.{scatteritem}.fasta"),
     resources:
         mem_mb=4000,
     threads: config.get("threads", 16)
@@ -114,7 +115,7 @@ rule actc:
 
 rule index:
     input:
-        ccs=rules.actc.output.bam,
+        bam=rules.actc.output.bam,
     output:
         pbi=temp(f"{rules.actc.output.bam}.pbi"),
     resources:
@@ -128,7 +129,7 @@ rule index:
         "benchmarks/{sm}/index.{scatteritem}.tbl"
     shell:
         """
-        pbindex {input.ccs} &> {log}
+        pbindex {input.bam} &> {log}
         """
 
 
@@ -267,6 +268,7 @@ rule nuc:
 rule merge:
     input:
         bam=gather.chunks(rules.nuc.output.bam, allow_missing=True),
+        bam=gather.chunks(rules.ccs.output.pbi, allow_missing=True),
     output:
         bam="results/{sm}/unaligned.m6a.bam",
     conda:
