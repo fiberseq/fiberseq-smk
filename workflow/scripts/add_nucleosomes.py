@@ -10,6 +10,21 @@ import argparse
 import logging
 import pomegranate as pom
 import tqdm
+from applyHMM import *
+
+
+def assign_states(model):
+    s0 = dict(model.states[0].distribution.parameters[0])
+    s1 = dict(model.states[1].distribution.parameters[0])
+    s0_m6a_probability, s1_m6a_probability = s0[1], s1[1]
+    if s0_m6a_probability > s1_m6a_probability:
+        actuated = 0
+        nucleated = 1
+    else:
+        actuated = 1
+        nucleated = 0
+
+    return actuated, nucleated
 
 
 def get_mods_from_rec(rec, mods=[("A", 0, "a"), ("T", 1, "a")], mask=True, binary=True):
@@ -65,6 +80,9 @@ def parse():
         default=5000,
     )
     parser.add_argument(
+        "-c", "--cutoff", type=int, default=65, help="hmm nucleosome size cutoff"
+    )
+    parser.add_argument(
         "out",
         help="Output bam or json file.",
         type=argparse.FileType("w"),
@@ -94,6 +112,9 @@ def main():
             handle.write(json_model)
     else:
         out = pysam.AlignmentFile(args.out, "wb", template=bam)
+        hmm = pom.HiddenMarkovModel().from_json(args.model)
+        _actuated_label, nucleated_label = assign_states(hmm)
+        apply_hmm(bam, hmm, nucleated_label, args.cutoff)
 
     return 0
 

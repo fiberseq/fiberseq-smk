@@ -37,6 +37,7 @@ rule ccs:
         """
 
 
+# no longer used
 rule zmws:
     input:
         bam=rules.ccs.output.bam,
@@ -57,6 +58,7 @@ rule zmws:
         """
 
 
+# no longer used
 rule subreads:
     input:
         bam=get_subreads,
@@ -81,7 +83,7 @@ rule subreads:
 rule actc:
     input:
         ccs=rules.ccs.output.bam,
-        subreads=rules.subreads.output.bam,
+        subreads=get_subreads,
     output:
         bam=temp("temp/{sm}/actc.{scatteritem}.bam"),
     resources:
@@ -103,7 +105,6 @@ rule index:
     input:
         ccs=rules.actc.output.bam,
     output:
-        #bai=temp(f"{rules.actc.output.bam}.bai"),
         pbi=temp(f"{rules.actc.output.bam}.pbi"),
     resources:
         mem_mb=1000,
@@ -117,7 +118,6 @@ rule index:
     shell:
         """
         pbindex {input.ccs} &> {log}
-        #samtools index {input.ccs} &>> {log}
         """
 
 
