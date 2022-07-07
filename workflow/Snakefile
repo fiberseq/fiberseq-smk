@@ -212,9 +212,52 @@ rule gmm:
         """
 
 
+rule train_hmm:
+    input:
+        bam=f"temp/{{sm}}/gmm.1-of-{20}.bam",
+    output:
+        model=temp("temp/{sm}/hmm_model.json"),
+    conda:
+        "envs/env.yml"
+    log:
+        "logs/{sm}/train_hmm.log",
+    params:
+        nuc=workflow.source_path("scripts/add_nucleosomes.py"),
+        utils=workflow.source_path("scripts/hmmutils.py"),
+    benchmark:
+        "benchmarks/{sm}/train_hmm.tbl"
+    threads: 4
+    shell:
+        """
+        python {params.nuc} --threads {threads} {input.bam} {output.model} 2> {log}
+        """
+
+
+rule nuc:
+    input:
+        bam=rules.gmm.output.bam,
+        model=rules.train_hmm.output.model,
+    output:
+        bam=temp("temp/{sm}/nuc.{scatteritem}.bam"),
+    conda:
+        "envs/env.yml"
+    log:
+        "logs/{sm}/nuc.{scatteritem}.log",
+    params:
+        nuc=workflow.source_path("scripts/add_nucleosomes.py"),
+        utils=workflow.source_path("scripts/hmmutils.py"),
+    benchmark:
+        "benchmarks/{sm}/nuc.{scatteritem}.tbl"
+    threads: 4
+    shell:
+        """
+        python {params.nuc} -m {input.model} --threads {threads} {input.bam} {output.bam} 2> {log}
+        """
+
+
 rule merge:
     input:
-        bam=gather.chunks(rules.gmm.output.bam, allow_missing=True),
+        bam=gather.chunks(rules.nuc.output.bam, allow_missing=True),
     output:
         bam="results/{sm}/unaligned.m6a.bam",
     conda:

@@ -257,7 +257,6 @@ def apply_hmm(bam, hmm, nuc_label, cutoff, out):
 
 
 def simpleFind(methylated_positions, binary, cutoff):
-
     """Using an array of methylated positions
     calculate the spacing between each methylation.
     If the distance between two methylations > 85 then

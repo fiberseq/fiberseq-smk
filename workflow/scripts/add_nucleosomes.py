@@ -64,9 +64,11 @@ def main():
     bam = pysam.AlignmentFile(args.bam, threads=args.threads, check_sq=False)
     if args.model is None:
         training_set = []
-        for rec in bam.fetch(until_eof=True):
+        for idx, rec in enumerate(bam.fetch(until_eof=True)):
             mods, _AT_pos, _m6a_pos = get_mods_from_rec(rec, mask=True)
             training_set.append(mods)
+            if idx >= args.num_train:
+                break
         model = train_hmm(training_set, n_jobs=args.threads)
         json_model = model.to_json()
         with args.out as handle:
