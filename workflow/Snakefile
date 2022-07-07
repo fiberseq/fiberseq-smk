@@ -5,6 +5,7 @@ scattergather:
     chunks=20,
 
 
+env = config.get("env", "envs/env.yml")
 n_chunks = len(scatter.chunks("temp/{scatteritem}.fake"))
 
 
@@ -30,7 +31,7 @@ rule ccs:
         mem_mb=8000,
     threads: config.get("threads", 16)
     conda:
-        "envs/env.yml"
+        env
     log:
         "logs/{sm}/ccs.{scatteritem}.log",
     benchmark:
@@ -58,7 +59,7 @@ rule zmws:
         mem_mb=1000,
     threads: 1
     conda:
-        "envs/env.yml"
+        env
     log:
         "logs/{sm}/zmw.{scatteritem}.log",
     benchmark:
@@ -80,7 +81,7 @@ rule subreads:
         mem_mb=2000,
     threads: 1
     conda:
-        "envs/env.yml"
+        env
     log:
         "logs/{sm}/subreads.{scatteritem}.log",
     benchmark:
@@ -102,7 +103,7 @@ rule actc:
         mem_mb=4000,
     threads: config.get("threads", 16)
     conda:
-        "envs/env.yml"
+        env
     log:
         "logs/{sm}/actc.{scatteritem}.log",
     benchmark:
@@ -122,7 +123,7 @@ rule index:
         mem_mb=1000,
     threads: 1
     conda:
-        "envs/env.yml"
+        env
     log:
         "logs/{sm}/index.{scatteritem}.log",
     benchmark:
@@ -143,7 +144,7 @@ rule ccs_fasta:
         mem_mb=1000,
     threads: 4
     conda:
-        "envs/env.yml"
+        env
     log:
         "logs/{sm}/ccs.fasta.{scatteritem}.log",
     benchmark:
@@ -166,7 +167,7 @@ rule ipdSummary:
         csv=temp("temp/{sm}/ipdSummary.{scatteritem}.csv"),
     threads: config.get("threads", 16)
     conda:
-        "envs/env.yml"
+        env
     log:
         "logs/{sm}/ipdSummary.{scatteritem}.log",
     benchmark:
@@ -192,7 +193,7 @@ rule compress_csv:
         mem_mb=1000,
     threads: 4
     conda:
-        "envs/env.yml"
+        env
     log:
         "logs/{sm}/ipdSummary.{scatteritem}.log",
     benchmark:
@@ -211,7 +212,7 @@ rule gmm:
         bam=temp("temp/{sm}/gmm.{scatteritem}.bam"),
     threads: 4
     conda:
-        "envs/env.yml"
+        env
     log:
         "logs/{sm}/gmm.{scatteritem}.log",
     params:
@@ -230,7 +231,7 @@ rule train_hmm:
     output:
         model=temp("temp/{sm}/hmm_model.json"),
     conda:
-        "envs/env.yml"
+        env
     log:
         "logs/{sm}/train_hmm.log",
     params:
@@ -251,7 +252,7 @@ rule nuc:
     output:
         bam=temp("temp/{sm}/nuc.{scatteritem}.bam"),
     conda:
-        "envs/env.yml"
+        env
     log:
         "logs/{sm}/nuc.{scatteritem}.log",
     params:
@@ -272,7 +273,7 @@ rule merge:
     output:
         bam="results/{sm}/unaligned.m6a.bam",
     conda:
-        "envs/env.yml"
+        env
     log:
         "logs/{sm}/samtools.cat.log",
     resources:
@@ -292,7 +293,7 @@ rule index_merge:
     output:
         pbi=f"{rules.merge.output.bam}.pbi",
     conda:
-        "envs/env.yml"
+        env
     resources:
         mem_mb=2000,
     log:
