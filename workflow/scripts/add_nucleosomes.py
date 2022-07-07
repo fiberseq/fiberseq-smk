@@ -1,60 +1,21 @@
 #!/usr/bin/env python3
-from operator import mod
 import pysam
-import sys
-import numpy as np
-from tqdm import tqdm
-import pandas as pd
 import numpy as np
 import argparse
 import logging
 import pomegranate as pom
-import tqdm
-from applyHMM import *
+from hmmutils import *
 
 
-def assign_states(model):
-    s0 = dict(model.states[0].distribution.parameters[0])
-    s1 = dict(model.states[1].distribution.parameters[0])
-    s0_m6a_probability, s1_m6a_probability = s0[1], s1[1]
-    if s0_m6a_probability > s1_m6a_probability:
-        actuated = 0
-        nucleated = 1
-    else:
-        actuated = 1
-        nucleated = 0
-
-    return actuated, nucleated
-
-
-def get_mods_from_rec(rec, mods=[("A", 0, "a"), ("T", 1, "a")], mask=True, binary=True):
-    seq = np.frombuffer(bytes(rec.query_sequence, "utf-8"), dtype="S1")
-    positions = []
-    for mod in mods:
-        if mod in rec.modified_bases:
-            pos = np.array(rec.modified_bases[mod])[:, 0]
-            positions.append(pos)
-    methylated_positions = np.concatenate(positions)
-    methylated_positions.sort(kind="mergesort")
-    if binary:
-        binary = np.zeros(shape=len(seq), dtype=bool)
-        binary[methylated_positions] = 1
-        if mask:
-            # TODO check for other mods
-            return binary[(seq == b"A") | (seq == b"T")]
-        return binary
-    return methylated_positions
-
-
-def train_hmm(data, output):
+def train_hmm(data, n_jobs=4):
     model = pom.HiddenMarkovModel().from_samples(
         pom.DiscreteDistribution,
         n_components=2,
         X=data,
         verbose=True,
-        n_jobs=1,
-        max_iterations=10,  # 250,
+        max_iterations=250,
         n_init=10,
+        n_jobs=n_jobs,
     )
     model.bake()
     return model
@@ -104,9 +65,9 @@ def main():
     if args.model is None:
         training_set = []
         for rec in bam.fetch(until_eof=True):
-            mods = get_mods_from_rec(rec, binary=True, mask=True)
+            mods, _AT_pos, _m6a_pos = get_mods_from_rec(rec, mask=True)
             training_set.append(mods)
-        model = train_hmm(training_set, args.out)
+        model = train_hmm(training_set, n_jobs=args.threads)
         json_model = model.to_json()
         with args.out as handle:
             handle.write(json_model)
@@ -114,7 +75,7 @@ def main():
         out = pysam.AlignmentFile(args.out, "wb", template=bam)
         hmm = pom.HiddenMarkovModel().from_json(args.model)
         _actuated_label, nucleated_label = assign_states(hmm)
-        apply_hmm(bam, hmm, nucleated_label, args.cutoff)
+        apply_hmm(bam, hmm, nucleated_label, args.cutoff, out)
 
     return 0
 
