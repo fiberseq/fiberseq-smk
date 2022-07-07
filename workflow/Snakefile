@@ -23,6 +23,9 @@ rule ccs:
         bam=get_subreads,
     output:
         bam=temp("temp/{sm}/ccs.{scatteritem}.bam"),
+        pbi=temp("temp/{sm}/ccs.{scatteritem}.bam.pbi"),
+        json=temp("temp/{sm}/ccs.{scatteritem}.zmw_metrics.json.gz"),
+        txt=temp("temp/{sm}/ccs.{scatteritem}.ccs_report.txt"),
     resources:
         mem_mb=8000,
     threads: config.get("threads", 16)
@@ -36,7 +39,12 @@ rule ccs:
         chunk=get_chunk,
     shell:
         """
-        ccs {input.bam} {output.bam} --hifi-kinetics -j {threads} --chunk {params.chunk} &> {log}
+        ccs {input.bam} {output.bam} \
+            --metrics-json {output.json} \
+            --report-file {output.txt} \
+            --hifi-kinetics -j {threads} \
+            --chunk {params.chunk} \
+        &> {log}
         """
 
 
