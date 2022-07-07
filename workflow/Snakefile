@@ -5,7 +5,7 @@ scattergather:
     chunks=20,
 
 
-env = config.get("env", "envs/env.yml")
+env = config.pop("env", "envs/env.yml")
 n_chunks = len(scatter.chunks("temp/{scatteritem}.fake"))
 
 
