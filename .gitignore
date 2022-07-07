@@ -9,3 +9,4 @@ benchmarks/**
 **__pycache__**
 tmp.**
 temp.**
+.vscode/**
