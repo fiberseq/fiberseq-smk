@@ -22,7 +22,7 @@ rerun-triggers: mtime
 cluster-cancel: scancel
 cluster-cancel-nargs: 1000
 set-scatter:
-  - chunks=2
+  - chunks=2000
 restart-times: 2
 printshellcmds: True
 reason: True
