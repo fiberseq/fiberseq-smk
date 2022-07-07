@@ -38,17 +38,15 @@ def apply_gmm(csv, bam, out, min_prediction_value=0.99999999, min_number_of_call
             out.write(rec)
             continue
         molecule_df = csv.loc[rec.query_name]
-        # ec = molecule_df["coverage"].mean()  # effective coverage
-        # data = molecule_df[["tpl", "ipdRatio"]].to_numpy().transpose()
-        # tpl = data[0].astype(int)
-        # ipdRatios = data[1].reshape(-1, 1)
+
+        # if there are not enough m6a calls, skip
+        if molecule_df.shape[0] < min_number_of_calls:
+            out.write(rec)
+            continue
 
         # convert to zero based
         tpl = molecule_df.tpl.values - 1
         ipdRatios = molecule_df.ipdRatio.values.reshape(-1, 1)
-        # logging.debug(f"{rec.query_name} {tpl.shape} {ipdRatios.shape}")
-        if int(ipdRatios.shape[0]) < min_number_of_calls:
-            continue
 
         gmm = GaussianMixture(
             n_components=2, n_init=3, max_iter=500, covariance_type="full", tol=1e-5
