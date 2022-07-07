@@ -44,8 +44,8 @@ def apply_gmm(csv, bam, out, min_prediction_value=0.99999999, min_number_of_call
         # ipdRatios = data[1].reshape(-1, 1)
 
         # convert to zero based
-        tpl = molecule_df.tpl.to_numpy() - 1
-        ipdRatios = molecule_df.ipdRatio.to_numpy().reshape(-1, 1)
+        tpl = molecule_df.tpl.values - 1
+        ipdRatios = molecule_df.ipdRatio.values.reshape(-1, 1)
         # logging.debug(f"{rec.query_name} {tpl.shape} {ipdRatios.shape}")
         if int(ipdRatios.shape[0]) < min_number_of_calls:
             continue
