@@ -83,6 +83,7 @@ def apply_gmm(csv, bam, out, min_prediction_value=0.99999999, min_number_of_call
             rec.set_tags(new_tags)
         else:
             rec.tags += [("MM:Z:", mods)]
+            rec.tags += [("ML:C:", new_probabilities)]
         out.write(rec)
 
 
