@@ -62,6 +62,9 @@ def apply_gmm(csv, bam, out, min_prediction_value=0.99999999, min_number_of_call
         sequence = np.frombuffer(bytes(rec.query_sequence, "utf-8"), dtype="S1")
         mod_count = ((sequence[mol_m6a] == b"A") | (sequence[mol_m6a] == b"T")).sum()
         assert mol_m6a.shape[0] == mod_count, f"{mol_m6a.shape[0]} != {mod_count}"
+        if mod_count < 1:
+            out.write(rec)
+            continue
 
         # add modifications to bam
         A_mods = coordinateConversion_MMTag(sequence, "A", mol_m6a)
