@@ -101,7 +101,7 @@ rule ccs_fasta:
     output:
         fasta=temp("temp/{sm}/ccs.{scatteritem}.fasta"),
         fai=temp("temp/{sm}/ccs.{scatteritem}.fasta.fai"),
-    threads: 4
+    threads: 1
     conda:
         env
     log:
@@ -130,7 +130,6 @@ rule ipdSummary:
         env
     resources:
         time=80,
-    threads: 8
     log:
         "logs/{sm}/ipdSummary.{scatteritem}.log",
     benchmark:
