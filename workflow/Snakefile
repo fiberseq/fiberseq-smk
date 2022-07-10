@@ -55,6 +55,28 @@ rule ccs:
         """
 
 
+rule primrose:
+    input:
+        bam=rules.ccs.output.bam,
+    output:
+        bam=temp("temp/{sm}/primrose.{scatteritem}.bam"),
+    threads: config.get("threads", 8)
+    conda:
+        env
+    log:
+        "logs/{sm}/primrose.{scatteritem}.log",
+    benchmark:
+        "benchmarks/{sm}/primrose.{scatteritem}.tbl"
+    priority: 0
+    shell:
+        """
+        primrose --min-passes 3 -j {threads} \
+             --keep-kinetics \
+            {input.bam} {output.bam} \
+            &> {log}
+        """
+
+
 rule actc:
     input:
         ccs=rules.ccs.output.bam,
@@ -182,6 +204,9 @@ rule train_hmm:
         nuc=workflow.source_path("scripts/add_nucleosomes.py"),
     benchmark:
         "benchmarks/{sm}/train_hmm.tbl"
+    resources:
+        disk_mb=16000,
+        time=200,
     threads: 1
     priority: 60
     shell:
