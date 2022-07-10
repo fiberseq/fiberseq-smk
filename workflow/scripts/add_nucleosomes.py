@@ -76,6 +76,8 @@ def assign_states(model):
 
 
 def get_mods_from_rec(rec, mods=[("A", 0, "a"), ("T", 1, "a")], mask=True):
+    if rec.modified_bases is None:
+        return None, None, None
     seq = np.frombuffer(bytes(rec.query_sequence, "utf-8"), dtype="S1")
     positions = []
     for mod in mods:
