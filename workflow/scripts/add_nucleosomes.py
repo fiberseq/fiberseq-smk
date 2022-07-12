@@ -43,6 +43,13 @@ def parse():
         default=5000,
     )
     parser.add_argument(
+        "-d",
+        "--min-dist",
+        help="Minimum distance from the start or end of a fiber for a accessible or nucelosome call.",
+        type=int,
+        default=46,
+    )
+    parser.add_argument(
         "-c", "--cutoff", type=int, default=65, help="hmm nucleosome size cutoff"
     )
     parser.add_argument(
@@ -225,7 +232,7 @@ def meshMethods(
     # next check that it is flanked by 0s
 
 
-def apply_hmm(bam, hmm, nuc_label, cutoff, out):
+def apply_hmm(bam, hmm, nuc_label, cutoff, out, min_dist=46):
     for rec in bam.fetch(until_eof=True):
         (
             binary,
@@ -308,16 +315,43 @@ def apply_hmm(bam, hmm, nuc_label, cutoff, out):
             output_starts = np.concatenate([[front_terminal_nuc_start], all_starts])
             output_sizes = np.concatenate([[front_terminal_nuc_size], all_sizes])
 
-        rec.set_tag("ns", array.array("I", output_starts))
-        rec.set_tag("nl", array.array("I", output_sizes))
-        # print(output_starts)
-        # print(output_sizes)
-        # split_line[-3] = str(len(output_starts))
-        # split_line[-1] = ",".join(list(output_starts.astype(str)))
-        # split_line[-2] = ",".join(list(output_sizes.astype(str)))
-        # print("\t".join(split_line))
-        # print(rec.get_tag("ns"))
-        # print(rec.get_tag("nl"))
+        # make the acc arrays
+        acc_starts = (output_starts + output_sizes)[:-1]
+        acc_ends = output_starts[1:]
+        acc_sizes = acc_ends - acc_starts
+
+        # nucs always bookend the fiber, but now changing that here
+        assert (
+            output_starts[0] == 0
+            and output_starts[-1] + output_sizes[-1] == fiber_length
+        )
+        output_starts = output_starts[1:-1]
+        output_sizes = output_sizes[1:-1]
+        # check that nuclesomes are not too close to the ends of the fiber
+        # cond = (output_starts >= min_dist) & (
+        #    (output_starts + output_sizes) <= (fiber_length - min_dist)
+        # )
+        # output_starts = output_starts[cond]
+        # output_sizes = output_sizes[cond]
+
+        # check that accessible elements are not too close to the ends of the fiber
+        cond = (acc_starts >= min_dist) & (
+            (acc_starts + acc_sizes) <= (fiber_length - min_dist)
+        )
+        # logging.debug("{}".format(cond))
+        # logging.debug(f"{acc_starts}\n{output_starts}\n")
+        acc_starts = acc_starts[cond]
+        acc_sizes = acc_sizes[cond]
+
+        logging.debug("{} {}".format(output_sizes.shape, acc_sizes.shape))
+
+        if output_sizes.shape[0] > 0:
+            rec.set_tag("ns", array.array("I", output_starts))
+            rec.set_tag("nl", array.array("I", output_sizes))
+        if acc_sizes.shape[0] > 0:
+            rec.set_tag("as", array.array("I", acc_starts))
+            rec.set_tag("al", array.array("I", acc_sizes))
+
         out.write(rec)
 
 
@@ -487,7 +521,7 @@ def main():
         out = pysam.AlignmentFile(args.out, "wb", template=bam)
         hmm = pom.HiddenMarkovModel().from_json(args.model)
         _actuated_label, nucleated_label = assign_states(hmm)
-        apply_hmm(bam, hmm, nucleated_label, args.cutoff, out)
+        apply_hmm(bam, hmm, nucleated_label, args.cutoff, out, min_dist=args.min_dist)
 
     return 0
 
