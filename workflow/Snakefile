@@ -79,7 +79,7 @@ rule primrose:
 
 rule actc:
     input:
-        ccs=rules.ccs.output.bam,
+        ccs=rules.primrose.output.bam,
         subreads=get_subreads,
     output:
         bam=temp("temp/{sm}/actc.{scatteritem}.bam"),
