@@ -7,7 +7,7 @@ def get_subreads(wc):
     return config[wc.sm]
 
 
-def align_results():
+def align_results(sm):
     if "ref" in config:
-        return "results/{sm}/aligned.m6a.bam"
+        return expand("results/{sm}/aligned.m6a.bam", sm=sm)
     return []
