@@ -7,7 +7,7 @@ def get_subreads(wc):
     return config[wc.sm]
 
 
-def align_results(wc):
+def align_results():
     if "ref" in config:
         return rules.align.output
     return []
