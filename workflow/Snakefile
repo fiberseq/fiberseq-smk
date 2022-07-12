@@ -22,6 +22,7 @@ rule all:
     input:
         expand("results/{sm}/unaligned.m6a.bam", sm=list(config.keys())),
         expand("results/{sm}/unaligned.m6a.bam.pbi", sm=list(config.keys())),
+        align_results,
 
 
 rule ccs:
@@ -276,4 +277,31 @@ rule index_merge:
     shell:
         """
         pbindex {input.bam} &> {log}
+        """
+
+
+rule align:
+    input:
+        bam=rules.merge.output.bam,
+    output:
+        bam="results/{sm}/aligned.m6a.bam",
+        bai="results/{sm}/aligned.m6a.bam.bai",
+    conda:
+        env
+    log:
+        "logs/{sm}/align.log",
+    resources:
+        disk_mb=8000,
+        time=240,
+    threads: 40
+    benchmark:
+        "benchmarks/{sm}/align.tbl"
+    priority: 200
+    shell:
+        """
+        pbmm2 align \
+            -j {threads} \
+            --preset CCS --sort \
+            {input.ref} {input.bam} {output.bam} \
+        2> {log}
         """

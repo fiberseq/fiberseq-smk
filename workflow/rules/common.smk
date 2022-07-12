@@ -5,3 +5,9 @@ def get_chunk(wc):
 
 def get_subreads(wc):
     return config[wc.sm]
+
+
+def align_results(wc):
+    if "ref" in config:
+        return rules.align.output
+    return []
