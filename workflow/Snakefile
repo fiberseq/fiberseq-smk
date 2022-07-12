@@ -119,7 +119,7 @@ rule index:
 
 rule ccs_fasta:
     input:
-        ccs=rules.ccs.output.bam,
+        ccs=rules.primrose.output.bam,
     output:
         fasta=temp("temp/{sm}/ccs.{scatteritem}.fasta"),
         fai=temp("temp/{sm}/ccs.{scatteritem}.fasta.fai"),
@@ -171,7 +171,7 @@ rule ipdSummary:
 
 rule gmm:
     input:
-        ccs=rules.ccs.output.bam,
+        ccs=rules.primrose.output.bam,
         csv=rules.ipdSummary.output.csv,
     output:
         bam=temp("temp/{sm}/gmm.{scatteritem}.bam"),
