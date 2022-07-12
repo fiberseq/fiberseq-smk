@@ -283,6 +283,7 @@ rule index_merge:
 rule align:
     input:
         bam=rules.merge.output.bam,
+        ref=config["ref"],
     output:
         bam="results/{sm}/aligned.m6a.bam",
         bai="results/{sm}/aligned.m6a.bam.bai",
