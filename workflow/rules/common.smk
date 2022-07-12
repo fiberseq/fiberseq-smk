@@ -8,6 +8,6 @@ def get_subreads(wc):
 
 
 def align_results(sm):
-    if "ref" in config:
+    if ref is not None:
         return expand("results/{sm}/aligned.m6a.bam", sm=sm)
     return []
