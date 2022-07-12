@@ -22,7 +22,7 @@ rule all:
     input:
         expand("results/{sm}/unaligned.m6a.bam", sm=list(config.keys())),
         expand("results/{sm}/unaligned.m6a.bam.pbi", sm=list(config.keys())),
-        align_results,
+        expand(align_results, sm=list(config.keys())),
 
 
 rule ccs:
