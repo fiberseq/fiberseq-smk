@@ -9,5 +9,5 @@ def get_subreads(wc):
 
 def align_results():
     if "ref" in config:
-        return rules.align.output
-    return []
+        return "results/{sm}/aligned.m6a.bam"
+    return None
