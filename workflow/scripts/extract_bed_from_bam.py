@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+from black import out
 import pysam
 import numpy as np
 import argparse
@@ -7,7 +8,7 @@ import sys
 from numba import njit
 
 # C+m
-CPG_MODS = ["C", 0, "m"]
+CPG_MODS = [("C", 0, "m")]
 M6A_MODS = [("A", 0, "a"), ("T", 1, "a")]
 
 
@@ -56,16 +57,24 @@ def liftover_helper(aligned_pairs, sts, ens, query_length, is_reverse=False):
     if is_reverse:
         new_st = query_length - ens
         new_en = query_length - sts
-        sts = new_st
-        ens = new_en
+        sts = new_st[::-1]
+        ens = new_en[::-1]
 
-    # TODO filter for sts and ends within alignment
+    # search of closest matching index
     st_idxs = np.searchsorted(read_pos, sts, side="left")
-    ed_idxs = np.searchsorted(read_pos, ens, side="left")
+    en_idxs = np.searchsorted(read_pos, ens, side="left")
+    ## remove things that are past the end of the read
+    st_idxs[st_idxs >= ref_pos.shape[0]] = ref_pos.shape[0] - 1
+    en_idxs[en_idxs >= ref_pos.shape[0]] = ref_pos.shape[0] - 1
+    # get the ref positions
     ref_sts = ref_pos[st_idxs]
-    ref_ens = ref_pos[ed_idxs]
-    print(aligned_pairs)
-    return ref_sts, ref_ens
+    ref_ens = ref_pos[en_idxs]
+
+    # remove zero length liftovers (past start or end of alignment)
+    keep_idx = ref_ens - ref_sts > 0
+    if (~keep_idx).any():
+        logging.debug(f"removing {(~keep_idx).sum()} zero length liftovers.")
+    return ref_sts[keep_idx], ref_ens[keep_idx]
 
 
 def liftover(rec, sts, ens, aligned_pairs=None):
@@ -87,17 +96,34 @@ def write_bed12(rec, starts, output, lengths=None, aligned_pairs=None):
     passes = round(rec.get_tag("ec"))
     rgb = "0,0,0"
 
-    # bed 6
-    output.write(
-        f"{rec.query_name}\t0\t{rec.query_length}\t{rec.query_name}\t{passes}\t{strand}\t"
-    )
+    if aligned_pairs is None:
+        ct, st, en = rec.query_name, 0, rec.query_length
+    else:
+        ct, st, en = rec.reference_name, rec.reference_start, rec.reference_end
+
+    # write bed 6
+    output.write(f"{ct}\t{st}\t{en}\t{rec.query_name}\t{passes}\t{strand}\t")
+    # think start and end
+    output.write(f"{st}\t{en}\t")
+
+    # add lengths if none are provided
     if lengths is None:
         lengths = np.ones(starts.shape, dtype=int)
+
+    if aligned_pairs is not None:
+        l_sts, l_ens = liftover(
+            rec, starts, starts + lengths, aligned_pairs=aligned_pairs
+        )
+        l_len = l_ens - l_sts
+        l_sts -= rec.reference_start
+        starts = l_sts
+        lengths = l_len
+
     bc = starts.shape[0]
     bs = ",".join(starts.astype(str))
     bl = ",".join(lengths.astype(str))
     # bed 12
-    output.write(f"0\t{rec.query_length}\t{rgb}\t{bc}\t{bl}\t{bs}\n")
+    output.write(f"{rgb}\t{bc}\t{bl}\t{bs}\n")
 
 
 def extract(bam, args):
@@ -112,7 +138,7 @@ def extract(bam, args):
                 continue
             liftover(rec, ns, ns + nl, aligned_pairs=aligned_pairs)
             write_bed12(rec, ns, args.nuc, lengths=nl, aligned_pairs=aligned_pairs)
-            break
+            # break
         if args.acc is not None:
             acc_s, acc_l = get_accessible(rec)
             write_bed12(
