@@ -5,8 +5,13 @@ import argparse
 import logging
 import pomegranate as pom
 import array
+import git
 
-# from hmmutils import *
+
+def get_commit_hash(short=7):
+    repo = git.Repo(search_parent_directories=True)
+    sha = repo.head.commit.hexsha
+    return repo.git.rev_parse(sha, short=short)
 
 
 def train_hmm(data, n_jobs=1):
