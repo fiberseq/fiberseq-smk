@@ -1,6 +1,4 @@
 #!/usr/bin/env python3
-from tracemalloc import start
-from black import out
 import pysam
 import numpy as np
 import argparse
