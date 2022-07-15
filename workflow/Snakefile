@@ -22,9 +22,8 @@ wildcard_constraints:
 
 rule all:
     input:
-        expand("results/{sm}/unaligned.m6a.bam", sm=list(config.keys())),
-        expand("results/{sm}/unaligned.m6a.bam.pbi", sm=list(config.keys())),
-        expand("results/{sm}/unaligned.m6a.bam.pbi", sm=list(config.keys())),
+        expand("results/{sm}/unaligned.fiberseq.bam", sm=list(config.keys())),
+        expand("results/{sm}/unaligned.fiberseq.bam.pbi", sm=list(config.keys())),
         align_results(list(config.keys())),
         expand(
             "results/{sm}/{aligned}.{data}.bed.gz",
@@ -252,7 +251,7 @@ rule merge:
         bam=gather.chunks(rules.nuc.output.bam, allow_missing=True),
         pbi=gather.chunks(rules.ccs.output.pbi, allow_missing=True),
     output:
-        bam="results/{sm}/unaligned.m6a.bam",
+        bam="results/{sm}/unaligned.fiberseq.bam",
     conda:
         env
     log:
@@ -294,8 +293,8 @@ rule align:
         bam=rules.merge.output.bam,
         ref=ref,
     output:
-        bam="results/{sm}/aligned.m6a.bam",
-        bai="results/{sm}/aligned.m6a.bam.bai",
+        bam="results/{sm}/aligned.fiberseq.bam",
+        bai="results/{sm}/aligned.fiberseq.bam.bai",
     conda:
         env
     log:
