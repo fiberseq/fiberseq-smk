@@ -358,7 +358,7 @@ rule make_beds:
 
 rule compress_bed:
     input:
-        bed="results/{sm}/{aligned}.{data}.bed",
+        bed="temp/{sm}/{aligned}.{data}.bed",
     output:
         bed="results/{sm}/{aligned}.{data}.bed.gz",
     conda:
