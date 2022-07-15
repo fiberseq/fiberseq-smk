@@ -31,6 +31,11 @@ rule all:
             sm=list(config.keys()),
             data=output_types,
         ),
+        expand(
+            "results/{sm}/aligned.{data}.bed.bb",
+            sm=list(config.keys()),
+            data=output_types,
+        ),
 
 
 rule ccs:
@@ -320,10 +325,10 @@ rule make_aligned_beds:
     input:
         bam="results/{sm}/{aligned}.fiberseq.bam",
     output:
-        cpg=pipe("results/{sm}/{aligned}.cpg.bed"),
-        msp=pipe("results/{sm}/{aligned}.msp.bed"),
-        m6a=pipe("results/{sm}/{aligned}.m6a.bed"),
-        nuc=pipe("results/{sm}/{aligned}.nuc.bed"),
+        cpg=temp("temp/{sm}/{aligned}.cpg.bed"),
+        msp=temp("temp/{sm}/{aligned}.msp.bed"),
+        m6a=temp("temp/{sm}/{aligned}.m6a.bed"),
+        nuc=temp("temp/{sm}/{aligned}.nuc.bed"),
     conda:
         env
     log:
@@ -357,11 +362,30 @@ rule compress_bed:
         env
     log:
         "logs/{sm}/compress_bed_{aligned}_{data}.log",
-    threads: 2
+    threads: 4
     benchmark:
         "benchmarks/{sm}/compress_bed_{aligned}_{data}.tbl"
     priority: 300
     shell:
         """
         cat {input.bed} | bgzip -@ {threads} > {output.bed}
+        """
+
+
+rule bigbed:
+    input:
+        fai=f"{ref}.fai",
+        bed="results/{sm}/aligned.{data}.bed",
+    output:
+        bb="results/{sm}/aligned.{data}.bed.bb",
+    conda:
+        env
+    log:
+        "logs/{sm}/bigbed_{data}.log",
+    benchmark:
+        "benchmarks/{sm}/bigbed_{data}.tbl"
+    priority: 300
+    shell:
+        """
+        bedToBigBed {input.bed} {input.fai} {output.bb}
         """
