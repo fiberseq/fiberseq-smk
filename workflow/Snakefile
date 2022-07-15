@@ -356,11 +356,11 @@ rule compress_bed:
         env
     log:
         "logs/{sm}/compress_bed_{aligned}_{data}.log",
-    threads: 4
+    threads: 2
     benchmark:
         "benchmarks/{sm}/compress_bed_{aligned}_{data}.tbl"
     priority: 300
     shell:
         """
-        bgzip -@ {threads} {input.bed} -c > {output.bed}
+        cat {input.bed} | bgzip -@ {threads} > {output.bed}
         """
