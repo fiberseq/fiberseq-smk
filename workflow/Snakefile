@@ -14,10 +14,13 @@ env = config.pop("env", "envs/env.yml")
 ref = config.pop("ref", None)
 n_chunks = len(scatter.chunks("temp/{scatteritem}.fake"))
 output_types = ["m6a", "cpg", "nuc", "msp"]
+aligned = (["aligned", "unaligned"],)
 
 
 wildcard_constraints:
     sm="|".join(config.keys()),
+    data="|".join(output_types),
+    aligned="|".join(aligned),
 
 
 rule all:
@@ -27,7 +30,7 @@ rule all:
         align_results(list(config.keys())),
         expand(
             "results/{sm}/{aligned}.{data}.bed.gz",
-            aligned=["aligned", "unaligned"],
+            aligned=aligned,
             sm=list(config.keys()),
             data=output_types,
         ),
