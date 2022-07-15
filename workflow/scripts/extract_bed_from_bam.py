@@ -102,7 +102,7 @@ def make_bed_blocks(starts, lengths, st, en):
         o_lengths += str(t_en) + ","
         bc += 1
     if starts[-1] + lengths[-1] != en:
-        o_starts += str(en - st) - 2 + ","
+        o_starts += str(en - st) - 1 + ","
         o_lengths += "1,"
         bc += 1
     return bc, o_starts[:-1], o_lengths[:-1]

@@ -321,7 +321,7 @@ rule align:
         """
 
 
-rule make_aligned_beds:
+rule make_beds:
     input:
         bam="results/{sm}/{aligned}.fiberseq.bam",
     output:
