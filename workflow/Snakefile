@@ -307,3 +307,34 @@ rule align:
             {input.ref} {input.bam} {output.bam} \
         2> {log}
         """
+
+
+rule make_aligned_beds:
+    input:
+        bam=rules.merge.output.bam,
+    output:
+        cpg="results/{sm}/aligned.m6a.cpg.bed",
+        msp="results/{sm}/aligned.m6a.msp.bed",
+        m6a="results/{sm}/aligned.m6a.m6a.bed",
+        nuc="results/{sm}/aligned.m6a.nuc.bed",
+    conda:
+        env
+    log:
+        "logs/{sm}/{rule}.log",
+    resources:
+        disk_mb=8000,
+        time=240,
+    threads: 4
+    benchmark:
+        "benchmarks/{sm}/{rule}.tbl"
+    params:
+        extract=workflow.source_path("scripts/extract_bed_from_bam.py"),
+    priority: 300
+    shell:
+        """
+        python {params.extract} \
+            {input.bam} \
+             --cpg {output.cpg} --msp {output.msp} \
+             --m6a {output.m6a} --nuc {output.nuc} \
+            2> {log}
+        """
