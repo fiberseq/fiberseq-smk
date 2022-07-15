@@ -319,7 +319,7 @@ rule align:
 
 rule make_aligned_beds:
     input:
-        bam=rules.merge.output.bam,
+        bam="results/{sm}/{aligned}.m6a.bam",
     output:
         cpg=pipe("results/{sm}/{aligned}.cpg.bed"),
         msp=pipe("results/{sm}/{aligned}.msp.bed"),
