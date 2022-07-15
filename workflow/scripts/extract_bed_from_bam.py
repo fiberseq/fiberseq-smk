@@ -1,36 +1,37 @@
 #!/usr/bin/env python3
+from tracemalloc import start
 from black import out
 import pysam
 import numpy as np
 import argparse
 import logging
-import sys
 from numba import njit
+import tqdm
 
 # C+m
 CPG_MODS = [("C", 0, "m")]
 M6A_MODS = [("A", 0, "a"), ("T", 1, "a")]
+D_TYPE = np.int64
 
 
 def get_mod_pos_from_rec(rec, mods=M6A_MODS):
     positions = []
     for mod in mods:
         if mod in rec.modified_bases_forward:
-            pos = np.array(rec.modified_bases_forward[mod])[:, 0]
+            pos = np.array(rec.modified_bases_forward[mod], dtype=D_TYPE)[:, 0]
             positions.append(pos)
     if len(positions) < 1:
         return None
-    mod_positions = np.concatenate(positions)
+    mod_positions = np.concatenate(positions, dtype=D_TYPE)
     mod_positions.sort(kind="mergesort")
-    # print(mod_positions)
     return mod_positions
 
 
 def get_start_length_tags(rec, start_tag="ns", length_tag="nl"):
     if not rec.has_tag(start_tag) or not rec.has_tag(length_tag):
         return None, None
-    starts = np.array(rec.get_tag(start_tag))
-    lengths = np.array(rec.get_tag(length_tag))
+    starts = np.array(rec.get_tag(start_tag), dtype=D_TYPE)
+    lengths = np.array(rec.get_tag(length_tag), dtype=D_TYPE)
     return starts, lengths
 
 
@@ -48,7 +49,7 @@ def get_accessible(rec):
 # rev comp [1,5) = [2,6)
 # new_st = len(7) - old_en(5)
 # new_en = len(7) - old_st(1)
-# @njit
+@njit
 def liftover_helper(aligned_pairs, sts, ens, query_length, is_reverse=False):
     read_pos = aligned_pairs[:, 0]
     ref_pos = aligned_pairs[:, 1]
@@ -72,14 +73,14 @@ def liftover_helper(aligned_pairs, sts, ens, query_length, is_reverse=False):
 
     # remove zero length liftovers (past start or end of alignment)
     keep_idx = ref_ens - ref_sts > 0
-    if (~keep_idx).any():
-        logging.debug(f"removing {(~keep_idx).sum()} zero length liftovers.")
+    # if (~keep_idx).any():
+    #    logging.debug(f"removing {(~keep_idx).sum()} zero length liftovers.")
     return ref_sts[keep_idx], ref_ens[keep_idx]
 
 
 def liftover(rec, sts, ens, aligned_pairs=None):
     if aligned_pairs is None:
-        aligned_pairs = np.array(rec.get_aligned_pairs(matches_only=True))
+        aligned_pairs = np.array(rec.get_aligned_pairs(matches_only=True), dtype=D_TYPE)
     return liftover_helper(
         aligned_pairs,
         sts,
@@ -87,6 +88,26 @@ def liftover(rec, sts, ens, aligned_pairs=None):
         rec.query_length,
         is_reverse=rec.is_reverse,
     )
+
+
+@njit
+def make_bed_blocks(starts, lengths, st, en):
+    o_starts = ""
+    o_lengths = ""
+    bc = 0
+    if starts[0] != 0:
+        o_starts += "0,"
+        o_lengths += "1,"
+        bc += 1
+    for t_st, t_en in zip(starts, lengths):
+        o_starts += str(t_st) + ","
+        o_lengths += str(t_en) + ","
+        bc += 1
+    if starts[-1] + lengths[-1] != en:
+        o_starts += str(en - st) + ","
+        o_lengths += "1,"
+        bc += 1
+    return bc, o_starts[:-1], o_lengths[:-1]
 
 
 def write_bed12(rec, starts, output, lengths=None, aligned_pairs=None):
@@ -97,40 +118,48 @@ def write_bed12(rec, starts, output, lengths=None, aligned_pairs=None):
     rgb = "0,0,0"
 
     if aligned_pairs is None:
-        ct, st, en = rec.query_name, 0, rec.query_length
+        ct, st, en = rec.query_name, np.int64(0), np.int64(rec.query_length)
     else:
-        ct, st, en = rec.reference_name, rec.reference_start, rec.reference_end
+        ct, st, en = (
+            rec.reference_name,
+            np.int64(rec.reference_start),
+            np.int64(rec.reference_end),
+        )
 
     # write bed 6
     output.write(f"{ct}\t{st}\t{en}\t{rec.query_name}\t{passes}\t{strand}\t")
     # think start and end
-    output.write(f"{st}\t{en}\t")
+    output.write(f"{st}\t{en}\t{rgb}\t")
 
     # add lengths if none are provided
     if lengths is None:
-        lengths = np.ones(starts.shape, dtype=int)
+        lengths = np.ones(starts.shape, dtype=D_TYPE)
 
     if aligned_pairs is not None:
         l_sts, l_ens = liftover(
             rec, starts, starts + lengths, aligned_pairs=aligned_pairs
         )
         l_len = l_ens - l_sts
-        l_sts -= rec.reference_start
+        l_sts -= st
         starts = l_sts
         lengths = l_len
 
-    bc = starts.shape[0]
-    bs = ",".join(starts.astype(str))
-    bl = ",".join(lengths.astype(str))
+    assert (
+        starts + lengths > en
+    ).sum() == 0, f"Blocks exceed end position of bed12\n{starts}\n{lengths}\n{en}"
+
+    bc, bs, bl = make_bed_blocks(starts, lengths, st, en)
     # bed 12
-    output.write(f"{rgb}\t{bc}\t{bl}\t{bs}\n")
+    output.write(f"{bc}\t{bl}\t{bs}\n")
 
 
 def extract(bam, args):
-    for rec in bam.fetch(until_eof=True):
+    for rec in tqdm.tqdm(bam.fetch(until_eof=True)):
         aligned_pairs = None
         if args.reference:
-            aligned_pairs = np.array(rec.get_aligned_pairs(matches_only=True))
+            aligned_pairs = np.array(
+                rec.get_aligned_pairs(matches_only=True), dtype=D_TYPE
+            )
 
         if args.nuc is not None:
             ns, nl = get_nucleosomes(rec)
@@ -139,10 +168,10 @@ def extract(bam, args):
             liftover(rec, ns, ns + nl, aligned_pairs=aligned_pairs)
             write_bed12(rec, ns, args.nuc, lengths=nl, aligned_pairs=aligned_pairs)
             # break
-        if args.acc is not None:
-            acc_s, acc_l = get_accessible(rec)
+        if args.msp is not None:
+            msp_s, msp_l = get_accessible(rec)
             write_bed12(
-                rec, acc_s, args.acc, lengths=acc_l, aligned_pairs=aligned_pairs
+                rec, msp_s, args.msp, lengths=msp_l, aligned_pairs=aligned_pairs
             )
         if args.m6a is not None:
             mod_pos = get_mod_pos_from_rec(rec, mods=M6A_MODS)
@@ -178,7 +207,7 @@ def parse():
     )
     parser.add_argument(
         "-a",
-        "--acc",
+        "--msp",
         help="Output accessible stretches in bed12.",
         type=argparse.FileType("w"),
     )
