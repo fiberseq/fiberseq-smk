@@ -378,6 +378,7 @@ rule bigbed:
         bed="temp/{sm}/aligned.{data}.bed",
     output:
         bb="results/{sm}/aligned.{data}.bed.bb",
+        bed=temp("temp/{sm}/aligned.{data}.bed.pre.bb"),
     conda:
         env
     log:
@@ -387,5 +388,6 @@ rule bigbed:
     priority: 300
     shell:
         """
-        bedToBigBed {input.bed} {input.fai} {output.bb}
+        sort -k1,1 -k2,2n {input.bed} > {output.bed}
+        bedToBigBed {output.bed} {input.fai} {output.bb}
         """
