@@ -14,7 +14,7 @@ env = config.pop("env", "envs/env.yml")
 ref = config.pop("ref", None)
 n_chunks = len(scatter.chunks("temp/{scatteritem}.fake"))
 output_types = ["m6a", "cpg", "nuc", "msp"]
-aligned = (["aligned", "unaligned"],)
+aligned = ["aligned", "unaligned"]
 
 
 wildcard_constraints:
