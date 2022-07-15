@@ -13,6 +13,7 @@ scattergather:
 env = config.pop("env", "envs/env.yml")
 ref = config.pop("ref", None)
 n_chunks = len(scatter.chunks("temp/{scatteritem}.fake"))
+output_types = ["m6a", "cpg", "nuc", "msp"]
 
 
 wildcard_constraints:
@@ -26,9 +27,9 @@ rule all:
         expand("results/{sm}/unaligned.m6a.bam.pbi", sm=list(config.keys())),
         align_results(list(config.keys())),
         expand(
-            "results/{sm}/unaligned.{data}.bed",
+            "results/{sm}/unaligned.{data}.bed.gz",
             sm=list(config.keys()),
-            data=["m6a", "cpg", "nuc", "msp"],
+            data=output_types,
         ),
 
 
@@ -319,10 +320,10 @@ rule make_aligned_beds:
     input:
         bam=rules.merge.output.bam,
     output:
-        cpg="results/{sm}/unaligned.cpg.bed",
-        msp="results/{sm}/unaligned.msp.bed",
-        m6a="results/{sm}/unaligned.m6a.bed",
-        nuc="results/{sm}/unaligned.nuc.bed",
+        cpg=pipe("results/{sm}/unaligned.cpg.bed"),
+        msp=pipe("results/{sm}/unaligned.msp.bed"),
+        m6a=pipe("results/{sm}/unaligned.m6a.bed"),
+        nuc=pipe("results/{sm}/unaligned.nuc.bed"),
     conda:
         env
     log:
@@ -343,4 +344,23 @@ rule make_aligned_beds:
              --cpg {output.cpg} --msp {output.msp} \
              --m6a {output.m6a} --nuc {output.nuc} \
             2> {log}
+        """
+
+
+rule compress_bed:
+    input:
+        bed="results/{sm}/{aligned}.{data}.bed",
+    output:
+        bed="results/{sm}/{aligned}.{data}.bed.gz",
+    conda:
+        env
+    log:
+        "logs/{sm}/compress_bed_{aligned}_{data}.log",
+    threads: 4
+    benchmark:
+        "benchmarks/{sm}/compress_bed_{aligned}_{data}.tbl"
+    priority: 300
+    shell:
+        """
+        bgzip -@ {threads} {input.bed} -c > {output.bed}
         """
