@@ -326,15 +326,15 @@ rule make_aligned_beds:
     conda:
         env
     log:
-        "logs/{sm}/{rule}.log",
+        "logs/{sm}/unaligned_beds.log",
     resources:
         disk_mb=8000,
         time=240,
     threads: 4
     benchmark:
-        "benchmarks/{sm}/{rule}.tbl"
+        "benchmarks/{sm}/unaligned_beds.tbl"
     params:
-        extract=workflow.source_path("scripts/extract_bed_from_bam.py"),
+        extract=workflow.source_path("scripts/unaligned_beds.py"),
     priority: 300
     shell:
         """
