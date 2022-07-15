@@ -26,7 +26,7 @@ rule all:
         expand("results/{sm}/unaligned.m6a.bam.pbi", sm=list(config.keys())),
         align_results(list(config.keys())),
         expand(
-            "results/{sm}/unaligned.{data}.cpg.bed",
+            "results/{sm}/unaligned.{data}.bed",
             sm=list(config.keys()),
             data=["m6a", "cpg", "nuc", "msp"],
         ),
@@ -319,10 +319,10 @@ rule make_aligned_beds:
     input:
         bam=rules.merge.output.bam,
     output:
-        cpg="results/{sm}/unaligned.m6a.cpg.bed",
-        msp="results/{sm}/unaligned.m6a.msp.bed",
-        m6a="results/{sm}/unaligned.m6a.m6a.bed",
-        nuc="results/{sm}/unaligned.m6a.nuc.bed",
+        cpg="results/{sm}/unaligned.cpg.bed",
+        msp="results/{sm}/unaligned.msp.bed",
+        m6a="results/{sm}/unaligned.m6a.bed",
+        nuc="results/{sm}/unaligned.nuc.bed",
     conda:
         env
     log:
