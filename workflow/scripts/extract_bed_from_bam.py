@@ -161,9 +161,6 @@ def extract(bam, args):
 
         if args.nuc is not None:
             ns, nl = get_nucleosomes(rec)
-            if ns is None:
-                continue
-            liftover(rec, ns, ns + nl, aligned_pairs=aligned_pairs)
             write_bed12(rec, ns, args.nuc, lengths=nl, aligned_pairs=aligned_pairs)
             # break
         if args.msp is not None:
