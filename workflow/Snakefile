@@ -318,7 +318,7 @@ rule align:
 
 rule make_aligned_beds:
     input:
-        bam="results/{sm}/{aligned}.m6a.bam",
+        bam="results/{sm}/{aligned}.fiberseq.bam",
     output:
         cpg=pipe("results/{sm}/{aligned}.cpg.bed"),
         msp=pipe("results/{sm}/{aligned}.msp.bed"),
