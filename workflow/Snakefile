@@ -334,7 +334,7 @@ rule make_aligned_beds:
     benchmark:
         "benchmarks/{sm}/unaligned_beds.tbl"
     params:
-        extract=workflow.source_path("scripts/unaligned_beds.py"),
+        extract=workflow.source_path("scripts/extract_bed_from_bam.py"),
     priority: 300
     shell:
         """
