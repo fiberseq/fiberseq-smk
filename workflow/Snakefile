@@ -224,7 +224,7 @@ rule train_hmm:
     resources:
         disk_mb=16000,
         time=200,
-    threads: 1
+    threads: 4
     priority: 60
     shell:
         """
