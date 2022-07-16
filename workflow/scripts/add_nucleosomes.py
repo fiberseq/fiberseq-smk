@@ -7,6 +7,8 @@ import pomegranate as pom
 import array
 import git
 
+D_TYPE = np.int64
+
 
 def get_commit_hash(short=7):
     repo = git.Repo(search_parent_directories=True)
@@ -94,11 +96,11 @@ def get_mods_from_rec(rec, mods=[("A", 0, "a"), ("T", 1, "a")], mask=True):
     positions = []
     for mod in mods:
         if mod in rec.modified_bases:
-            pos = np.array(rec.modified_bases[mod])[:, 0]
+            pos = np.array(rec.modified_bases[mod], dtype=D_TYPE)[:, 0]
             positions.append(pos)
     if len(positions) < 1:
         return None, None, None
-    methylated_positions = np.concatenate(positions)
+    methylated_positions = np.concatenate(positions, dtype=D_TYPE)
     methylated_positions.sort(kind="mergesort")
 
     AT_mask = (seq == b"A") | (seq == b"T")
@@ -134,8 +136,8 @@ def meshMethods(
     # where the HMM model essentially finds nucleosomes
 
     # generate the end boundary
-    simple_ends = np.add(simple_starts, simple_sizes)
-    hmm_ends = np.add(hmm_starts, hmm_sizes)
+    simple_ends = np.add(simple_starts, simple_sizes, dtype=D_TYPE)
+    hmm_ends = np.add(hmm_starts, hmm_sizes, dtype=D_TYPE)
 
     # stack with nucleosome boundary
     simple_stack = np.vstack([simple_starts, simple_ends])
@@ -159,7 +161,7 @@ def meshMethods(
 
     ### append nucleosome starts/sizes as arrays for consistency and use of np.concatenate
 
-    chromatin_binary = np.zeros(shape=fiber_length).astype(int)
+    chromatin_binary = np.zeros(shape=fiber_length).astype(D_TYPE)
 
     for column in range(hmm_stack.shape[1]):
 
@@ -309,16 +311,31 @@ def apply_hmm(bam, hmm, nuc_label, cutoff, out, min_dist=46):
             end_terminal_nuc_size = end_terminal_nuc_end - end_terminal_nuc_start
 
             output_starts = np.concatenate(
-                [[front_terminal_nuc_start], all_starts, [end_terminal_nuc_start]]
+                [[front_terminal_nuc_start], all_starts, [end_terminal_nuc_start]],
+                dtype=D_TYPE,
             )
             output_sizes = np.concatenate(
-                [[front_terminal_nuc_size], all_sizes, [end_terminal_nuc_size]]
+                [[front_terminal_nuc_size], all_sizes, [end_terminal_nuc_size]],
+                dtype=D_TYPE,
             )
 
         else:
 
-            output_starts = np.concatenate([[front_terminal_nuc_start], all_starts])
-            output_sizes = np.concatenate([[front_terminal_nuc_size], all_sizes])
+            output_starts = np.concatenate(
+                [[front_terminal_nuc_start], all_starts], dtype=D_TYPE
+            )
+            output_sizes = np.concatenate(
+                [[front_terminal_nuc_size], all_sizes], dtype=D_TYPE
+            )
+
+        # check that the hmm is only making ranges that are possible.
+        correct_sizes = output_starts[:-1] + output_sizes[:-1] <= output_starts[1:]
+        if not np.all(correct_sizes):
+            logging.warning(
+                f"HMM made invalid ranges for {rec.query_name} skipping nucelosome calling for fiber"
+            )
+            out.write(rec)
+            continue
 
         # make the acc arrays
         acc_starts = (output_starts + output_sizes)[:-1]
@@ -345,18 +362,19 @@ def apply_hmm(bam, hmm, nuc_label, cutoff, out, min_dist=46):
         )
         # logging.debug("{}".format(cond))
         # logging.debug(f"{acc_starts}\n{output_starts}\n")
-        acc_starts = acc_starts[cond]
-        acc_sizes = acc_sizes[cond]
-
-        logging.debug("{} {}".format(output_sizes.shape, acc_sizes.shape))
-
+        # logging.debug(f"{acc_starts.shape}, {acc_sizes.shape}, {cond.shape}")
+        # subsetting only works with a new variable apparently?
+        acc_starts_2 = acc_starts[cond]
+        acc_sizes_2 = acc_sizes[cond]
+        # logging.debug("{}\n{}".format(acc_sizes, cond))
         if output_sizes.shape[0] > 0:
             rec.set_tag("ns", array.array("I", output_starts))
             rec.set_tag("nl", array.array("I", output_sizes))
         if acc_sizes.shape[0] > 0:
-            rec.set_tag("as", array.array("I", acc_starts))
-            rec.set_tag("al", array.array("I", acc_sizes))
-
+            rec.set_tag("as", array.array("I", acc_starts_2))
+            # logging.debug("{}".format(acc_sizes))
+            rec.set_tag("al", array.array("I", acc_sizes_2))
+        # logging.debug("\n")
         out.write(rec)
 
 
@@ -366,7 +384,7 @@ def simpleFind(methylated_positions, binary, cutoff):
     If the distance between two methylations > 85 then
     that is a nucleosome call. Otherwise continue."""
 
-    dif = np.subtract(methylated_positions[1:], methylated_positions[:-1])
+    dif = np.subtract(methylated_positions[1:], methylated_positions[:-1], dtype=D_TYPE)
     # difference between adjacent methylations
 
     index = np.argwhere(dif >= cutoff).reshape(-1)
@@ -497,7 +515,7 @@ def rle(inarray):
     https://stackoverflow.com/questions/1066758/
     find-length-of-sequences-of-identical-values-in-a-numpy-array-run-length-encodi
     """
-    ia = np.asarray(inarray)  # force numpy
+    ia = np.asarray(inarray, dtype=D_TYPE)  # force numpy
     n = len(ia)
     y = ia[1:] != ia[:-1]  # pairwise unequal (string safe)
     i = np.append(np.where(y), n - 1)  # must include last element posi
