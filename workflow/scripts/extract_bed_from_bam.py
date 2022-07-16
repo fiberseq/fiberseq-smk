@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+from tracemalloc import start
 import pysam
 import numpy as np
 import argparse
@@ -99,9 +100,9 @@ def make_bed_blocks(starts, lengths, st, en):
         o_starts += "0,"
         o_lengths += "1,"
         bc += 1
-    for t_st, t_en in zip(starts, lengths):
-        o_starts += str(t_st) + ","
-        o_lengths += str(t_en) + ","
+    for b_st, b_ln in zip(starts, lengths):
+        o_starts += str(b_st) + ","
+        o_lengths += str(b_ln) + ","
         bc += 1
     if starts[-1] + lengths[-1] != en:
         o_starts += str(en - st - 1) + ","
@@ -149,6 +150,8 @@ def write_bed12(rec, starts, output, lengths=None, aligned_pairs=None):
     ).sum() == 0, f"Blocks exceed end position of bed12\n{starts}\n{lengths}\n{en}"
 
     bc, bs, bl = make_bed_blocks(starts, lengths, st, en)
+    if bs[0] != "0":
+        logging.warning("First block start is not 0")
     # bed 12
     output.write(f"{bc}\t{bl}\t{bs}\n")
 
