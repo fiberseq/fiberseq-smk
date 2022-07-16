@@ -51,13 +51,13 @@ rule ccs:
         txt=temp("temp/{sm}/ccs.{scatteritem}.ccs_report.txt"),
     resources:
         mem_mb=16 * 1024,
-    threads: config.get("threads", 8)
+    threads: config.get("threads", 16)
     conda:
         env
     log:
-        "logs/{sm}/ccs.{scatteritem}.log",
+        "logs/{sm}/ccs/{scatteritem}.log",
     benchmark:
-        "benchmarks/{sm}/ccs.{scatteritem}.tbl"
+        "benchmarks/{sm}/ccs/{scatteritem}.tbl"
     params:
         chunk=get_chunk,
     priority: 0
@@ -77,13 +77,13 @@ rule primrose:
         bam=rules.ccs.output.bam,
     output:
         bam=temp("temp/{sm}/primrose.{scatteritem}.bam"),
-    threads: config.get("threads", 8)
+    threads: config.get("threads", 16)
     conda:
         env
     log:
-        "logs/{sm}/primrose.{scatteritem}.log",
+        "logs/{sm}/primrose/{scatteritem}.log",
     benchmark:
-        "benchmarks/{sm}/primrose.{scatteritem}.tbl"
+        "benchmarks/{sm}/primrose/{scatteritem}.tbl"
     priority: 0
     shell:
         """
@@ -105,9 +105,9 @@ rule actc:
     conda:
         env
     log:
-        "logs/{sm}/actc.{scatteritem}.log",
+        "logs/{sm}/actc/{scatteritem}.log",
     benchmark:
-        "benchmarks/{sm}/actc.{scatteritem}.tbl"
+        "benchmarks/{sm}/actc/{scatteritem}.tbl"
     priority: 10
     shell:
         """
@@ -124,9 +124,9 @@ rule index:
     conda:
         env
     log:
-        "logs/{sm}/index.{scatteritem}.log",
+        "logs/{sm}/index/{scatteritem}.log",
     benchmark:
-        "benchmarks/{sm}/index.{scatteritem}.tbl"
+        "benchmarks/{sm}/index/{scatteritem}.tbl"
     priority: 20
     shell:
         """
@@ -144,9 +144,9 @@ rule ccs_fasta:
     conda:
         env
     log:
-        "logs/{sm}/ccs.fasta.{scatteritem}.log",
+        "logs/{sm}/ccs.fasta/{scatteritem}.log",
     benchmark:
-        "benchmarks/{sm}/ccs_fasta.{scatteritem}.tbl"
+        "benchmarks/{sm}/ccs_fasta/{scatteritem}.tbl"
     priority: 30
     shell:
         """
@@ -164,15 +164,15 @@ rule ipdSummary:
         pbi=rules.index.output.pbi,
     output:
         csv=temp("temp/{sm}/ipdSummary.{scatteritem}.csv"),
-    threads: config.get("threads", 8)
+    threads: config.get("threads", 40)
     conda:
         env
     resources:
         time=80,
     log:
-        "logs/{sm}/ipdSummary.{scatteritem}.log",
+        "logs/{sm}/ipdSummary/{scatteritem}.log",
     benchmark:
-        "benchmarks/{sm}/ipdSummary.{scatteritem}.tbl"
+        "benchmarks/{sm}/ipdSummary/{scatteritem}.tbl"
     priority: 40
     shell:
         """
@@ -196,11 +196,11 @@ rule gmm:
     conda:
         env
     log:
-        "logs/{sm}/gmm.{scatteritem}.log",
+        "logs/{sm}/gmm/{scatteritem}.log",
     params:
         gmm=workflow.source_path("scripts/push_m6a_to_bam.py"),
     benchmark:
-        "benchmarks/{sm}/gmm.{scatteritem}.tbl"
+        "benchmarks/{sm}/gmm/{scatteritem}.tbl"
     priority: 50
     shell:
         """
@@ -216,11 +216,11 @@ rule train_hmm:
     conda:
         env
     log:
-        "logs/{sm}/train_hmm.log",
+        "logs/{sm}/train_hmm/train.log",
     params:
         nuc=workflow.source_path("scripts/add_nucleosomes.py"),
     benchmark:
-        "benchmarks/{sm}/train_hmm.tbl"
+        "benchmarks/{sm}/train_hmm/train.tbl"
     resources:
         disk_mb=16000,
         time=200,
@@ -241,11 +241,11 @@ rule nuc:
     conda:
         env
     log:
-        "logs/{sm}/nuc.{scatteritem}.log",
+        "logs/{sm}/nuc/{scatteritem}.log",
     params:
         nuc=workflow.source_path("scripts/add_nucleosomes.py"),
     benchmark:
-        "benchmarks/{sm}/nuc.{scatteritem}.tbl"
+        "benchmarks/{sm}/nuc/{scatteritem}.tbl"
     threads: 4
     priority: 70
     shell:
@@ -263,13 +263,13 @@ rule merge:
     conda:
         env
     log:
-        "logs/{sm}/samtools.cat.log",
+        "logs/{sm}/merge/samtools.cat.log",
     resources:
         disk_mb=8000,
         time=120,
     threads: 4
     benchmark:
-        "benchmarks/{sm}/merge.tbl"
+        "benchmarks/{sm}/merge/samtools.cat.tbl"
     priority: 100
     shell:
         """
@@ -285,9 +285,9 @@ rule index_merge:
     conda:
         env
     log:
-        "logs/{sm}/samtools.cat.log",
+        "logs/{sm}/index_merge/index.tbl",
     benchmark:
-        "benchmarks/{sm}/index.tbl"
+        "benchmarks/{sm}/index_merge/index.tbl"
     threads: 1
     priority: 100
     shell:
@@ -306,13 +306,13 @@ rule align:
     conda:
         env
     log:
-        "logs/{sm}/align.log",
+        "logs/{sm}/align/align.log",
     resources:
         disk_mb=8000,
         time=240,
     threads: 40
     benchmark:
-        "benchmarks/{sm}/align.tbl"
+        "benchmarks/{sm}/align/align.tbl"
     priority: 200
     shell:
         """
@@ -335,13 +335,13 @@ rule make_beds:
     conda:
         env
     log:
-        "logs/{sm}/{aligned}_beds.log",
+        "logs/{sm}/make_beds/{aligned}_beds.log",
     resources:
         disk_mb=8000,
         time=240,
     threads: 4
     benchmark:
-        "benchmarks/{sm}/{aligned}_beds.tbl"
+        "benchmarks/{sm}/make_beds/{aligned}_beds.tbl"
     params:
         extract=workflow.source_path("scripts/extract_bed_from_bam.py"),
         aligned=lambda wc: "-r" if wc.aligned == "aligned" else "",
@@ -364,10 +364,10 @@ rule compress_bed:
     conda:
         env
     log:
-        "logs/{sm}/compress_bed_{aligned}_{data}.log",
+        "logs/{sm}/compress_bed/{aligned}_{data}.log",
     threads: 4
     benchmark:
-        "benchmarks/{sm}/compress_bed_{aligned}_{data}.tbl"
+        "benchmarks/{sm}/compress_bed/{aligned}_{data}.tbl"
     priority: 300
     shell:
         """
@@ -385,9 +385,9 @@ rule bigbed:
     conda:
         env
     log:
-        "logs/{sm}/bigbed_{data}.log",
+        "logs/{sm}/bigbed/{data}.log",
     benchmark:
-        "benchmarks/{sm}/bigbed_{data}.tbl"
+        "benchmarks/{sm}/bigbed/{data}.tbl"
     priority: 300
     shell:
         """
