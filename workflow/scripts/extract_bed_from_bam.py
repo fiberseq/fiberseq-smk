@@ -126,12 +126,6 @@ def write_bed12(rec, starts, output, lengths=None, aligned_pairs=None):
             np.int64(rec.reference_start),
             np.int64(rec.reference_end),
         )
-
-    # write bed 6
-    output.write(f"{ct}\t{st}\t{en}\t{rec.query_name}\t{passes}\t{strand}\t")
-    # think start and end
-    output.write(f"{st}\t{en}\t{rgb}\t")
-
     # add lengths if none are provided
     if lengths is None:
         lengths = np.ones(starts.shape, dtype=D_TYPE)
@@ -152,6 +146,12 @@ def write_bed12(rec, starts, output, lengths=None, aligned_pairs=None):
     bc, bs, bl = make_bed_blocks(starts, lengths, st, en)
     if bs[0] != "0":
         logging.warning("First block start is not 0")
+        return
+
+    # write bed 6
+    output.write(f"{ct}\t{st}\t{en}\t{rec.query_name}\t{passes}\t{strand}\t")
+    # think start and end
+    output.write(f"{st}\t{en}\t{rgb}\t")
     # bed 12
     output.write(f"{bc}\t{bl}\t{bs}\n")
 
