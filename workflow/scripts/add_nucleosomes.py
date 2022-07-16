@@ -491,12 +491,12 @@ def simpleFind(methylated_positions, binary, cutoff):
 
 
 def rle(inarray):
-    # https://stackoverflow.com/questions/1066758/
-    # find-length-of-sequences-of-identical-values-in-a-numpy-array-run-length-encodi
-
     """run length encoding. Partial credit to R rle function.
     Multi datatype arrays catered for including non Numpy
-    returns: tuple (runlengths, startpositions, values)"""
+    returns: tuple (runlengths, startpositions, values)
+    https://stackoverflow.com/questions/1066758/
+    find-length-of-sequences-of-identical-values-in-a-numpy-array-run-length-encodi
+    """
     ia = np.asarray(inarray)  # force numpy
     n = len(ia)
     y = ia[1:] != ia[:-1]  # pairwise unequal (string safe)
