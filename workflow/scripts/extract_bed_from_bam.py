@@ -13,6 +13,8 @@ D_TYPE = np.int64
 
 
 def get_mod_pos_from_rec(rec, mods=M6A_MODS):
+    if rec.modified_bases_forward is None:
+        return None
     positions = []
     for mod in mods:
         if mod in rec.modified_bases_forward:
