@@ -156,6 +156,8 @@ def write_bed12(rec, starts, output, lengths=None, aligned_pairs=None):
 def extract(bam, args):
     for rec in tqdm.tqdm(bam.fetch(until_eof=True)):
         aligned_pairs = None
+        if args.reference and rec.is_unmapped:
+            continue
         if args.reference:
             aligned_pairs = np.array(
                 rec.get_aligned_pairs(matches_only=True), dtype=D_TYPE
