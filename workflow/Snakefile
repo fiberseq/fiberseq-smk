@@ -320,7 +320,7 @@ rule align:
         pbmm2 align \
             -j {threads} \
             --preset CCS --sort \
-            --sort-memory 4G \
+            --sort-memory 2G \
             --log-level INFO \
             --unmapped \
             {input.ref} {input.bam} {output.bam} \
