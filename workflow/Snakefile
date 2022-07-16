@@ -310,6 +310,7 @@ rule align:
     resources:
         disk_mb=8000,
         time=240,
+        mem_mb=32 * 1024,
     threads: 40
     benchmark:
         "benchmarks/{sm}/align/align.tbl"
@@ -319,6 +320,9 @@ rule align:
         pbmm2 align \
             -j {threads} \
             --preset CCS --sort \
+            --sort-memory 4G \
+            --log-level INFO \
+            --unmapped \
             {input.ref} {input.bam} {output.bam} \
         2> {log}
         """
