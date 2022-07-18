@@ -172,6 +172,7 @@ rule ipdSummary:
         env
     resources:
         time=80,
+        mem_mb=32 * 1024,
     log:
         "logs/{sm}/ipdSummary/{scatteritem}.log",
     benchmark:
