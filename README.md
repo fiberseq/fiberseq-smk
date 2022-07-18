@@ -27,6 +27,15 @@ snakemake \
     --set-scatter chunks=400 \
     -p
 ```
+## Example config file
+
+```yaml
+# sample name and then path to the subreads
+test: .test/subreads.bam
+# path to the reference genome
+ref: /mmfs1/gscratch/stergachislab/assemblies/hg38.analysisSet.fa%
+```
+
 # TODO
 - [x] Make an extract tool
 - [ ] Add a sample tag to the bam header.
