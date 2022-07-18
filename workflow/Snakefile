@@ -197,6 +197,8 @@ rule gmm:
     output:
         bam=temp("temp/{sm}/gmm.{scatteritem}.bam"),
     threads: 4
+    resources:
+        mem_mb=16 * 1024,
     conda:
         env
     log:
