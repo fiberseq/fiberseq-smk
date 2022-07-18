@@ -17,39 +17,22 @@ export PATH=$PATH:/path/to/smrtlink/tools
 ```
 
 # Usage
+
+Send your jobs to the cluster with:
 ```bash
-snakemake --cores 10 -p --set-scatter chunks=2  --show-failed-logs --configfile .test/config.yml -n
-```
-
-# Cluster usage
-
-### Example:
-```bash
-mkdir -p logs_cluster
-partition="compute"
-partition="ckpt"
-
 snakemake \
-  --cores 8 \
-  --jobs 500 \
-  -p -r \
-  --use-conda \
-  --config env="fiberseq-smk" \
-  --configfile .test/config.yml \
-  --set-scatter chunks=8 \
-  --cluster " sbatch --account=stergachislab --partition=$partition --nodes=1 --ntasks-per-node={threads} --time=20:00 --mem={resources.mem_mb} --export=all -o ./logs_cluster/slurm-%j.out -e ./logs_cluster/slurm-%j.err " \
-  --show-failed-logs \
-  --rerun-incomplete  \
-  --rerun-triggers mtime 
+    --profile profile/ 
+    --config env="fiberseq-smk" \
+    --configfile .test/config.yml \
+    --set-scatter chunks=400 \
+    -p
 ```
-
-
 # TODO
-* Make an extract tool
-* Add a sample tag to the bam header.
-* Add a pipeline version to the bam header (git commit).
-* Add primrose
-* Add unknown case to end of fiber calls
+- [x] Make an extract tool
+- [ ] Add a sample tag to the bam header.
+- [ ] Add a pipeline version to the bam header (git commit).
+- [x] Add primrose
+- [x] Add unknown case to end of fiber calls
 
 # Workflow
 
