@@ -228,7 +228,8 @@ rule train_hmm:
     benchmark:
         "benchmarks/{sm}/train_hmm/train.tbl"
     resources:
-        disk_mb=16000,
+        disk_mb=16 * 1024,
+        mem_mb=16 * 1024,
         time=200,
     threads: 4
     priority: 60
