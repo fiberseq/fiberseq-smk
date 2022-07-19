@@ -28,7 +28,7 @@ def coordinateConversion_MMTag(sequence, base, modification_coords):
     distance = np.diff(masked_coords) - 1
     if coords.shape[0] < 1:
         return ""
-    return ",".join([coords[0].astype(str)] + list(distance.astype(str)))
+    return ",".join([masked_coords[0].astype(str)] + list(distance.astype(str)))
 
 
 def apply_gmm(csv, bam, out, min_prediction_value=0.99999999, min_number_of_calls=25):
