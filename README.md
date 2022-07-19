@@ -33,7 +33,7 @@ snakemake \
 # sample name and then path to the subreads
 test: .test/subreads.bam
 # path to the reference genome
-ref: /mmfs1/gscratch/stergachislab/assemblies/hg38.analysisSet.fa%
+ref: /mmfs1/gscratch/stergachislab/assemblies/hg38.analysisSet.fa
 ```
 
 # TODO
