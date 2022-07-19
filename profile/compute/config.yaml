@@ -1,0 +1,30 @@
+default-resources:
+  - disk_mb=4096
+  - mem_mb=4096
+  - time=40
+cluster:
+  mkdir -p cluster_logs/{rule} &&
+  sbatch
+    --account=stergachislab
+    --partition=compute
+    --nodes=1 
+    --ntasks-per-node={threads} 
+    --mem={resources.mem_mb} 
+    --tmp={resources.disk_mb}
+    --time={resources.time}
+    --job-name=smk-{rule}-{wildcards}
+    --output=cluster_logs/{rule}/{rule}-{wildcards}-%j.out
+    --export=all
+    --parsable # Required to pass job IDs to scancel
+jobs: 2000
+rerun-incomplete: True
+rerun-triggers: mtime 
+cluster-cancel: scancel
+cluster-cancel-nargs: 5000
+set-scatter:
+  - chunks=1000
+restart-times: 2
+printshellcmds: True
+reason: True
+use-conda: True
+show-failed-logs: True 
