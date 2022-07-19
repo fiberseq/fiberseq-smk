@@ -21,10 +21,10 @@ export PATH=$PATH:/path/to/smrtlink/tools
 Send your jobs to the cluster with:
 ```bash
 snakemake \
-    --profile profile/ 
+    --profile profile/checkpoint \
     --config env="fiberseq-smk" \
     --configfile .test/config.yml \
-    --set-scatter chunks=400 \
+    --set-scatter chunks=40 \
     -p
 ```
 ## Example config file
