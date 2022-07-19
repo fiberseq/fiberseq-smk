@@ -42,6 +42,7 @@ ref: /mmfs1/gscratch/stergachislab/assemblies/hg38.analysisSet.fa%
 - [ ] Add a pipeline version to the bam header (git commit).
 - [x] Add primrose
 - [x] Add unknown case to end of fiber calls
+- [ ] Add a ccs input option
 
 # Workflow
 
