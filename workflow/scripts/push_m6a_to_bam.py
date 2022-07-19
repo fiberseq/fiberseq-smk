@@ -18,15 +18,15 @@ def coordinateConversion_MMTag(sequence, base, modification_coords):
 
     mask = sequence == bytes(base, encoding="utf-8")
     # find all masks = boolean Array
-
     coords = modification_coords[
         sequence[modification_coords] == bytes(base, encoding="utf-8")
     ]
     # when working with double stranded data we can only use modifications
     # on the specifc base that the modification would fall on on that strand
     # i.e. As  on + , Ts on -, we only want the mods that = that base of interest
-
-    MM_coords = ",".join(list((np.diff(np.cumsum(mask)[coords]) - 1).astype(str)))
+    masked_coords = np.cumsum(mask)[coords] - 1
+    distance = np.diff(masked_coords) - 1
+    MM_coords = ",".join([coords[0].astype(str)] + list(distance.astype(str)))
 
     return MM_coords
 
