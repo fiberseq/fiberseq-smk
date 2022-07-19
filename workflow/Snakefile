@@ -171,8 +171,9 @@ rule ipdSummary:
     conda:
         env
     resources:
-        time=80,
-        mem_mb=32 * 1024,
+        time=120,
+        mem_mb=64 * 1024,
+        disk_mb=16 * 1024,
     log:
         "logs/{sm}/ipdSummary/{scatteritem}.log",
     benchmark:
