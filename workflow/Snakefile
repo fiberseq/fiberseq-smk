@@ -1,3 +1,4 @@
+import os
 from snakemake.utils import min_version
 
 min_version("7.8")
@@ -6,15 +7,20 @@ min_version("7.8")
 include: "rules/common.smk"
 
 
-scatter_threads = config.get("scatter_threads", 8)
+scatter_threads = config.pop("scatter_threads", 8)
+env = config.pop("env", "envs/env.yml")
+ref = config.pop("ref", None)
+# one chunk per GB in the subreads
+
+default_n_chunks = min(
+    [int(os.path.getsize(subreads) / 1024**3) for sample, subreads in config.items()]
+)
 
 
 scattergather:
-    chunks=20,
+    chunks=default_n_chunks,
 
 
-env = config.pop("env", "envs/env.yml")
-ref = config.pop("ref", None)
 n_chunks = len(scatter.chunks("temp/{scatteritem}.fake"))
 output_types = ["m6a", "cpg", "nuc", "msp"]
 aligned = ["aligned", "unaligned"]
