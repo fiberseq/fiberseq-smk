@@ -17,6 +17,10 @@ def get_input_ccs(wc):
     return input_ccs
 
 
+def get_input_pbi(wc):
+    return f"{get_input_ccs(wc)}.pbi"
+
+
 def get_ccs_bam(wc):
     if input_ccs is None:
         return "temp/{sm}/ccs.{scatteritem}.bam"
