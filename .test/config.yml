@@ -1,3 +1,3 @@
 test: .test/subreads.bam
 ref: .test/ref.fa      
-ccs: .test/ccs.bam
+#ccs: .test/ccs.bam
