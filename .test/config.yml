@@ -1,2 +1,2 @@
 test: .test/subreads.bam
-ref: /mmfs1/gscratch/stergachislab/assemblies/hg38.analysisSet.fa
+ref: .test/ref.fa      

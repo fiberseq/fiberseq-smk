@@ -146,33 +146,30 @@ rule index:
         """
 
 
-rule ccs_fasta:
+rule index_ccs_fasta:
     input:
-        ccs=rules.primrose.output.bam,
+        fasta=rules.actc.output.fasta,
     output:
-        fasta=temp("temp/{sm}/ccs.{scatteritem}.fasta"),
-        fai=temp("temp/{sm}/ccs.{scatteritem}.fasta.fai"),
+        fai=temp(f"{rules.actc.output.fasta}.fai"),
     threads: 1
     conda:
         env
     log:
-        "logs/{sm}/ccs.fasta/{scatteritem}.log",
+        "logs/{sm}/index_ccs_fasta/{scatteritem}.log",
     benchmark:
-        "benchmarks/{sm}/ccs_fasta/{scatteritem}.tbl"
-    priority: 30
+        "benchmarks/{sm}/index_ccs_fasta/{scatteritem}.tbl"
+    priority: 20
     shell:
         """
-        samtools fasta -@ {threads} {input.ccs} > {output.fasta} 2> {log}
-        samtools faidx {output.fasta} 2>> {log}
+        samtools faidx {input.fasta} &> {log}
         """
 
 
 rule ipdSummary:
     input:
-        ccs_fasta=rules.ccs_fasta.output.fasta,
-        fai=rules.ccs_fasta.output.fai,
+        ccs_fasta=rules.actc.output.fasta,
+        fai=rules.index_ccs_fasta.output.fai,
         actc=rules.actc.output.bam,
-        #bai=rules.index.output.bai,
         pbi=rules.index.output.pbi,
     output:
         csv=temp("temp/{sm}/ipdSummary.{scatteritem}.csv"),
@@ -249,7 +246,7 @@ rule train_hmm:
         """
 
 
-rule nuc:
+rule nucleosome:
     input:
         bam=rules.gmm.output.bam,
         model=rules.train_hmm.output.model,
@@ -273,8 +270,7 @@ rule nuc:
 
 rule merge:
     input:
-        bam=gather.chunks(rules.nuc.output.bam, allow_missing=True),
-        pbi=gather.chunks(rules.ccs.output.pbi, allow_missing=True),
+        bam=gather.chunks(rules.nucleosome.output.bam, allow_missing=True),
     output:
         bam="results/{sm}/unaligned.fiberseq.bam",
     conda:

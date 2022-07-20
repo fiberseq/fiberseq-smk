@@ -59,3 +59,24 @@ rule compress_csv:
         """
         bgzip -@ {threads} {input.csv} > {output.csv} 2> {log}
         """
+
+
+rule ccs_fasta:
+    input:
+        ccs=rules.primrose.output.bam,
+    output:
+        fasta=temp("temp/{sm}/ccs.{scatteritem}.fasta"),
+        fai=temp("temp/{sm}/ccs.{scatteritem}.fasta.fai"),
+    threads: 1
+    conda:
+        env
+    log:
+        "logs/{sm}/ccs.fasta/{scatteritem}.log",
+    benchmark:
+        "benchmarks/{sm}/ccs_fasta/{scatteritem}.tbl"
+    priority: 30
+    shell:
+        """
+        samtools fasta -@ {threads} {input.ccs} > {output.fasta} 2> {log}
+        samtools faidx {output.fasta} 2>> {log}
+        """
