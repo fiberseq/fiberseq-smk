@@ -80,3 +80,31 @@ rule ccs_fasta:
         samtools fasta -@ {threads} {input.ccs} > {output.fasta} 2> {log}
         samtools faidx {output.fasta} 2>> {log}
         """
+
+
+# maybe will use
+rule lima:
+    input:
+        bam=rules.ccs.output.bam,
+        # TODO
+        barcodes="barcodes.fa",
+    output:
+        # TODO check for additional outputs
+        bam=temp("temp/{sm}/lima.{scatteritem}.bam"),
+        pbi=temp("temp/{sm}/lima.{scatteritem}.bam.pbi"),
+    threads: scatter_threads
+    conda:
+        env
+    log:
+        "logs/{sm}/lima/{scatteritem}.log",
+    benchmark:
+        "benchmarks/{sm}/lima/{scatteritem}.tbl"
+    params:
+        symmetric="SYMMETRICS",
+    priority: 0
+    shell:
+        """
+        lima \
+            --hifi-prefix {params.symmetric} \
+            {input.bam} {input.barcodes} {output.bam} \
+        """

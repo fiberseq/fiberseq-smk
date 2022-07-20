@@ -85,32 +85,10 @@ rule ccs:
         """
 
 
-rule primrose:
-    input:
-        bam=rules.ccs.output.bam,
-    output:
-        bam=temp("temp/{sm}/primrose.{scatteritem}.bam"),
-        pbi=temp("temp/{sm}/primrose.{scatteritem}.bam.pbi"),
-    threads: scatter_threads
-    conda:
-        env
-    log:
-        "logs/{sm}/primrose/{scatteritem}.log",
-    benchmark:
-        "benchmarks/{sm}/primrose/{scatteritem}.tbl"
-    priority: 0
-    shell:
-        """
-        primrose --min-passes 3 -j {threads} \
-             --keep-kinetics \
-            {input.bam} {output.bam} \
-            &> {log}
-        """
-
-
 rule actc:
     input:
-        ccs=rules.primrose.output.bam,
+        ccs=rules.ccs.output.bam,
+        pbi=rules.ccs.output.pbi,
         subreads=get_subreads,
     output:
         bam=temp("temp/{sm}/actc.{scatteritem}.bam"),
@@ -201,8 +179,8 @@ rule ipdSummary:
 
 rule gmm:
     input:
-        ccs=rules.primrose.output.bam,
-        pbi=rules.primrose.output.pbi,
+        ccs=rules.ccs.output.bam,
+        pbi=rules.ccs.output.pbi,
         csv=rules.ipdSummary.output.csv,
     output:
         bam=temp("temp/{sm}/gmm.{scatteritem}.bam"),
@@ -224,9 +202,32 @@ rule gmm:
         """
 
 
+rule primrose:
+    input:
+        bam=rules.gmm.output.bam,
+    output:
+        bam=temp("temp/{sm}/primrose.{scatteritem}.bam"),
+        pbi=temp("temp/{sm}/primrose.{scatteritem}.bam.pbi"),
+    threads: scatter_threads
+    conda:
+        env
+    log:
+        "logs/{sm}/primrose/{scatteritem}.log",
+    benchmark:
+        "benchmarks/{sm}/primrose/{scatteritem}.tbl"
+    priority: 0
+    shell:
+        """
+        primrose --min-passes 3 -j {threads} \
+             --keep-kinetics \
+            {input.bam} {output.bam} \
+            &> {log}
+        """
+
+
 rule train_hmm:
     input:
-        bam=f"temp/{{sm}}/gmm.1-of-{n_chunks}.bam",
+        bam=f"temp/{{sm}}/primrose.1-of-{n_chunks}.bam",
     output:
         model=temp("temp/{sm}/hmm_model.json"),
     conda:
@@ -251,7 +252,7 @@ rule train_hmm:
 
 rule nucleosome:
     input:
-        bam=rules.gmm.output.bam,
+        bam=rules.primrose.output.bam,
         model=rules.train_hmm.output.model,
     output:
         bam=temp("temp/{sm}/nuc.{scatteritem}.bam"),
