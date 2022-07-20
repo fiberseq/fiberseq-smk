@@ -78,7 +78,7 @@ rule split_ccs_zmws:
 rule split_ccs:
     input:
         bam=get_input_ccs,
-        bam=get_input_pbi,
+        pbi=get_input_pbi,
         txt="temp/{sm}/split_ccs_zmws/{scatteritem}.txt",
     output:
         bam=temp("temp/{sm}/split_ccs/ccs.{scatteritem}.bam"),
