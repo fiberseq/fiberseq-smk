@@ -71,7 +71,7 @@ rule split_ccs_zmws:
     priority: 20
     shell:
         """
-        {params.split_zmws} {input.txt} -o {output.txt} 2> {log}
+        python {params.split_zmws} {input.txt} -o {output.txt} 2> {log}
         """
 
 
