@@ -177,10 +177,34 @@ rule ipdSummary:
         """
 
 
+rule primrose:
+    input:
+        bam=rules.ccs.output.bam,
+        pbi=rules.ccs.output.pbi,
+    output:
+        bam=temp("temp/{sm}/primrose.{scatteritem}.bam"),
+        pbi=temp("temp/{sm}/primrose.{scatteritem}.bam.pbi"),
+    threads: scatter_threads
+    conda:
+        env
+    log:
+        "logs/{sm}/primrose/{scatteritem}.log",
+    benchmark:
+        "benchmarks/{sm}/primrose/{scatteritem}.tbl"
+    priority: 0
+    shell:
+        """
+        primrose --min-passes 3 -j {threads} \
+             --keep-kinetics \
+            {input.bam} {output.bam} \
+            &> {log}
+        """
+
+
 rule gmm:
     input:
-        ccs=rules.ccs.output.bam,
-        pbi=rules.ccs.output.pbi,
+        ccs=rules.primrose.output.bam,
+        pbi=rules.primrose.output.pbi,
         csv=rules.ipdSummary.output.csv,
     output:
         bam=temp("temp/{sm}/gmm.{scatteritem}.bam"),
@@ -199,29 +223,6 @@ rule gmm:
     shell:
         """
         python {params.gmm} --threads {threads} {input.csv} {input.ccs} > {output.bam} 2> {log}
-        """
-
-
-rule primrose:
-    input:
-        bam=rules.gmm.output.bam,
-    output:
-        bam=temp("temp/{sm}/primrose.{scatteritem}.bam"),
-        pbi=temp("temp/{sm}/primrose.{scatteritem}.bam.pbi"),
-    threads: scatter_threads
-    conda:
-        env
-    log:
-        "logs/{sm}/primrose/{scatteritem}.log",
-    benchmark:
-        "benchmarks/{sm}/primrose/{scatteritem}.tbl"
-    priority: 0
-    shell:
-        """
-        primrose --min-passes 3 -j {threads} \
-             --keep-kinetics \
-            {input.bam} {output.bam} \
-            &> {log}
         """
 
 
