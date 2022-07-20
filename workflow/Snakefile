@@ -89,6 +89,7 @@ rule primrose:
         bam=rules.ccs.output.bam,
     output:
         bam=temp("temp/{sm}/primrose.{scatteritem}.bam"),
+        pbi=temp("temp/{sm}/primrose.{scatteritem}.bam.pbi"),
     threads: scatter_threads
     conda:
         env
@@ -200,6 +201,7 @@ rule ipdSummary:
 rule gmm:
     input:
         ccs=rules.primrose.output.bam,
+        pbi=rules.primrose.output.pbi,
         csv=rules.ipdSummary.output.csv,
     output:
         bam=temp("temp/{sm}/gmm.{scatteritem}.bam"),
