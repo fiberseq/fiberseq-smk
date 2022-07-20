@@ -1,7 +1,39 @@
+# NO CCS FILE PROVIDED SO WE MUST GENERATE ONE
+rule ccs:
+    input:
+        bam=get_subreads,
+    output:
+        bam=temp("temp/{sm}/ccs.{scatteritem}.bam"),
+        pbi=temp("temp/{sm}/ccs.{scatteritem}.bam.pbi"),
+        json=temp("temp/{sm}/ccs.{scatteritem}.zmw_metrics.json.gz"),
+        txt=temp("temp/{sm}/ccs.{scatteritem}.ccs_report.txt"),
+    resources:
+        mem_mb=16 * 1024,
+    threads: scatter_threads
+    conda:
+        env
+    log:
+        "logs/{sm}/ccs/{scatteritem}.log",
+    benchmark:
+        "benchmarks/{sm}/ccs/{scatteritem}.tbl"
+    params:
+        chunk=get_chunk,
+    priority: 0
+    shell:
+        """
+        ccs {input.bam} {output.bam} \
+            --metrics-json {output.json} \
+            --report-file {output.txt} \
+            --hifi-kinetics -j {threads} \
+            --chunk {params.chunk} \
+        &> {log}
+        """
 
+
+# CCS FILE PROVIDED SO WE MUST CHUNK IT INTO THE APPROPRIATE NUMBER OF SUBFILES
 rule ccs_zmws:
     input:
-        bam=get_ccs_bam,
+        bam=get_input_ccs,
     output:
         txt=temp("temp/{sm}/ccs_zmws/ccs_zmws.txt"),
     threads: 1
@@ -45,10 +77,10 @@ rule split_ccs_zmws:
 
 rule split_ccs:
     input:
-        bam=get_ccs_bam,
+        bam=get_input_ccs,
         txt="temp/{sm}/split_ccs_zmws/{scatteritem}.txt",
     output:
-        bam=temp("temp/{sm}/split_ccs/ccs_{scatteritem}.bam"),
+        bam=temp("temp/{sm}/split_ccs/ccs.{scatteritem}.bam"),
     threads: 1
     conda:
         env
