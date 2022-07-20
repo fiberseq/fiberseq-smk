@@ -57,8 +57,8 @@ rule all:
 
 rule actc:
     input:
-        ccs=rules.ccs.output.bam,
-        pbi=rules.ccs.output.pbi,
+        ccs=get_ccs_bam,
+        pbi=get_ccs_pbi,
         subreads=get_subreads,
     output:
         bam=temp("temp/{sm}/actc.{scatteritem}.bam"),
@@ -149,8 +149,8 @@ rule ipdSummary:
 
 rule primrose:
     input:
-        bam=rules.ccs.output.bam,
-        pbi=rules.ccs.output.pbi,
+        ccs=get_ccs_bam,
+        pbi=get_ccs_pbi,
     output:
         bam=temp("temp/{sm}/primrose.{scatteritem}.bam"),
         pbi=temp("temp/{sm}/primrose.{scatteritem}.bam.pbi"),

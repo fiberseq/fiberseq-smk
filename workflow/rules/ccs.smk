@@ -81,6 +81,7 @@ rule split_ccs:
         txt="temp/{sm}/split_ccs_zmws/{scatteritem}.txt",
     output:
         bam=temp("temp/{sm}/split_ccs/ccs.{scatteritem}.bam"),
+        pbi=temp("temp/{sm}/split_ccs/ccs.{scatteritem}.bam.pbi"),
     threads: 1
     conda:
         env
@@ -92,4 +93,5 @@ rule split_ccs:
     shell:
         """
         zmwfilter --include {input.txt} {input.bam} {output.bam} 2> {log}
+        pbindex {output.bam}
         """

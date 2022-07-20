@@ -14,11 +14,11 @@ def align_results(sm):
 
 
 def get_input_ccs(wc):
-    return ccs
+    return input_ccs
 
 
 def get_ccs_bam(wc):
-    if ccs is None:
+    if input_ccs is None:
         return "temp/{sm}/ccs.{scatteritem}.bam"
     return "temp/{sm}/split_ccs/ccs.{scatteritem}.bam"
 
