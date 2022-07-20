@@ -13,7 +13,10 @@ ref = config.pop("ref", None)
 # one chunk per GB in the subreads
 
 default_n_chunks = min(
-    [int(os.path.getsize(subreads) / 1024**3) for sample, subreads in config.items()]
+    [
+        int(os.path.getsize(subreads) / 1024**3) + 1
+        for sample, subreads in config.items()
+    ]
 )
 
 
