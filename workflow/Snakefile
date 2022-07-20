@@ -228,7 +228,7 @@ rule gmm:
 
 rule train_hmm:
     input:
-        bam=f"temp/{{sm}}/primrose.1-of-{n_chunks}.bam",
+        bam=f"temp/{{sm}}/gmm.1-of-{n_chunks}.bam",
     output:
         model=temp("temp/{sm}/hmm_model.json"),
     conda:
