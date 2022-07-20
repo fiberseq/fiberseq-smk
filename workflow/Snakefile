@@ -149,7 +149,7 @@ rule ipdSummary:
 
 rule primrose:
     input:
-        ccs=get_ccs_bam,
+        bam=get_ccs_bam,
         pbi=get_ccs_pbi,
     output:
         bam=temp("temp/{sm}/primrose.{scatteritem}.bam"),
