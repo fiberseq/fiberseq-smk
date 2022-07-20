@@ -14,7 +14,7 @@ ref = config.pop("ref", None)
 
 default_n_chunks = min(
     [
-        int(os.path.getsize(subreads) / 1024**3) + 1
+        int(2 * os.path.getsize(subreads) / 1024**3) + 1
         for sample, subreads in config.items()
     ]
 )
