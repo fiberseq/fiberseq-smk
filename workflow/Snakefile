@@ -253,7 +253,7 @@ rule train_hmm:
 
 rule nucleosome:
     input:
-        bam=rules.primrose.output.bam,
+        bam=rules.gmm.output.bam,
         model=rules.train_hmm.output.model,
     output:
         bam=temp("temp/{sm}/nuc.{scatteritem}.bam"),
