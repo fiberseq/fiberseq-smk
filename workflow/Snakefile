@@ -10,6 +10,11 @@ env = config.pop("env", "envs/env.yml")
 ref = config.pop("ref", None)
 # one chunk per GB in the subreads
 
+# make sure there is an existing index
+if input_ccs is not None:
+    assert os.path.exists(f"{input_ccs}.pbi")
+
+
 default_n_chunks = min(
     [
         int(2 * os.path.getsize(subreads) / 1024**3) + 1
