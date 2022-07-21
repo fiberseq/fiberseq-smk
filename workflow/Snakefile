@@ -76,8 +76,6 @@ rule actc:
         bam=temp("temp/{sm}/actc.{scatteritem}.bam"),
         fasta=temp("temp/{sm}/actc.{scatteritem}.fasta"),
     threads: scatter_threads
-    version:
-        "0.1.0"
     conda:
         env
     log:
