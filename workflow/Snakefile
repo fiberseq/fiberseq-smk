@@ -8,6 +8,10 @@ scatter_threads = config.pop("scatter_threads", 8)
 input_ccs = config.pop("ccs", None)
 env = config.pop("env", "envs/env.yml")
 ref = config.pop("ref", None)
+# output wildcards
+output_types = ["m6a", "cpg", "nuc", "msp"]
+aligned = ["aligned", "unaligned"]
+samples = list(config.keys())
 
 # make sure there is an existing index
 if input_ccs is not None:
@@ -32,30 +36,28 @@ include: "rules/ccs.smk"
 
 
 n_chunks = len(scatter.chunks("temp/{scatteritem}.fake"))
-output_types = ["m6a", "cpg", "nuc", "msp"]
-aligned = ["aligned", "unaligned"]
 
 
 wildcard_constraints:
-    sm="|".join(config.keys()),
+    sm="|".join(samples),
     data="|".join(output_types),
     aligned="|".join(aligned),
 
 
 rule all:
     input:
-        expand("results/{sm}/unaligned.fiberseq.bam", sm=list(config.keys())),
-        expand("results/{sm}/unaligned.fiberseq.bam.pbi", sm=list(config.keys())),
-        align_results(list(config.keys())),
+        expand("results/{sm}/unaligned.fiberseq.bam", sm=samples),
+        expand("results/{sm}/unaligned.fiberseq.bam.pbi", sm=samples),
+        align_results(samples),
         expand(
             "results/{sm}/{aligned}.{data}.bed.gz",
             aligned=aligned,
-            sm=list(config.keys()),
+            sm=samples,
             data=output_types,
         ),
         expand(
             "results/{sm}/aligned.{data}.bed.bb",
-            sm=list(config.keys()),
+            sm=samples,
             data=output_types,
         ),
 
