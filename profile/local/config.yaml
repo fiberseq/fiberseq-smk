@@ -3,5 +3,5 @@ rerun-triggers: mtime
 printshellcmds: True
 reason: True
 use-conda: True
-show-failed-logs: True 
+show-failed-logs: True
 cores: 8
