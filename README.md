@@ -56,6 +56,32 @@ ref: .test/hg38.analysisSet.fa
 ccs: .test/ccs.bam
 ```
 
+# Output files
+Example output files if your sample name is `test`:
+```bash 
+# bam files 
+results/test/unaligned.fiberseq.bam
+results/test/unaligned.fiberseq.bam.pbi
+# bed files
+results/test/unaligned.cpg.bed.gz
+results/test/unaligned.m6a.bed.gz
+results/test/unaligned.msp.bed.gz
+results/test/unaligned.nuc.bed.gz
+# aligned bam files 
+results/test/aligned.fiberseq.bam
+results/test/aligned.fiberseq.bam.bai
+# aligned bed files
+results/test/aligned.cpg.bed.gz
+results/test/aligned.m6a.bed.gz
+results/test/aligned.msp.bed.gz
+results/test/aligned.nuc.bed.gz
+# aligned big bed file
+results/test/aligned.nuc.bed.bb
+results/test/aligned.m6a.bed.bb
+results/test/aligned.cpg.bed.bb
+results/test/aligned.msp.bed.bb
+```
+
 # TODO
 - [x] Make an extract tool
 - [ ] Add a sample tag to the bam header.
