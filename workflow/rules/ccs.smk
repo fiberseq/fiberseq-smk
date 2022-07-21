@@ -31,6 +31,7 @@ rule ccs:
 
 
 # CCS FILE PROVIDED SO WE MUST CHUNK IT INTO THE APPROPRIATE NUMBER OF SUBFILES
+# TODO check that there are hifi kenetics files for each subfile
 rule ccs_zmws:
     input:
         bam=get_input_ccs,

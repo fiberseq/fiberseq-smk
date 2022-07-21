@@ -14,6 +14,7 @@ git clone https://github.com/StergachisLab/fiberseq-smk
 cd fiberseq-smk
 conda create -n fiberseq-smk
 mamba env update -n fiberseq-smk --file workflow/envs/env.yml 
+conda activate fiberseq-smk
 # Add the SMRTlink tools to your path
 export PATH=$PATH:/path/to/smrtlink/tools
 ```
@@ -104,6 +105,7 @@ results/test/aligned.msp.bed.bb
 - [x] Make an extract tool
 - [ ] Add a sample tag to the bam header.
 - [ ] Add a pipeline version to the bam header (git commit).
+- [ ] Add env version to the output somewhere. 
 - [x] Add primrose
 - [x] Add unknown case to end of fiber calls
 - [x] Add a ccs input option
