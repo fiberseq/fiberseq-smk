@@ -17,6 +17,10 @@ samples = list(config.keys())
 if input_ccs is not None:
     assert os.path.exists(f"{input_ccs}.pbi")
 
+# make sure all subreads have an index
+for sample, subreads in config.items():
+    assert os.path.exists(f"{subreads}.pbi")
+
 
 # Two chunks per GB in the subreads
 default_n_chunks = min(
