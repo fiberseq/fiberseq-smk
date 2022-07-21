@@ -103,12 +103,14 @@ results/test/aligned.msp.bed.bb
 
 # TODO
 - [x] Make an extract tool
-- [ ] Add a sample tag to the bam header.
-- [ ] Add a pipeline version to the bam header (git commit).
-- [ ] Add env version to the output somewhere. 
 - [x] Add primrose
 - [x] Add unknown case to end of fiber calls
 - [x] Add a ccs input option
+- [ ] Add a sample tag to the bam header.
+- [ ] Add a pipeline version to the bam header (git commit).
+- [ ] Add env version to the output somewhere. 
+- [ ] Can we check for de-multiplexing automatically?
+
 
 # Workflow
 
