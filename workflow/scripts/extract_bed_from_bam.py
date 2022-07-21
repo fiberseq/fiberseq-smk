@@ -186,7 +186,9 @@ def extract(bam, args):
 def parse():
     """Console script for fibertools."""
     parser = argparse.ArgumentParser(
-        description="", formatter_class=argparse.ArgumentDefaultsHelpFormatter
+        description="A tool for extracting fiberseq features from bam files.",
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter,
+        epilog="Author: Mitchell R. Vollger",
     )
     parser.add_argument("bam", help="(un)aligned bam file.")
     parser.add_argument(
