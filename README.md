@@ -23,10 +23,25 @@ Send your jobs to the cluster with:
 snakemake \
     --profile profile/checkpoint \
     --config env="fiberseq-smk" \
-    --configfile .test/config.yml \
-    --set-scatter chunks=40 \
+    --config \
+        ref=.test/ref.fa \
+        subreads=.test/subreads.bam \
     -p
 ```
+## Multiplexed data
+If you have multiplexed data, you have to pass a `ccs` bam into the pipeline that has already been processed with `lima`. e.g.
+```bash
+snakemake \
+    --profile profile/checkpoint \
+    --config env="fiberseq-smk" \
+    --config \
+        ref=.test/ref.fa \
+        subreads=.test/subreads.bam \
+        ccs=.test/ccs.bam \
+    -p
+```
+
+
 ## Example config file
 
 ```yaml
