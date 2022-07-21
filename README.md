@@ -24,8 +24,8 @@ Send your jobs to the cluster with:
 ```bash
 snakemake \
     --profile profile/checkpoint \
-    --config env="fiberseq-smk" \
     --config \
+        env="fiberseq-smk" \
         ref=.test/ref.fa \
         subreads=.test/subreads.bam \
     -p
@@ -35,8 +35,8 @@ If you have multiplexed data, you have to pass a `ccs` bam into the pipeline tha
 ```bash
 snakemake \
     --profile profile/checkpoint \
-    --config env="fiberseq-smk" \
     --config \
+        env="fiberseq-smk" \
         ref=.test/ref.fa \
         subreads=.test/subreads.bam \
         ccs=.test/ccs.bam \
