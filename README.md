@@ -40,10 +40,11 @@ snakemake \
         ccs=.test/ccs.bam \
     -p
 ```
+In general, you can pass a pre-generated ccs bam file to save on compute.
 
 
 ## Example config file
-
+Instead of passing configuration options on the command line, you can pass a config file. Here is an example, you often call this file `config.yml`:
 ```yaml
 # sample name and then path to the subreads
 test: .test/subreads.bam
