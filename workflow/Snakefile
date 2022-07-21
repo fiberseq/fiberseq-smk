@@ -14,7 +14,7 @@ if input_ccs is not None:
     assert os.path.exists(f"{input_ccs}.pbi")
 
 
-# one chunk per GB in the subreads
+# Two chunks per GB in the subreads
 default_n_chunks = min(
     [
         int(2 * os.path.getsize(subreads) / 1024**3) + 1
