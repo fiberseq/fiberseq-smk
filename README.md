@@ -48,8 +48,10 @@ Instead of passing configuration options on the command line, you can pass a con
 ```yaml
 # sample name and then path to the subreads
 test: .test/subreads.bam
-# path to the reference genome
-ref: /mmfs1/gscratch/stergachislab/assemblies/hg38.analysisSet.fa
+# path to the reference genome, optional input
+ref: .test/hg38.analysisSet.fa
+# path to the ccs bam file, optional input
+ccs: .test/ccs.bam
 ```
 
 # TODO
