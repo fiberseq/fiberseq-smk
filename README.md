@@ -10,6 +10,8 @@ A Snakemake workflow for making **fiberseq** calls.
 # Installation
 
 ```bash
+git clone https://github.com/StergachisLab/fiberseq-smk
+cd fiberseq-smk
 conda create -n fiberseq-smk
 mamba env update -n fiberseq-smk --file workflow/envs/env.yml 
 # Add the SMRTlink tools to your path
