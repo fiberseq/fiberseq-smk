@@ -198,7 +198,7 @@ def parse():
     parser.add_argument(
         "-c",
         "--cpg",
-        help="Output m6a bed12.",
+        help="Output CpG bed12.",
         type=argparse.FileType("w"),
     )
     parser.add_argument(
@@ -210,7 +210,7 @@ def parse():
     parser.add_argument(
         "-a",
         "--msp",
-        help="Output accessible stretches in bed12.",
+        help="Output accessible stretches (MSPs) in bed12.",
         type=argparse.FileType("w"),
     )
     parser.add_argument(
