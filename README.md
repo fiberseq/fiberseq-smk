@@ -58,6 +58,14 @@ ccs: .test/ccs.bam
 
 # Output files
 Example output files if your sample name is `test`:
+<table>
+<tr>
+<th> Unaligned outputs </th>
+<th> Aligned outputs </th>
+</tr>
+<tr>
+<td>
+
 ```bash 
 # bam files 
 results/test/unaligned.fiberseq.bam
@@ -67,6 +75,11 @@ results/test/unaligned.cpg.bed.gz
 results/test/unaligned.m6a.bed.gz
 results/test/unaligned.msp.bed.gz
 results/test/unaligned.nuc.bed.gz
+```
+</td>
+<td>
+
+```bash
 # aligned bam files 
 results/test/aligned.fiberseq.bam
 results/test/aligned.fiberseq.bam.bai
@@ -81,6 +94,11 @@ results/test/aligned.m6a.bed.bb
 results/test/aligned.cpg.bed.bb
 results/test/aligned.msp.bed.bb
 ```
+</td>
+</tr>
+</table>
+
+
 
 # TODO
 - [x] Make an extract tool
