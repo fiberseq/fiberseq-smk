@@ -19,6 +19,11 @@ conda activate fiberseq-smk
 export PATH=$PATH:/path/to/smrtlink/tools
 ```
 
+On the Stergachis Lab's cluster, you can add the following line to your `~/.bashrc` to load the needed `SMRTlink` tools:
+```bash
+PATH=$PATH:/gscratch/stergachislab/install_dir/smrtlink/smrtcmds/bin/
+```
+
 # Test case
 **Before running your own data** please run this small test case included in the repository.
 
