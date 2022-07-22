@@ -20,7 +20,9 @@ export PATH=$PATH:/path/to/smrtlink/tools
 ```
 
 # Test case
+**Before running your own data** please run this small test case included in the repository.
 
+```bash
 ## Local test case
 ```bash
 snakemake \
@@ -34,6 +36,7 @@ snakemake \
 ```
 
 ## Cluster test case
+You can also try submitting this test case to the cluster. Note the profile is currently configured for the Stergachis Lab cluster, you may need to modify it.
 ```bash
 snakemake \
   --profile profile/compute \
