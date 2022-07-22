@@ -334,31 +334,32 @@ rule make_beds:
     input:
         bam="results/{sm}/{aligned}.fiberseq.bam",
     output:
-        cpg=temp("temp/{sm}/{aligned}.cpg.bed"),
-        msp=temp("temp/{sm}/{aligned}.msp.bed"),
-        m6a=temp("temp/{sm}/{aligned}.m6a.bed"),
-        nuc=temp("temp/{sm}/{aligned}.nuc.bed"),
+        #cpg=temp("temp/{sm}/{aligned}.cpg.bed"),
+        #msp=temp("temp/{sm}/{aligned}.msp.bed"),
+        #m6a=temp("temp/{sm}/{aligned}.m6a.bed"),
+        #nuc=temp("temp/{sm}/{aligned}.nuc.bed"),
+        bed=temp("temp/{sm}/{aligned}.{data}.bed"),
     conda:
         env
     log:
-        "logs/{sm}/make_beds/{aligned}_beds.log",
+        "logs/{sm}/make_beds/{aligned}_{data}.bed.log",
     resources:
         disk_mb=8000,
         time=240,
     threads: 8
     benchmark:
-        "benchmarks/{sm}/make_beds/{aligned}_beds.tbl"
+        "benchmarks/{sm}/make_beds/{aligned}_{data}.bed.tbl"
     params:
         extract=workflow.source_path("scripts/extract_bed_from_bam.py"),
         aligned=lambda wc: "-r" if wc.aligned == "aligned" else "",
+        data=lambda wc: f"--{wc.data}",
     priority: 300
     shell:
         """
         python {params.extract} \
             --threads {threads} \
             {params.aligned} {input.bam} \
-            --cpg {output.cpg} --msp {output.msp} \
-            --m6a {output.m6a} --nuc {output.nuc} \
+            {params.data} {output.bed} \
         2> {log}
         """
 
