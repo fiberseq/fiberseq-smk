@@ -26,4 +26,5 @@ printshellcmds: True
 reason: True
 use-conda: True
 show-failed-logs: True 
-scheduler: greedy
+latency-wait: 30
+max-jobs-per-second: 50
