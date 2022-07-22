@@ -378,7 +378,7 @@ rule compress_bed:
     priority: 300
     shell:
         """
-        cat {input.bed} | bgzip -@ {threads} > {output.bed}
+        cat {input.bed} | bgzip -@ {threads} > {output.bed} 2> {log}
         """
 
 
@@ -398,6 +398,6 @@ rule bigbed:
     priority: 300
     shell:
         """
-        sort -k1,1 -k2,2n {input.bed} > {output.bed}
-        bedToBigBed {output.bed} {input.fai} {output.bb}
+        sort -k1,1 -k2,2n {input.bed} > {output.bed} 2> {log}
+        bedToBigBed {output.bed} {input.fai} {output.bb} 2>> {log}
         """
