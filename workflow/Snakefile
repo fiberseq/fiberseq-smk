@@ -173,7 +173,7 @@ rule primrose:
         "logs/{sm}/primrose/{scatteritem}.log",
     benchmark:
         "benchmarks/{sm}/primrose/{scatteritem}.tbl"
-    priority: 50
+    priority: 100
     shell:
         """
         primrose --min-passes 3 -j {threads} \
@@ -201,7 +201,7 @@ rule gmm:
         gmm=workflow.source_path("scripts/push_m6a_to_bam.py"),
     benchmark:
         "benchmarks/{sm}/gmm/{scatteritem}.tbl"
-    priority: 50
+    priority: 1000  # Run this as fast as possible so we can delete the csv from idpSummary.
     shell:
         """
         python {params.gmm} --threads {threads} {input.csv} {input.ccs} > {output.bam} 2> {log}
