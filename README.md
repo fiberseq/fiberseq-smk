@@ -19,6 +19,32 @@ conda activate fiberseq-smk
 export PATH=$PATH:/path/to/smrtlink/tools
 ```
 
+# Test case
+
+## Local test case
+```bash
+snakemake \
+  --profile profile/local \
+  --config \
+    env="fiberseq-smk" \
+    test=.test/subreads.bam \
+    ccs=.test/ccs.bam \
+    ref=.test/ref.fa \
+  -p 
+```
+
+## Cluster test case
+```bash
+snakemake \
+  --profile profile/compute \
+  --config \
+    env="fiberseq-smk" \
+    test=.test/subreads.bam \
+    ccs=.test/ccs.bam \
+    ref=.test/ref.fa \
+  -p 
+```
+
 # Usage
 
 Send your jobs to the cluster with:
