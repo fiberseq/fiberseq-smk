@@ -26,4 +26,3 @@ printshellcmds: True
 reason: True
 use-conda: True
 show-failed-logs: True 
-scheduler: greedy
