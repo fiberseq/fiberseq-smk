@@ -242,12 +242,14 @@ rule nucleosome:
     conda:
         env
     log:
-        "logs/{sm}/nuc/{scatteritem}.log",
+        "logs/{sm}/nucleosome/{scatteritem}.log",
     params:
         nuc=workflow.source_path("scripts/add_nucleosomes.py"),
     benchmark:
-        "benchmarks/{sm}/nuc/{scatteritem}.tbl"
+        "benchmarks/{sm}/nucleosome/{scatteritem}.tbl"
     threads: 4
+    resources:
+        disk_mb=16 * 1024,
     priority: 70
     shell:
         """
