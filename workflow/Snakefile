@@ -146,7 +146,7 @@ rule ipdSummary:
         "logs/{sm}/ipdSummary/{scatteritem}.log",
     benchmark:
         "benchmarks/{sm}/ipdSummary/{scatteritem}.tbl"
-    priority: 40
+    priority: 10
     shell:
         """
         ipdSummary \
@@ -173,7 +173,7 @@ rule primrose:
         "logs/{sm}/primrose/{scatteritem}.log",
     benchmark:
         "benchmarks/{sm}/primrose/{scatteritem}.tbl"
-    priority: 0
+    priority: 50
     shell:
         """
         primrose --min-passes 3 -j {threads} \
