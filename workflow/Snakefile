@@ -16,7 +16,7 @@ samples = list(config.keys())
 
 # make sure there is an existing index
 if input_ccs is not None:
-    assert os.path.exists(f"{input_ccs}.pbi"), f"pbi for {subreads} does not exist"
+    assert os.path.exists(f"{input_ccs}.pbi"), f"pbi for {input_ccs} does not exist"
 
 # make sure all subreads have an index
 for sample, subreads in config.items():
