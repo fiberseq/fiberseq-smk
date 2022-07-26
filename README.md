@@ -24,73 +24,78 @@ On the Stergachis Lab's cluster, you can add the following line to your `~/.bash
 PATH=$PATH:/gscratch/stergachislab/install_dir/smrtlink/smrtcmds/bin/
 ```
 
-# Test case
-**Before running your own data** please run this small test case included in the repository.
-
-```bash
-## Local test case
-```bash
-snakemake \
-  --profile profile/local \
-  --config \
-    env="fiberseq-smk" \
-    test=.test/subreads.bam \
-    ccs=.test/ccs.bam \
-    ref=.test/ref.fa \
-  -p 
-```
-
-## Cluster test case
-You can also try submitting this test case to the cluster. Note the profile is currently configured for the Stergachis Lab cluster, you may need to modify it.
-```bash
-snakemake \
-  --profile profile/compute \
-  --config \
-    env="fiberseq-smk" \
-    test=.test/subreads.bam \
-    ccs=.test/ccs.bam \
-    ref=.test/ref.fa \
-  -p 
-```
-
 # Usage
 
-Send your jobs to the cluster with:
+You can run data using the following command, read the comments to learn more about the config options:
 ```bash
 snakemake \
-    --profile profile/checkpoint \
-    --config \
-        env="fiberseq-smk" \
-        ref=.test/ref.fa \
-        subreads=.test/subreads.bam \
-    -p
+  --profile profile/local `# sets up where and how jobs are submitted` \
+  --config \
+    env="fiberseq-smk" `# sets the conda env for the jobs, always the same` \
+    test=.test/subreads.bam `# path to the subreads, and the key sets the sample name` \
+    ccs=.test/ccs.bam `# optional, precomputed CCS bam, needed for multiplexed data` \
+    ref=.test/ref.fa `# optional, reference to align results to`  
 ```
-## Multiplexed data
-If you have multiplexed data, you have to pass a `ccs` bam into the pipeline that has already been processed with `lima`. e.g.
+If you find this too verbose you can instead include the config options in a configuration file:
 ```bash
-snakemake \
-    --profile profile/checkpoint \
-    --config \
-        env="fiberseq-smk" \
-        ref=.test/ref.fa \
-        subreads=.test/subreads.bam \
-        ccs=.test/ccs.bam \
-    -p
+snakemake --profile profile/local --configfile config.yaml 
 ```
-In general, you can pass a pre-generated ccs bam file to save on compute.
-
-
-## Example config file
-Instead of passing configuration options on the command line, you can pass a config file. Here is an example, you often call this file `config.yml`:
+And then specify the options in the `config.yaml`, for example:
 ```yaml
-# sample name and then path to the subreads
+# sets the conda env for the jobs, always the same
+env: fiberseq-smk
+# choose any sample name followed by a path to the subreads
 test: .test/subreads.bam
-# path to the reference genome, optional input
+# optional path to a reference fasta to align the results to
 ref: .test/hg38.analysisSet.fa
-# path to the ccs bam file, optional input
+# optional path to the ccs bam file to avoid recomputing (required for multiplexed data)
 ccs: .test/ccs.bam
 ```
 
+
+# Test case
+**Before running your own data** please run this small test case included in the repository.
+
+## Local test case
+```bash
+snakemake \
+  --profile profile/local `# sets up where and how jobs are submitted` \
+  --config \
+    env="fiberseq-smk" `# sets the conda env for the jobs` \
+    test=.test/subreads.bam `# path to the subreads, and the key sets the sample name` \
+    ccs=.test/ccs.bam `# optional precomputed CCS bam, needed for multiplexed data` \
+    ref=.test/ref.fa `# optional, reference to align results to` \
+  -p 
+```
+
+## Submitting the test case to the cluster 
+You can also try submitting this test case to the cluster. Note the profile is currently configured for the Stergachis Lab cluster, you may need to modify it.
+```bash
+snakemake \
+  --profile profile/compute `# sets up where and how jobs are submitted` \
+  --config \
+    env="fiberseq-smk" `# sets the conda env for the jobs` \
+    test=.test/subreads.bam `# path to the subreads, and the key sets the sample name` \
+    ccs=.test/ccs.bam `# optional precomputed CCS bam, needed for multiplexed data` \
+    ref=.test/ref.fa `# optional, reference to align results to` \
+  -p 
+```
+
+## Submitting the test case to checkpoint 
+Similarly you can submit to the `checkpoint` nodes with: 
+```bash
+snakemake \
+  --profile profile/compute `# sets up where and how jobs are submitted` \
+  --config \
+    env="fiberseq-smk" `# sets the conda env for the jobs` \
+    test=.test/subreads.bam `# path to the subreads, and the key sets the sample name` \
+    ccs=.test/ccs.bam `# optional precomputed CCS bam, needed for multiplexed data` \
+    ref=.test/ref.fa `# optional, reference to align results to` \
+  -p 
+```
+
+## Multiplexed data
+If you have multiplexed data, you have to pass a `ccs` bam into the pipeline that has already been processed with `lima`. In general, you can pass a pre-generated ccs bam file to save on compute.
 # Output files
 Example output files if your sample name is `test`:
 <table>
