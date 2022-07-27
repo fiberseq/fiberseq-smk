@@ -27,3 +27,4 @@ reason: True
 use-conda: True
 show-failed-logs: True 
 latency-wait: 30
+max-jobs-per-second: 50
