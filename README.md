@@ -140,8 +140,8 @@ results/test/aligned.msp.bed.bb
 
 ## Added bam tags and definitions.
 - MSP: methylation sensitive patch, defined as being any stretch of sequence between nucleosomes that has methylation.
-- ms: A bam tag with an array of MSP start sites
-- ml: A bam tag with an array of MSP lengths
+- as: A bam tag with an array of MSP start sites
+- al: A bam tag with an array of MSP lengths
 - ns: A bam tag with an array of nucleosome start sites
 - nl: A bam tag with an array of nucleosome lengths
 - MM/ML: Bam tags for sorting m6a and 5mC methylation information. See the SAM spec for details.
