@@ -138,6 +138,15 @@ results/test/aligned.msp.bed.bb
 </tr>
 </table>
 
+All the bed output files are [bed12 format](https://genome.ucsc.edu/FAQ/FAQformat.html#format1). If the bed output beings with `aligned` all the bed file coordinates are in reference space, conversely if it begins with `unaligned` then all the coordinates are with respect to the unaligned fiberseq read. For both `aligned` and `unaligned` there are four types of bed files:
+
+- `cpg`: Uses the block starts in bed12 format to describe the positions of `5mC` calls from `primrose`
+- `m6a`: Uses the block starts in bed12 format to describe the positions of `m6a` calls from the pipeline
+- `msp`: Uses the block starts and block lengths in bed12 format to describe the start and end of Methylation Sensitive Patches (MSPs)
+- `nuc`: Uses the block starts and block lengths in bed12 format to describe the start and end of nucleosomes
+
+For all records in all the bed files the first and last block position do not reflect real data, they are only there because bed12 format requires the first and last block to match the first and last position of the entire read.
+
 ## Added bam tags and definitions.
 - MSP: methylation sensitive patch, defined as being any stretch of sequence between nucleosomes that has methylation.
 - as: A bam tag with an array of MSP start sites
