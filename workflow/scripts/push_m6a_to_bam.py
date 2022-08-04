@@ -106,7 +106,11 @@ def apply_gmm(
         # add modifications to bam
         A_mods, A_mod_count = coordinateConversion_MMTag(sequence, "A", mol_m6a)
         T_mods, T_mod_count = coordinateConversion_MMTag(sequence, "T", mol_m6a)
-        mods = "A+a," + A_mods + ";" + "T-a," + T_mods + ";"
+        mods = ""
+        if A_mod_count > 0:
+            mods += "A+a," + A_mods + ";"
+        if T_mod_count > 0:
+            mods += "T-a," + T_mods + ";"
         new_probabilities = [255] * mod_count
 
         assert (
@@ -129,9 +133,9 @@ def apply_gmm(
             )
             new_probs_length = len(new_probs)
 
-            assert (
-                new_mod_length == new_probs_length
-            ), f"{new_mod_length} != {new_probs_length}"
+            # assert (
+            #    new_mod_length == new_probs_length
+            # ), f"{new_mod_length} != {new_probs_length}"
 
             new_tags = [("MM", new_mods, "Z"), ("ML", new_probs, "C")]
             for tag_set in rec.get_tags():
