@@ -1,3 +1,4 @@
 test: .test/subreads.bam
 ref: .test/ref.fa      
+env: fiberseq-smk
 #ccs: .test/ccs.bam
