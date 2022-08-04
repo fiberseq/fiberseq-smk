@@ -30,7 +30,7 @@ def coordinateConversion_MMTag(sequence, base, modification_coords):
     masked_coords = np.cumsum(mask)[coords] - 1
     distance = np.diff(masked_coords) - 1
     if coords.shape[0] < 1:
-        return ""
+        return "", 0
     return (
         ",".join([masked_coords[0].astype(str)] + list(distance.astype(str))),
         coords.shape[0],
