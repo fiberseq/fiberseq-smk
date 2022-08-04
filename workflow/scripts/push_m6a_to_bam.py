@@ -198,6 +198,7 @@ def main():
     csv = read_csv(args.csv)
 
     if args.model is not None:
+        logging.debug(f"Loading pre-trained model from {args.model}")
         model = read_model(args.model)
     else:
         model = None

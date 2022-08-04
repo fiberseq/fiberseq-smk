@@ -236,7 +236,7 @@ rule gmm:
     priority: 1000  # Run this as fast as possible so we can delete the csv from idpSummary.
     shell:
         """
-        python {params.gmm} {params.model} --threads {threads} {input.csv} {input.ccs} > {output.bam} 2> {log}
+        python {params.gmm} -v {params.model} --threads {threads} {input.csv} {input.ccs} > {output.bam} 2> {log}
         """
 
 
