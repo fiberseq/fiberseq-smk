@@ -189,7 +189,7 @@ rule train_gmm:
         bam=f"temp/{{sm}}/primrose.1-of-{n_chunks}.bam",
         csv=f"temp/{{sm}}/ipdSummary.1-of-{n_chunks}.csv",
     output:
-        model=temp("temp/{sm}/gmm_model.pkl"),
+        model="results/{sm}/gmm_model.pkl",
     conda:
         env
     log:

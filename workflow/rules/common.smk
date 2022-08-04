@@ -33,5 +33,7 @@ def get_ccs_pbi(wc):
 
 def get_gmm_model(wc):
     if gmm_model is True:
-        return f"temp/{wc.sm}/gmm_model.pkl"
+        return f"results/{wc.sm}/gmm_model.pkl"
+    elif os.path.exists(gmm_model):
+        return gmm_model
     return []
