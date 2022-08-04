@@ -121,10 +121,18 @@ def apply_gmm(
         if rec.has_tag("MM"):
             original_mods = rec.get_tag("MM")
             new_mods = str(original_mods) + mods
+            new_mod_length = new_mods.count(",")
+
             original_probs = list(rec.get_tag("ML"))
             new_probs = (
                 np.array(original_probs + new_probabilities).astype(int).tolist()
             )
+            new_probs_length = len(new_probs)
+
+            assert (
+                new_mod_length == new_probs_length
+            ), f"{new_mod_length} != {new_probs_length}"
+
             new_tags = [("MM", new_mods, "Z"), ("ML", new_probs, "C")]
             for tag_set in rec.get_tags():
                 if tag_set[0] != "MM" and tag_set[0] != "ML":
