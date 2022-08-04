@@ -138,7 +138,8 @@ def read_csv(file):
         },
     )
     csv = csv[
-        (csv.base == "A" and csv.strand == 0) | (csv.base == "T" and csv.strand == 1)
+        ((csv.base == "A") & (csv.strand == 0))
+        | ((csv.base == "T") & (csv.strand == 1))
     ]
     csv.set_index("refName", inplace=True)
     logging.debug("Done reading csv")
