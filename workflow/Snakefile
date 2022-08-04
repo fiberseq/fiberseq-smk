@@ -215,10 +215,10 @@ rule train_gmm:
 
 rule gmm:
     input:
+        get_gmm_model,  # can be empty if we are training per fiber
         ccs=rules.primrose.output.bam,
         pbi=rules.primrose.output.pbi,
         csv=rules.ipdSummary.output.csv,
-        model=get_gmm_model,  # can be empty if we are training per fiber
     output:
         bam=temp("temp/{sm}/gmm.{scatteritem}.bam"),
     threads: 4
@@ -230,7 +230,7 @@ rule gmm:
         "logs/{sm}/gmm/{scatteritem}.log",
     params:
         gmm=workflow.source_path("scripts/push_m6a_to_bam.py"),
-        #model=lambda wc: " --model " + get_gmm_model(wc) if gmm_model else "",
+        model=lambda wc: " --model " + get_gmm_model(wc) if gmm_model else "",
     benchmark:
         "benchmarks/{sm}/gmm/{scatteritem}.tbl"
     priority: 1000  # Run this as fast as possible so we can delete the csv from idpSummary.
