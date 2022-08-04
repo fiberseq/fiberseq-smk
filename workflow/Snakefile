@@ -9,6 +9,7 @@ scatter_threads = config.pop("scatter_threads", 8)
 input_ccs = config.pop("ccs", None)
 env = config.pop("env", "envs/env.yml")
 ref = config.pop("ref", None)
+gmm_model = config.pop("gmm_model", False)
 # output wildcards
 output_types = ["m6a", "cpg", "nuc", "msp"]
 aligned = ["aligned", "unaligned"]
@@ -183,11 +184,41 @@ rule primrose:
         """
 
 
+rule train_gmm:
+    input:
+        bam=f"temp/{{sm}}/primrose.1-of-{n_chunks}.bam",
+        csv=f"temp/{{sm}}/ipdSummary.1-of-{n_chunks}.csv",
+    output:
+        model=temp("temp/{sm}/gmm_model.pkl"),
+    conda:
+        env
+    log:
+        "logs/{sm}/train_gmm/train.log",
+    params:
+        gmm=workflow.source_path("scripts/push_m6a_to_bam.py"),
+    benchmark:
+        "benchmarks/{sm}/train_gmm/train.tbl"
+    resources:
+        disk_mb=16 * 1024,
+        mem_mb=16 * 1024,
+        time=200,
+    threads: 4
+    priority: 60
+    shell:
+        """
+        python {params.gmm} --threads {threads} \
+            {input.csv} {input.bam} \
+            --train -o {output.model} \
+            2> {log}
+        """
+
+
 rule gmm:
     input:
         ccs=rules.primrose.output.bam,
         pbi=rules.primrose.output.pbi,
         csv=rules.ipdSummary.output.csv,
+        model=get_gmm_model,  # can be empty if we are training per fiber
     output:
         bam=temp("temp/{sm}/gmm.{scatteritem}.bam"),
     threads: 4
@@ -199,12 +230,13 @@ rule gmm:
         "logs/{sm}/gmm/{scatteritem}.log",
     params:
         gmm=workflow.source_path("scripts/push_m6a_to_bam.py"),
+        model="--model {input.model}" if gmm_model else "",
     benchmark:
         "benchmarks/{sm}/gmm/{scatteritem}.tbl"
     priority: 1000  # Run this as fast as possible so we can delete the csv from idpSummary.
     shell:
         """
-        python {params.gmm} --threads {threads} {input.csv} {input.ccs} > {output.bam} 2> {log}
+        python {params.gmm} {params.model} --threads {threads} {input.csv} {input.ccs} > {output.bam} 2> {log}
         """
 
 

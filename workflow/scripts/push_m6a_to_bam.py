@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+from statistics import mode
 import pysam
 import sys
 import numpy as np
@@ -9,6 +10,8 @@ from sklearn.mixture import GaussianMixture
 import argparse
 import logging
 import tqdm
+from xgboost import train
+import pickle
 
 
 def coordinateConversion_MMTag(sequence, base, modification_coords):
@@ -31,7 +34,37 @@ def coordinateConversion_MMTag(sequence, base, modification_coords):
     return ",".join([masked_coords[0].astype(str)] + list(distance.astype(str)))
 
 
-def apply_gmm(csv, bam, out, min_prediction_value=0.99999999, min_number_of_calls=25):
+def train_gmm(ipdRatios):
+    gmm = GaussianMixture(
+        n_components=2, n_init=3, max_iter=500, covariance_type="full", tol=1e-5
+    )
+    return gmm.fit(ipdRatios)
+
+
+def apply_model(model, tpl, ipdRatios, min_prediction_value):
+    labels = model.predict_proba(ipdRatios)
+    predictions = labels[:, np.argmax(model.means_[:, 0])]
+    return tpl[predictions >= min_prediction_value]
+
+
+def write_model(model, file):
+    with open(file, "wb") as f:
+        pickle.dump(model, f)
+    logging.debug("Done writing model")
+
+
+def read_model(filename):
+    pickle.load(open(filename, "rb"))
+
+
+def apply_gmm(
+    csv,
+    bam,
+    out,
+    min_prediction_value=0.99999999,
+    min_number_of_calls=25,
+    pre_trained_model=None,
+):
     for rec in tqdm.tqdm(bam.fetch(until_eof=True), total=csv.index.unique().shape[0]):
         if not rec.query_name in csv.index:
             logging.debug(f"Missing {rec.query_name}")
@@ -44,19 +77,19 @@ def apply_gmm(csv, bam, out, min_prediction_value=0.99999999, min_number_of_call
             out.write(rec)
             continue
 
-        # convert to zero based
+        # convert to zero based coordinates on the read
         tpl = molecule_df.tpl.to_numpy() - 1
+        # ipd ratios for the above positions
         ipdRatios = molecule_df.ipdRatio.to_numpy().reshape(-1, 1)
 
-        gmm = GaussianMixture(
-            n_components=2, n_init=3, max_iter=500, covariance_type="full", tol=1e-5
-        )
-        model = gmm.fit(ipdRatios)
+        # either do per molecule training or use a pre-trained model
+        if pre_trained_model is None:
+            model = train_gmm(ipdRatios)
+        else:
+            model = pre_trained_model
 
-        labels = model.predict_proba(ipdRatios)
-
-        predictions = labels[:, np.argmax(model.means_[:, 0])]
-        mol_m6a = tpl[predictions >= min_prediction_value]
+        # coordinates of m6a calls predicted by the gmm
+        mol_m6a = apply_model(model, tpl, ipdRatios, min_prediction_value)
 
         # check the mod count is correct
         sequence = np.frombuffer(bytes(rec.query_sequence, "utf-8"), dtype="S1")
@@ -130,6 +163,16 @@ def parse():
         type=int,
         default=25,
     )
+    parser.add_argument(
+        "--model",
+        help="Pre trained GMM to load.",
+        default=None,
+    )
+    parser.add_argument(
+        "--train",
+        help="train a GMM instead of writing a bam",
+        action="store_true",
+    )
     parser.add_argument("-o", "--out", help="Output bam file.", default=sys.stdout)
     parser.add_argument("-t", "--threads", help="n threads to use", type=int, default=1)
     parser.add_argument(
@@ -142,18 +185,35 @@ def parse():
     return args
 
 
+def train_model_on_csv(csv, args):
+    ipdRatios = csv.ipdRatio.to_numpy().reshape(-1, 1)
+    logging.debug(f"Starting training on {ipdRatios.shape[0]:,} m6a calls")
+    model = train_gmm(ipdRatios)
+    write_model(model, args.out)
+
+
 def main():
     args = parse()
     csv = read_csv(args.csv)
-    bam = pysam.AlignmentFile(args.bam, threads=args.threads, check_sq=False)
-    out = pysam.AlignmentFile(args.out, "wb", template=bam)
-    apply_gmm(
-        csv,
-        bam,
-        out,
-        min_prediction_value=args.min_prediction_value,
-        min_number_of_calls=args.min_number_of_calls,
-    )
+
+    if args.model is not None:
+        model = read_model(args.model)
+    else:
+        model = None
+
+    if args.train:
+        train_model_on_csv(csv, args)
+    else:
+        bam = pysam.AlignmentFile(args.bam, threads=args.threads, check_sq=False)
+        out = pysam.AlignmentFile(args.out, "wb", template=bam)
+        apply_gmm(
+            csv,
+            bam,
+            out,
+            min_prediction_value=args.min_prediction_value,
+            min_number_of_calls=args.min_number_of_calls,
+            pre_trained_model=model,
+        )
     return 0
 
 

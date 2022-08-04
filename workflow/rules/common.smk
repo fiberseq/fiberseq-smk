@@ -29,3 +29,9 @@ def get_ccs_bam(wc):
 
 def get_ccs_pbi(wc):
     return f"{get_ccs_bam(wc)}.pbi"
+
+
+def get_gmm_model(wc):
+    if gmm_model is True:
+        return "temp/{sm}/gmm_model.pkl"
+    return []
