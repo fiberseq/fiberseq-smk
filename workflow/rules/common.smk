@@ -33,5 +33,5 @@ def get_ccs_pbi(wc):
 
 def get_gmm_model(wc):
     if gmm_model is True:
-        return "temp/{sm}/gmm_model.pkl"
+        return f"temp/{wc.sm}/gmm_model.pkl"
     return []
