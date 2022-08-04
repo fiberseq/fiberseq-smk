@@ -31,7 +31,10 @@ def coordinateConversion_MMTag(sequence, base, modification_coords):
     distance = np.diff(masked_coords) - 1
     if coords.shape[0] < 1:
         return ""
-    return ",".join([masked_coords[0].astype(str)] + list(distance.astype(str)))
+    return (
+        ",".join([masked_coords[0].astype(str)] + list(distance.astype(str))),
+        coords.shape[0],
+    )
 
 
 def train_gmm(ipdRatios):
