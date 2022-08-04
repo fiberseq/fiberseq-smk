@@ -105,6 +105,11 @@ def apply_gmm(
         T_mods = coordinateConversion_MMTag(sequence, "T", mol_m6a)
         mods = "A+a," + A_mods + ";" + "T-a," + T_mods + ";"
         new_probabilities = [255] * mod_count
+
+        assert (
+            len(A_mods) + len(T_mods) == mod_count
+        ), f"{len(A_mods) + len(T_mods)} != {mod_count}"
+
         # check if tag exists
         if rec.has_tag("MM"):
             original_mods = rec.get_tag("MM")
