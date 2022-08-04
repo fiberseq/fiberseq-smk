@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+from distutils.log import debug
 from statistics import mode
 import pysam
 import sys
@@ -85,6 +86,7 @@ def apply_gmm(
         if pre_trained_model is None:
             model = train_gmm(ipdRatios)
         else:
+            logging.debug("Using pre-trained model")
             model = pre_trained_model
 
         # coordinates of m6a calls predicted by the gmm
