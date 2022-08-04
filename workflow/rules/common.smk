@@ -36,4 +36,4 @@ def get_gmm_model(wc):
         return f"results/{wc.sm}/gmm_model.pkl"
     elif os.path.exists(gmm_model):
         return gmm_model
-    return None
+    return list()
