@@ -113,6 +113,10 @@ def apply_gmm(
             A_mod_count + T_mod_count == mod_count
         ), f"{A_mod_count + T_mod_count} != {mod_count}"
 
+        assert (
+            len(new_probabilities) == mod_count
+        ), f"{len(new_probabilities)} != {mod_count}"
+
         # check if tag exists
         if rec.has_tag("MM"):
             original_mods = rec.get_tag("MM")
