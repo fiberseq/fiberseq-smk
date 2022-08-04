@@ -54,7 +54,7 @@ def write_model(model, file):
 
 
 def read_model(filename):
-    pickle.load(open(filename, "rb"))
+    return pickle.load(open(filename, "rb"))
 
 
 def apply_gmm(
