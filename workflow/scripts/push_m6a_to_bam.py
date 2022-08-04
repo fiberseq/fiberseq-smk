@@ -101,14 +101,14 @@ def apply_gmm(
             continue
 
         # add modifications to bam
-        A_mods = coordinateConversion_MMTag(sequence, "A", mol_m6a)
-        T_mods = coordinateConversion_MMTag(sequence, "T", mol_m6a)
+        A_mods, A_mod_count = coordinateConversion_MMTag(sequence, "A", mol_m6a)
+        T_mods, T_mod_count = coordinateConversion_MMTag(sequence, "T", mol_m6a)
         mods = "A+a," + A_mods + ";" + "T-a," + T_mods + ";"
         new_probabilities = [255] * mod_count
 
         assert (
-            len(A_mods) + len(T_mods) == mod_count
-        ), f"{len(A_mods) + len(T_mods)} != {mod_count}"
+            A_mod_count + T_mod_count == mod_count
+        ), f"{A_mod_count + T_mod_count} != {mod_count}"
 
         # check if tag exists
         if rec.has_tag("MM"):
