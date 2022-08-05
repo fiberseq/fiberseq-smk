@@ -46,7 +46,9 @@ def train_gmm(ipdRatios, means_init=[0.5, 2.2]):
         tol=1e-5,
         means_init=means_init,
     )
-    return gmm.fit(ipdRatios)
+    model = gmm.fit(ipdRatios)
+    logging.debug(f"Done training GMM, means: {model.means_}")
+    return model
 
 
 def apply_model(model, tpl, ipdRatios, min_prediction_value):
