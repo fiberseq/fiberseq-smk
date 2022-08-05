@@ -206,7 +206,7 @@ rule train_gmm:
     priority: 60
     shell:
         """
-        python {params.gmm} --threads {threads} \
+        python {params.gmm} -v --threads {threads} \
             {input.csv} {input.bam} \
             --train -o {output.model} \
             2> {log}
