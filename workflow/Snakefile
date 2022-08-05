@@ -230,7 +230,8 @@ rule gmm:
         "logs/{sm}/gmm/{scatteritem}.log",
     params:
         gmm=workflow.source_path("scripts/push_m6a_to_bam.py"),
-        model=lambda wc: " --min-prediction-value 0.9999 --model " + get_gmm_model(wc)
+        model=lambda wc: " --min-prediction-value 0.999999 --model "
+        + get_gmm_model(wc)
         if gmm_model
         else "",
     benchmark:
@@ -260,7 +261,7 @@ rule train_hmm:
         mem_mb=16 * 1024,
         time=200,
     threads: 4
-    priority: 60
+    priority: 2000
     shell:
         """
         python {params.nuc} --threads {threads} {input.bam} {output.model} 2> {log}
