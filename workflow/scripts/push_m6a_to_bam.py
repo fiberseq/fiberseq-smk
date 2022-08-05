@@ -38,6 +38,7 @@ def coordinateConversion_MMTag(sequence, base, modification_coords):
 
 
 def train_gmm(ipdRatios, means_init=[0.5, 2.2]):
+    means_init = np.array(means_init).reshape(-1, 1)
     gmm = GaussianMixture(
         n_components=2,
         n_init=3,
