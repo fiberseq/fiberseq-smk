@@ -230,7 +230,7 @@ rule gmm:
         "logs/{sm}/gmm/{scatteritem}.log",
     params:
         gmm=workflow.source_path("scripts/push_m6a_to_bam.py"),
-        model=lambda wc: " --min-prediction-value 0.9999 --model " + get_gmm_model(wc)
+        model=lambda wc: " --min-prediction-value 0.999 --model " + get_gmm_model(wc)
         if gmm_model
         else "",
     benchmark:
