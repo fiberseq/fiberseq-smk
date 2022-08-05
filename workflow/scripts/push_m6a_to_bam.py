@@ -37,9 +37,14 @@ def coordinateConversion_MMTag(sequence, base, modification_coords):
     )
 
 
-def train_gmm(ipdRatios):
+def train_gmm(ipdRatios, means_init=[0.5, 2.2]):
     gmm = GaussianMixture(
-        n_components=2, n_init=3, max_iter=500, covariance_type="full", tol=1e-5
+        n_components=2,
+        n_init=3,
+        max_iter=500,
+        covariance_type="full",
+        tol=1e-5,
+        means_init=means_init,
     )
     return gmm.fit(ipdRatios)
 
