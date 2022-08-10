@@ -306,7 +306,7 @@ def apply_hmm(bam, hmm, nuc_label, cutoff, out, min_dist=46):
         front_terminal_nuc_end = methylated_positions[0]
         front_terminal_nuc_size = front_terminal_nuc_end - front_terminal_nuc_start
         if not generated_terminal:
-            end_terminal_nuc_start = methylated_positions[-1]
+            end_terminal_nuc_start = np.maximum(methylated_positions[-1], output_starts[-1]+output_sizes[-1]+1)
             end_terminal_nuc_end = fiber_length
             end_terminal_nuc_size = end_terminal_nuc_end - end_terminal_nuc_start
 
