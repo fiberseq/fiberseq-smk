@@ -295,6 +295,11 @@ def apply_hmm(bam, hmm, nuc_label, cutoff, out, min_dist=46):
         output_starts = all_starts
         output_sizes = all_sizes
 
+        # no nucleosomes found, continue
+        if methylated_positions.shape[0] == 0 or output_sizes.shape[0] == 0:
+            out.write(rec)
+            continue
+
         # now need to bookend the fibers with the terminal nucleosomes
         # only need to bookend if hmm or simplecaller did not handle it
         # i.e. only need to book end front if there is not a 1 present in the nuc_starts
@@ -305,28 +310,29 @@ def apply_hmm(bam, hmm, nuc_label, cutoff, out, min_dist=46):
         front_terminal_nuc_start = 0
         front_terminal_nuc_end = methylated_positions[0]
         front_terminal_nuc_size = front_terminal_nuc_end - front_terminal_nuc_start
+
         if not generated_terminal:
-            end_terminal_nuc_start = np.maximum(methylated_positions[-1], output_starts[-1]+output_sizes[-1]+1)
-            end_terminal_nuc_end = fiber_length
-            end_terminal_nuc_size = end_terminal_nuc_end - end_terminal_nuc_start
+            end_terminal_nuc_start = np.maximum(
+                methylated_positions[-1], output_starts[-1] + output_sizes[-1] + 1
+            )
+            if end_terminal_nuc_start != methylated_positions[-1]:
+                all_sizes[-1] = (
+                    fiber_length - output_starts[-1]
+                )  # resize the last nucleosome call to the end of fiber
+                output_sizes[-1] = all_sizes[-1]
+            else:
+                end_terminal_nuc_size = fiber_length - end_terminal_nuc_start
+                output_starts = np.append(output_starts, [end_terminal_nuc_start])
+                output_sizes = np.append(output_sizes, [end_terminal_nuc_size])
+                all_starts = output_starts
+                all_sizes = output_sizes
 
-            output_starts = np.concatenate(
-                [[front_terminal_nuc_start], all_starts, [end_terminal_nuc_start]],
-                dtype=D_TYPE,
-            )
-            output_sizes = np.concatenate(
-                [[front_terminal_nuc_size], all_sizes, [end_terminal_nuc_size]],
-                dtype=D_TYPE,
-            )
-
-        else:
-
-            output_starts = np.concatenate(
-                [[front_terminal_nuc_start], all_starts], dtype=D_TYPE
-            )
-            output_sizes = np.concatenate(
-                [[front_terminal_nuc_size], all_sizes], dtype=D_TYPE
-            )
+        output_starts = np.concatenate(
+            [[front_terminal_nuc_start], all_starts], dtype=D_TYPE
+        )
+        output_sizes = np.concatenate(
+            [[front_terminal_nuc_size], all_sizes], dtype=D_TYPE
+        )
 
         # check that the hmm is only making ranges that are possible.
         correct_sizes = output_starts[:-1] + output_sizes[:-1] <= output_starts[1:]
@@ -349,32 +355,37 @@ def apply_hmm(bam, hmm, nuc_label, cutoff, out, min_dist=46):
         )
         output_starts = output_starts[1:-1]
         output_sizes = output_sizes[1:-1]
-        # check that nuclesomes are not too close to the ends of the fiber
-        # cond = (output_starts >= min_dist) & (
-        #    (output_starts + output_sizes) <= (fiber_length - min_dist)
-        # )
-        # output_starts = output_starts[cond]
-        # output_sizes = output_sizes[cond]
 
-        # check that accessible elements are not too close to the ends of the fiber
-        cond = (acc_starts >= min_dist) & (
-            (acc_starts + acc_sizes) <= (fiber_length - min_dist)
+        # check that nucleosomes are not too close to the ends of the fiber, and have non-zero size
+        cond = (
+            (output_starts >= min_dist)
+            & ((output_starts + output_sizes) <= (fiber_length - min_dist))
+            & (output_sizes > 0)
         )
-        # logging.debug("{}".format(cond))
-        # logging.debug(f"{acc_starts}\n{output_starts}\n")
-        # logging.debug(f"{acc_starts.shape}, {acc_sizes.shape}, {cond.shape}")
-        # subsetting only works with a new variable apparently?
+        output_starts_2 = output_starts[cond]
+        output_sizes_2 = output_sizes[cond]
+
+        # check that accessible elements are not too close to the ends of the fiber, and have non-zero size
+        cond = (
+            (acc_starts >= min_dist)
+            & ((acc_starts + acc_sizes) <= (fiber_length - min_dist))
+            & (acc_sizes > 0)
+        )
         acc_starts_2 = acc_starts[cond]
         acc_sizes_2 = acc_sizes[cond]
-        # logging.debug("{}\n{}".format(acc_sizes, cond))
+
+        n_msp = acc_starts_2.shape[0]
+        n_nuc = output_starts_2.shape[0]
+        assert (
+            abs(n_msp - n_nuc) < 2
+        ), f"Number of nucleosomes must be within 1 of the number of MSP elements: MSP({n_msp}), Nuc({n_nuc})"
+
         if output_sizes.shape[0] > 0:
-            rec.set_tag("ns", array.array("I", output_starts))
-            rec.set_tag("nl", array.array("I", output_sizes))
+            rec.set_tag("ns", array.array("I", output_starts_2))
+            rec.set_tag("nl", array.array("I", output_sizes_2))
         if acc_sizes.shape[0] > 0:
             rec.set_tag("as", array.array("I", acc_starts_2))
-            # logging.debug("{}".format(acc_sizes))
             rec.set_tag("al", array.array("I", acc_sizes_2))
-        # logging.debug("\n")
         out.write(rec)
 
 
