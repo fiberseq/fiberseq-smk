@@ -311,11 +311,6 @@ def apply_hmm(bam, hmm, nuc_label, cutoff, out, min_dist=46):
         front_terminal_nuc_end = methylated_positions[0]
         front_terminal_nuc_size = front_terminal_nuc_end - front_terminal_nuc_start
 
-        # if not generated_terminal:
-        #    end_terminal_nuc_start = np.maximum(
-        #        methylated_positions[-1], output_starts[-1] + output_sizes[-1] + 1
-        #    )
-
         if not generated_terminal:
             end_terminal_nuc_start = np.maximum(
                 methylated_positions[-1], output_starts[-1] + output_sizes[-1] + 1
@@ -325,25 +320,19 @@ def apply_hmm(bam, hmm, nuc_label, cutoff, out, min_dist=46):
                     fiber_length - output_starts[-1]
                 )  # resize the last nucleosome call to the end of fiber
                 output_sizes[-1] = all_sizes[-1]
-            end_terminal_nuc_size = fiber_length - end_terminal_nuc_start
+            else:
+                end_terminal_nuc_size = fiber_length - end_terminal_nuc_start
+                output_starts = np.append(output_starts, [end_terminal_nuc_start])
+                output_sizes = np.append(output_sizes, [end_terminal_nuc_size])
+                all_starts = output_starts
+                all_sizes = output_sizes
 
-            output_starts = np.concatenate(
-                [[front_terminal_nuc_start], all_starts, [end_terminal_nuc_start]],
-                dtype=D_TYPE,
-            )
-            output_sizes = np.concatenate(
-                [[front_terminal_nuc_size], all_sizes, [end_terminal_nuc_size]],
-                dtype=D_TYPE,
-            )
-
-        else:
-
-            output_starts = np.concatenate(
-                [[front_terminal_nuc_start], all_starts], dtype=D_TYPE
-            )
-            output_sizes = np.concatenate(
-                [[front_terminal_nuc_size], all_sizes], dtype=D_TYPE
-            )
+        output_starts = np.concatenate(
+            [[front_terminal_nuc_start], all_starts], dtype=D_TYPE
+        )
+        output_sizes = np.concatenate(
+            [[front_terminal_nuc_size], all_sizes], dtype=D_TYPE
+        )
 
         # check that the hmm is only making ranges that are possible.
         correct_sizes = output_starts[:-1] + output_sizes[:-1] <= output_starts[1:]
