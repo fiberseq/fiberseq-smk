@@ -39,3 +39,11 @@ def get_gmm_model(wc):
         print("Using the input GMM model")
         return gmm_model
     return []
+
+
+def get_nucleosome_bam(wc):
+    fmt = "temp/{sm}/nuc.{scatteritem}.bam"
+    if process_first_n is None:
+        return gather.chunks(fmt, allow_missing=True)
+    scatteritems = [f"{i+1}-of-{process_first_n}" for i in range(process_first_n)]
+    return expand(fmt, scatteritem=scatteritems, allow_missing=True)

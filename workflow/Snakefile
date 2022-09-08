@@ -10,6 +10,7 @@ input_ccs = config.pop("ccs", None)
 env = config.pop("env", "envs/env.yml")
 ref = config.pop("ref", None)
 gmm_model = config.pop("gmm_model", False)
+process_first_n = config.pop("process_first_n", None)
 # output wildcards
 output_types = ["m6a", "cpg", "nuc", "msp"]
 aligned = ["aligned", "unaligned"]
@@ -294,7 +295,7 @@ rule nucleosome:
 
 rule merge:
     input:
-        bam=gather.chunks(rules.nucleosome.output.bam, allow_missing=True),
+        bam=get_nucleosome_bam,
     output:
         bam="results/{sm}/unaligned.fiberseq.bam",
     conda:
