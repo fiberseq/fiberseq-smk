@@ -5,7 +5,7 @@ rule qc_msp:
         pdf="results/{sm}/qc_msp.pdf",
         txt="temp/{sm}/qc_msp.intermediate.stat.txt",
     conda:
-        "RR"
+        env
     log:
         "logs/{sm}/qc/msp.log",
     params:
@@ -27,7 +27,7 @@ rule qc_nuc:
         pdf="results/{sm}/qc_nuc.pdf",
         txt="temp/{sm}/qc_nuc.intermediate.stat.txt",
     conda:
-        "RR"
+        env
     log:
         "logs/{sm}/qc/nuc.log",
     params:
@@ -49,7 +49,7 @@ rule qc_m6a:
         pdf="results/{sm}/qc_m6a.pdf",
         txt="temp/{sm}/qc_m6a.intermediate.stat.txt",
     conda:
-        "RR"
+        env
     log:
         "logs/{sm}/qc/m6a.log",
     params:
@@ -71,7 +71,7 @@ rule qc_nucs_per_read:
         pdf="results/{sm}/qc_number_nucs_per_read.pdf",
         txt="temp/{sm}/qc_number_nucs_per_read.intermediate.stat.txt",
     conda:
-        "RR"
+        env
     log:
         "logs/{sm}/qc/nucs_per_read.log",
     params:
@@ -93,7 +93,7 @@ rule qc_readlength_per_nuc:
         pdf="results/{sm}/qc_readlength_per_nuc.pdf",
         txt="temp/{sm}/qc_readlength_per_nuc.intermediate.stat.txt",
     conda:
-        "RR"
+        env
     log:
         "logs/{sm}/qc/readlength_per_nuc.log",
     params:
@@ -115,7 +115,7 @@ rule qc_readlengths:
         pdf="results/{sm}/qc_readlengths.pdf",
         txt="temp/{sm}/qc_readlengths.intermediate.stat.txt",
     conda:
-        "RR"
+        env
     log:
         "logs/{sm}/qc/readlengths.log",
     params:
@@ -137,7 +137,7 @@ rule qc_rq:
         pdf="results/{sm}/qc_readquality.pdf",
         txt="temp/{sm}/qc_readquality.intermediate.stat.txt",
     conda:
-        "RR"
+        env
     log:
         "logs/{sm}/qc/readquality.log",
     params:
