@@ -60,7 +60,7 @@ rule qc_m6a:
     priority: 20
     shell:
         """
-        sh {params.script} {wildcards.sm} {input.bam} {output.pdf} {output.txt}
+        sh {params.script} {wildcards.sm} {input.bam} {output.pdf} {output.txt} 2> {log}
         """
 
 
