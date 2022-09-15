@@ -398,8 +398,7 @@ rule make_beds:
     priority: 300
     shell:
         """
-        ft extract \
-            --threads {threads} \
+        ft --threads {threads} extract \
             {params.aligned} {input.bam} \
             --cpg {output.cpg} --msp {output.msp} --m6a {output.m6a} --nuc {output.nuc} \
         2> {log}
