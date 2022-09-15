@@ -2,7 +2,7 @@ rule qc_msp:
     input:
         bed="results/{sm}/unaligned.msp.bed.gz",
     output:
-        pdf="results/{sm}/qc_msp.pdf",
+        pdf="results/{sm}/qc/qc_msp.pdf",
         txt="temp/{sm}/qc_msp.intermediate.stat.txt",
     conda:
         env
@@ -24,7 +24,7 @@ rule qc_nuc:
     input:
         bed="results/{sm}/unaligned.nuc.bed.gz",
     output:
-        pdf="results/{sm}/qc_nuc.pdf",
+        pdf="results/{sm}/qc/qc_nuc.pdf",
         txt="temp/{sm}/qc_nuc.intermediate.stat.txt",
     conda:
         env
@@ -46,7 +46,7 @@ rule qc_m6a:
     input:
         bam="results/{sm}/unaligned.fiberseq.bam",
     output:
-        pdf="results/{sm}/qc_m6a.pdf",
+        pdf="results/{sm}/qc/qc_m6a.pdf",
         txt="temp/{sm}/qc_m6a.intermediate.stat.txt",
     conda:
         env
@@ -68,7 +68,7 @@ rule qc_nucs_per_read:
     input:
         bed="results/{sm}/unaligned.nuc.bed.gz",
     output:
-        pdf="results/{sm}/qc_number_nucs_per_read.pdf",
+        pdf="results/{sm}/qc/qc_number_nucs_per_read.pdf",
         txt="temp/{sm}/qc_number_nucs_per_read.intermediate.stat.txt",
     conda:
         env
@@ -90,7 +90,7 @@ rule qc_readlength_per_nuc:
     input:
         bam="results/{sm}/unaligned.fiberseq.bam",
     output:
-        pdf="results/{sm}/qc_readlength_per_nuc.pdf",
+        pdf="results/{sm}/qc/qc_readlength_per_nuc.pdf",
         txt="temp/{sm}/qc_readlength_per_nuc.intermediate.stat.txt",
     conda:
         env
@@ -112,7 +112,7 @@ rule qc_readlengths:
     input:
         bam="results/{sm}/unaligned.fiberseq.bam",
     output:
-        pdf="results/{sm}/qc_readlengths.pdf",
+        pdf="results/{sm}/qc/qc_readlengths.pdf",
         txt="temp/{sm}/qc_readlengths.intermediate.stat.txt",
     conda:
         env
@@ -134,7 +134,7 @@ rule qc_rq:
     input:
         bam="results/{sm}/unaligned.fiberseq.bam",
     output:
-        pdf="results/{sm}/qc_readquality.pdf",
+        pdf="results/{sm}/qc/qc_readquality.pdf",
         txt="temp/{sm}/qc_readquality.intermediate.stat.txt",
     conda:
         env
@@ -160,7 +160,7 @@ rule qc_combine_stats:
         qc5=rules.qc_readlengths.output.txt,
         qc6=rules.qc_rq.output.txt,
     output:
-        txt="results/{sm}/qc_stats.txt",
+        txt="results/{sm}/qc/qc_stats.txt",
     conda:
         env
     log:
