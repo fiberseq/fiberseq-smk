@@ -386,13 +386,13 @@ rule make_beds:
     conda:
         env
     log:
-        "logs/{sm}/make_beds/{aligned}_{data}.bed.log",
+        "logs/{sm}/make_beds/{aligned}_extract.bed.log",
     resources:
         disk_mb=8000,
         time=240,
     threads: 8
     benchmark:
-        "benchmarks/{sm}/make_beds/{aligned}_{data}.bed.tbl"
+        "benchmarks/{sm}/make_beds/{aligned}_extract_bed.tbl"
     params:
         aligned=lambda wc: "-r" if wc.aligned == "aligned" else "",
     priority: 300
