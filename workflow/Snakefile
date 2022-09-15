@@ -441,5 +441,5 @@ rule bigbed:
     shell:
         """
         sort -k1,1 -k2,2n {input.bed} > {output.bed} 2> {log}
-        bedToBigBed -allow1bpOverlap {output.bed} {input.fai} {output.bb} 2>> {log}
+        bedToBigBed {output.bed} {input.fai} {output.bb} 2>> {log}
         """
