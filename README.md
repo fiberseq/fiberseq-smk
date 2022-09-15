@@ -17,6 +17,9 @@ mamba env update -n fiberseq-smk --file workflow/envs/env.yml
 conda activate fiberseq-smk
 # Add the SMRTlink tools to your path
 export PATH=$PATH:/path/to/smrtlink/tools
+# Download and add cutnm to your path
+wget https://raw.githubusercontent.com/sjneph/cutnm/master/src/cutnm
+export PATH=$PATH:/path/to/cutnm
 ```
 
 On the Stergachis Lab's cluster, you can add the following line to your `~/.bashrc` to load the needed `SMRTlink` tools:
