@@ -11,7 +11,7 @@ rule qc_msp:
     params:
         script=workflow.source_path("../scripts/qc/make-plot-msp.sh"),
     benchmark:
-        "benchmarks/{sm}/qc/msp.tbl",
+        "benchmarks/{sm}/qc/msp.tbl"
     threads: 4
     priority: 20
     shell:
@@ -33,7 +33,7 @@ rule qc_nuc:
     params:
         script=workflow.source_path("../scripts/qc/make-plot-nuc.sh"),
     benchmark:
-        "benchmarks/{sm}/qc/nuc.tbl",
+        "benchmarks/{sm}/qc/nuc.tbl"
     threads: 4
     priority: 20
     shell:
@@ -77,7 +77,7 @@ rule qc_nucs_per_read:
     params:
         script=workflow.source_path("../scripts/qc/make-plot-number-nucs-per-read.sh"),
     benchmark:
-        "benchmarks/{sm}/qc/nucs_per_read.tbl",
+        "benchmarks/{sm}/qc/nucs_per_read.tbl"
     threads: 4
     priority: 20
     shell:
@@ -99,7 +99,7 @@ rule qc_readlength_per_nuc:
     params:
         script=workflow.source_path("../scripts/qc/make-plot-readlength-per-nuc.sh"),
     benchmark:
-        "benchmarks/{sm}/qc/readlength_per_nuc.tbl",
+        "benchmarks/{sm}/qc/readlength_per_nuc.tbl"
     threads: 4
     priority: 20
     shell:
@@ -121,7 +121,7 @@ rule qc_readlengths:
     params:
         script=workflow.source_path("../scripts/qc/make-plot-readlengths.sh"),
     benchmark:
-        "benchmarks/{sm}/qc/readlengths.tbl",
+        "benchmarks/{sm}/qc/readlengths.tbl"
     threads: 4
     priority: 20
     shell:
@@ -166,7 +166,7 @@ rule qc_combine_stats:
     log:
         "logs/{sm}/qc/combine.log",
     benchmark:
-        "benchmarks/{sm}/qc/combine.tbl",
+        "benchmarks/{sm}/qc/combine.tbl"
     threads: 1
     priority: 20
     shell:
