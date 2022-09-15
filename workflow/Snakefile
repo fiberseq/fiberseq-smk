@@ -398,7 +398,7 @@ rule make_beds:
     priority: 300
     shell:
         """
-        python {params.extract} \
+        ft extract \
             --threads {threads} \
             {params.aligned} {input.bam} \
             --cpg {output.cpg} --msp {output.msp} --m6a {output.m6a} --nuc {output.nuc} \
