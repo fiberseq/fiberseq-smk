@@ -19,6 +19,7 @@ conda activate fiberseq-smk
 export PATH=$PATH:/path/to/smrtlink/tools
 # Download and add cutnm to your path
 wget https://raw.githubusercontent.com/sjneph/cutnm/master/src/cutnm
+chmod 755 cutnm
 export PATH=$PATH:/path/to/cutnm
 ```
 
