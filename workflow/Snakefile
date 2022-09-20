@@ -146,6 +146,7 @@ rule ipdSummary:
         pbi=rules.index.output.pbi,
     output:
         csv=temp("temp/{sm}/ipdSummary.{scatteritem}.csv"),
+        gff=temp("temp/{sm}/ipdSummary.{scatteritem}.gff"),
     threads: config.get("ipd-threads", 16)
     conda:
         env
@@ -162,10 +163,11 @@ rule ipdSummary:
         """
         ipdSummary \
             --reference {input.ccs_fasta} \
-            --pvalue 0.001 \
+            --pvalue 0.01 \
             --numWorkers {threads} \
             --quiet --identify m6A \
             --csv {output.csv} \
+            --gff {output.gff} \
             {input.actc} &> {log}
         """
 
