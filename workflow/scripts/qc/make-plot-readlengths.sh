@@ -74,11 +74,11 @@ R --no-save --quiet << __R__
   pdf("$outpdf")
   plot(s[,1], s[,2], xlim=c(0, mxh), axes=F, type="h", main=paste("$samplenm", "$ftype", sep=":"), xlab="Unaligned read length (bp)", ylab="Count")
   abline(v=reads_10, col=mycol, lty=1)
-  msg1 <- paste(reads_10)
+  msg1 <- paste(round(reads_10/1000,1), "k", sep="")
   abline(v=reads_50, col=mycol, lty=1)
-  msg2 <- paste(reads_50)
+  msg2 <- paste(round(reads_50/1000,1), "k", sep="")
   abline(v=reads_90, col=mycol, lty=1)
-  msg3 <- paste(reads_90)
+  msg3 <- paste(round(reads_90/1000,1), "k", sep="")
   msg4 <- paste(p, "% > ", paste(mxh/1000, "kb", sep=""), sep="")
 
   mxc <- max(s[,2])
@@ -87,16 +87,16 @@ R --no-save --quiet << __R__
   rtoff <- 2000
   div <- 3
 
-  lines(c(reads_10-rtoff, reads_10), c(mxc/div-20, 0), col=mycol)
-  text(reads_10-rtoff-3*offxv, mxc/div, msg1, col=mycol)
+  lines(c(reads_10-rtoff, reads_10), c(mxc/div-strheight(msg1, units="user"), 0), col=mycol)
+  text(reads_10-rtoff-3*offxv, mxc/div, msg1, col=mycol, cex=0.9)
 
-  lines(c(reads_50+rtoff, reads_50), c(mxc/div-20, 0), col=mycol)
-  text(reads_50+rtoff+3*offxv, mxc/div, msg2, col=mycol)
+  lines(c(reads_50+rtoff, reads_50), c(mxc/div-strheight(msg2, units="user"), 0), col=mycol)
+  text(reads_50+rtoff+3*offxv, mxc/div, msg2, col=mycol, cex=0.9)
 
-  lines(c(reads_90+rtoff, reads_90), c(mxc/div-20, 0), col=mycol)
-  text(reads_90+rtoff+3*offxv, mxc/div, msg3, col=mycol)
+  lines(c(reads_90+rtoff, reads_90), c(mxc/div-strheight(msg3, units="user"), 0), col=mycol)
+  text(reads_90+rtoff+3*offxv, mxc/div, msg3, col=mycol, cex=0.9)
 
-  text(mxh-3000, mxc/div, msg4, col=mycol)
+  text(mxh-mxh/16, mxc/div, msg4, col=mycol)
 
   axis(1, seq(0, mxh, 4000), labels=paste(seq(0, 50, 4), "k", sep=""))
   axis(2)
