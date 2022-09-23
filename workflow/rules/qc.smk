@@ -144,7 +144,7 @@ rule qc_rq:
     params:
         script=workflow.source_path("../scripts/qc/make-plot-rq.sh"),
     benchmark:
-        "benchmarks/{sm}/qc/readquality.tbl",
+        "benchmarks/{sm}/qc/readquality.tbl"
     threads: 4
     priority: 20
     shell:
@@ -177,6 +177,7 @@ rule qc_combine_stats:
         find {input} | xargs -I}}{{ sh -c "cat }}{{; echo ''" > {output.txt} 2> {log}
         """
 
+
 rule qc_html:
     input:
         qc0a=rules.qc_msp.output.pdf,
@@ -205,7 +206,7 @@ rule qc_html:
     params:
         script=workflow.source_path("../scripts/qc/make-html.tcsh"),
     benchmark:
-        "logs/{sm}/qc/qc_html.tbl",
+        "logs/{sm}/qc/qc_html.tbl"
     threads: 1
     priority: 20
     shell:
