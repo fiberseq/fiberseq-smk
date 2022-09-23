@@ -2,14 +2,14 @@ rule qc_msp:
     input:
         bed="results/{sm}/unaligned.msp.bed.gz",
     output:
-        pdf="results/{sm}/qc/qc_msp.pdf",
+        pdf="results/{sm}/qc/qc_msp_lengths.pdf",
         txt="temp/{sm}/qc_msp.intermediate.stat.txt",
     conda:
         env
     log:
         "logs/{sm}/qc/msp.log",
     params:
-        script=workflow.source_path("../scripts/qc/make-plot-msp.sh"),
+        script=workflow.source_path("../scripts/qc/make-plot-msp-lengths.sh"),
     benchmark:
         "benchmarks/{sm}/qc/msp.tbl"
     threads: 4
@@ -24,14 +24,14 @@ rule qc_nuc:
     input:
         bed="results/{sm}/unaligned.nuc.bed.gz",
     output:
-        pdf="results/{sm}/qc/qc_nuc.pdf",
+        pdf="results/{sm}/qc/qc_nuc_lengths.pdf",
         txt="temp/{sm}/qc_nuc.intermediate.stat.txt",
     conda:
         env
     log:
         "logs/{sm}/qc/nuc.log",
     params:
-        script=workflow.source_path("../scripts/qc/make-plot-nuc.sh"),
+        script=workflow.source_path("../scripts/qc/make-plot-nuc-lengths.sh"),
     benchmark:
         "benchmarks/{sm}/qc/nuc.tbl"
     threads: 4
@@ -46,7 +46,7 @@ rule qc_m6a:
     input:
         bam="results/{sm}/unaligned.fiberseq.bam",
     output:
-        pdf="results/{sm}/qc/qc_m6a.pdf",
+        pdf="results/{sm}/qc/qc_m6a_per_read.pdf",
         txt="temp/{sm}/qc_m6a.intermediate.stat.txt",
     conda:
         env

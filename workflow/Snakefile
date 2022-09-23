@@ -57,13 +57,13 @@ rule all:
     input:
         expand("results/{sm}/unaligned.fiberseq.bam", sm=samples),
         expand("results/{sm}/unaligned.fiberseq.bam.pbi", sm=samples),
-        expand("results/{sm}/qc/qc_msp.pdf", sm=samples),
-        expand("results/{sm}/qc/qc_nuc.pdf", sm=samples),
+        expand("results/{sm}/qc/qc_msp_lengths.pdf", sm=samples),
+        expand("results/{sm}/qc/qc_nuc_lengths.pdf", sm=samples),
         expand("results/{sm}/qc/qc_number_nucs_per_read.pdf", sm=samples),
         expand("results/{sm}/qc/qc_readlength_per_nuc.pdf", sm=samples),
         expand("results/{sm}/qc/qc_readlengths.pdf", sm=samples),
         expand("results/{sm}/qc/qc_readquality.pdf", sm=samples),
-        expand("results/{sm}/qc/qc_m6a.pdf", sm=samples),
+        expand("results/{sm}/qc/qc_m6a_per_read.pdf", sm=samples),
         expand("results/{sm}/qc/qc_stats.txt", sm=samples),
         align_results(samples),
         expand(
