@@ -40,6 +40,7 @@ ft extract --all - $inp \
   > $tmpd/$samplenm.$ftype
 
 R --no-save --quiet << __R__
+  library(scales)
   ss <- scan("$tmpd/$samplenm.$ftype")
   mxh <- 1500
   s <- ss
@@ -57,7 +58,13 @@ R --no-save --quiet << __R__
 
   mycol <- "darkgreen"
   pdf("$outpdf")
-  h <- hist(s, xlim=c(0, mxh), breaks=mxh, axes=F, main=paste("$samplenm"), xlab="Read length (bp)/# nucleosome footprints per read", ylab="Count")
+  h <- hist(s, xlim=c(0, mxh), breaks=1000, axes=F, main=paste("$samplenm"), xlab="Read length (bp)/# nucleosome footprints per read", ylab="Count")
+  mxc <- max(h[["counts"]][h[["breaks"]]<=mxv])
+  rect(0, 0, mxv, max(h[["counts"]]/2), col=alpha(mycol, 0.25), border=NA)
+  # plot again to put rect in background
+  h <- hist(s, xlim=c(0, mxh), breaks=1000, axes=F, main=paste("$samplenm"), xlab="Read length (bp)/# nucleosome footprints per read", ylab="Count", add=T)
+  #abline(v=mxv, col=alpha(mycol, 0.25), lty=2, lwd=3)
+  #abline(v=0, col=alpha(mycol, 0.25), lty=2, lwd=3)
   abline(v=m, col=mycol, lty=1)
   msg <- paste(m)
   msg2 <- paste(round(plarge*100,1), "% >", mxh, "bp", sep="")
@@ -68,7 +75,7 @@ R --no-save --quiet << __R__
   div <- 3
   lines(c(m+rtoff, m), c(max(h[["counts"]])/(div*1.05), 0), col=mycol)
   text(m+rtoff+3*offxv, max(h[["counts"]])/div, msg, col=mycol)
-  text(mxh-100, max(h[["counts"]])/div, msg2, col=mycol)
+  text(0.85*mxh, max(h[["counts"]])/div, msg2, col=mycol)
 
   axis(1, seq(0, mxh, 100))
   axis(2)
