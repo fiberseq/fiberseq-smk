@@ -59,7 +59,6 @@ R --no-save --quiet << __R__
 
   count <- length(s[s>QV50])
   all <- length(s)
-  cat(count, "\n", all, "\n")
   perc <- round(100*count/all, 2)
   s[s>=QV50] <- QV50
   s <- 10*(-log10(1-s))
