@@ -47,6 +47,7 @@ rule qc_m6a:
         bam="results/{sm}/unaligned.fiberseq.bam",
     output:
         pdf="results/{sm}/qc/qc_m6a_per_read.pdf",
+        ccs_pdf="results/{sm}/qc/qc_ccs_passes.pdf",
         txt="temp/{sm}/qc_m6a.intermediate.stat.txt",
     conda:
         env
@@ -60,7 +61,7 @@ rule qc_m6a:
     priority: 20
     shell:
         """
-        sh {params.script} {wildcards.sm} {input.bam} {output.pdf} {output.txt} 2> {log}
+        sh {params.script} {wildcards.sm} {input.bam} {output.pdf} {output.ccs_pdf} {output.txt} 2> {log}
         """
 
 
@@ -142,6 +143,8 @@ rule qc_rq:
         "logs/{sm}/qc/readquality.log",
     params:
         script=workflow.source_path("../scripts/qc/make-plot-rq.sh"),
+    benchmark:
+        "benchmarks/{sm}/qc/readquality.tbl",
     threads: 4
     priority: 20
     shell:
@@ -172,4 +175,31 @@ rule qc_combine_stats:
     shell:
         """
         find {input} | xargs -I}}{{ sh -c "cat }}{{; echo ''" > {output.txt} 2> {log}
+        """
+
+rule qc_html:
+    input:
+        qc0=rules.qc_msp.output.pdf,
+        qc1=rules.qc_nuc.output.pdf,
+        qc2=rules.qc_m6a.output.pdf,
+        qc3=rules.qc_m6a.output.ccs_pdf,
+        qc4=rules.qc_nucs_per_read.output.pdf,
+        qc5=rules.qc_readlength_per_nuc.output.pdf,
+        qc6=rules.qc_readlengths.output.pdf,
+        qc7=rules.qc_rq.output.pdf,
+    output:
+        html="results/{sm}/qc/qc.html",
+    conda:
+        env
+    log:
+        "logs/{sm}/qc/qc_html.log",
+    params:
+        script=workflow.source_path("../scripts/qc/make-html.tcsh"),
+    benchmark:
+        "logs/{sm}/qc/qc_html.tbl",
+    threads: 1
+    priority: 20
+    shell:
+        """
+        tcsh {params.script} {wildcards.sm} {output.html} {input} 2> {log}
         """

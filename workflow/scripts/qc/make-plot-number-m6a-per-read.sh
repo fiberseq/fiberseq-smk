@@ -12,24 +12,25 @@
 #   ft extract --m6a - <BAM> | cut -f 4,10 | head
 # The tools takes into account M6A vs CpG methylations
 
-# Can you change the name of "qc_m6A.ec.pdf" to "qc_ccs_passes.pdf" 
+# Can you change the name of "qc_m6A.ec.pdf" to "qc_ccs_passes.pdf" - now factored out to Snakefile
 
 set -exuo pipefail
 
-if [[ $# != 4 ]]; then
-  printf "Expect $0 <sample-name> <input-file> <output-pdf> <output-stat.txt>\n"
+if [[ $# != 5 ]]; then
+  printf "Expect $0 <sample-name> <input-file> <output-pdf> <output-ec-pdf> <output-stat.txt>\n"
   exit -1
 fi
 
 samplenm=$1
 inp=$2 # "*_unaligned.fiberseq.bam"
 outpdf=$3
-outstat=$4
+ec_outpdf=$4
+outstat=$5
 
 ftype=m6a
 #ec_outpdf=$(basename "${outpdf}" | sed 's/\(.*\)\..*/\1/')".ec.pdf"
 #ec_outpdf=$(dirname "${outpdf}")"/${ec_outpdf}"
-ec_outpdf=$(dirname "${outpdf}")"/qc_ccs_passes.pdf"
+#ec_outpdf=$(dirname "${outpdf}")"/qc_ccs_passes.pdf"
 tmpd=/tmp/`whoami`/$$
 if [[ ! -s $inp ]]; then
   printf "Problem finding 1 file: %s\n" $inp
