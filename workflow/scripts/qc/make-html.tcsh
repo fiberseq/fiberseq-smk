@@ -4,7 +4,7 @@
 
 # This script assumes the qc graphics are in the same dir as the <html-out>
 
-if ( $#argv < 3 ) then
+if ( $#argv < 4 ) then
   printf "Expect $0 <sample-name> <html-overview> <html-meat> <pdf|txt>*\n"
   exit -1
 endif
