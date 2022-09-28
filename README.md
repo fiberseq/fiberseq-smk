@@ -21,6 +21,7 @@ export PATH=$PATH:/path/to/smrtlink/tools
 wget https://raw.githubusercontent.com/sjneph/cutnm/master/src/cutnm
 chmod 755 cutnm
 export PATH=$PATH:/path/to/cutnm
+# Download and build ft as shown at https://github.com/mrvollger/fibertools-rs.  Add ft to your path.
 ```
 
 On the Stergachis Lab's cluster, you can add the following line to your `~/.bashrc` to load the needed `SMRTlink` tools:
