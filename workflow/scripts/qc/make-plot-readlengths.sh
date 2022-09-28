@@ -104,10 +104,10 @@ R --no-save --quiet << __R__
   dev.off()
 
   stats_file <- "$outstat"
-  cat("# Note: ***Readlength stats***\n", file=stats_file, append=FALSE)
-  cat("Quantile10%(Readlength)=", reads_10, "\n", file=stats_file, sep="", append=TRUE)
-  cat("Median(Readlength)=", reads_50, "\n", file=stats_file, sep="", append=TRUE)
-  cat("Quantile90%(Readlength)=", reads_90, "\n", file=stats_file, sep="", append=TRUE)
+  cat("# Note: ***Read length stats***\n", file=stats_file, append=FALSE)
+  cat("Quantile10%(ReadLength)=", reads_10, "\n", file=stats_file, sep="", append=TRUE)
+  cat("Median(ReadLength)=", reads_50, "\n", file=stats_file, sep="", append=TRUE)
+  cat("Quantile90%(ReadLength)=", reads_90, "\n", file=stats_file, sep="", append=TRUE)
 __R__
 
 rm -rf $tmpd

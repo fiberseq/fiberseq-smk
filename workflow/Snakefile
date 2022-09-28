@@ -64,6 +64,7 @@ rule all:
         expand("results/{sm}/qc/qc_m6a_per_read.pdf", sm=samples),
         expand("results/{sm}/qc/qc_stats.txt", sm=samples),
         expand("results/{sm}/qc/qc.html", sm=samples),
+        expand("results/{sm}/qc/overview.html", sm=samples),
         align_results(samples),
         expand(
             "results/{sm}/{aligned}.{data}.bed.gz",

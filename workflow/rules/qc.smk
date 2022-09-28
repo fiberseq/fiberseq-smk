@@ -179,16 +179,25 @@ rule qc_combine_stats:
 
 rule qc_html:
     input:
-        qc0=rules.qc_msp.output.pdf,
-        qc1=rules.qc_nuc.output.pdf,
-        qc2=rules.qc_m6a.output.pdf,
-        qc3=rules.qc_m6a.output.ccs_pdf,
-        qc4=rules.qc_nucs_per_read.output.pdf,
-        qc5=rules.qc_readlength_per_nuc.output.pdf,
-        qc6=rules.qc_readlengths.output.pdf,
-        qc7=rules.qc_rq.output.pdf,
+        qc0a=rules.qc_msp.output.pdf,
+        qc0b=rules.qc_msp.output.txt,
+        qc1a=rules.qc_nuc.output.pdf,
+        qc1b=rules.qc_nuc.output.txt,
+        qc2a=rules.qc_m6a.output.pdf,
+        qc2b=rules.qc_m6a.output.txt,
+        qc3a=rules.qc_m6a.output.ccs_pdf,
+        qc3b=rules.qc_m6a.output.txt,
+        qc4a=rules.qc_nucs_per_read.output.pdf,
+        qc4b=rules.qc_nucs_per_read.output.txt,
+        qc5a=rules.qc_readlength_per_nuc.output.pdf,
+        qc5b=rules.qc_readlength_per_nuc.output.txt,
+        qc6a=rules.qc_readlengths.output.pdf,
+        qc6b=rules.qc_readlengths.output.txt,
+        qc7a=rules.qc_rq.output.pdf,
+        qc7b=rules.qc_rq.output.txt,
     output:
-        html="results/{sm}/qc/qc.html",
+        overview_html="results/{sm}/qc/overview.html",
+        main_html="results/{sm}/qc/qc.html",
     conda:
         env
     log:
@@ -201,5 +210,5 @@ rule qc_html:
     priority: 20
     shell:
         """
-        tcsh {params.script} {wildcards.sm} {output.html} {input} 2> {log}
+        tcsh {params.script} {wildcards.sm} {output.overview_html} {output.main_html} {input} 2> {log}
         """
