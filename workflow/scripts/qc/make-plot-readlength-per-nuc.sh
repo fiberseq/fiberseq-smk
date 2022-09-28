@@ -52,17 +52,17 @@ R --no-save --quiet << __R__
 
   stats_file <- "$outstat"
   prop = round(100*length(s[s<=mxv])/length(s), 1)
-  cat("# Note: ***readlength divided by #nucs stats***\n", file=stats_file, append=FALSE)
-  cat("Proportion(readlength/#nucs<=", mxv, ")=", prop, "%\n", file=stats_file, sep="", append=TRUE)
-  cat("Median(readlength/#nucs<=", mxv, ")=", m, "\n", file=stats_file, sep="", append=TRUE)
+  cat("# Note: ***Read length divided by #nucs stats***\n", file=stats_file, append=FALSE)
+  cat("Proportion(ReadLength/#nucs<=", mxv, ")=", prop, "%\n", file=stats_file, sep="", append=TRUE)
+  cat("Median(ReadLength/#nucs<=", mxv, ")=", m, "\n", file=stats_file, sep="", append=TRUE)
 
   mycol <- "darkgreen"
   pdf("$outpdf")
-  h <- hist(s, xlim=c(0, mxh), breaks=1000, axes=F, main=paste("$samplenm"), xlab="Read length (bp)/# nucleosome footprints per read", ylab="Count")
+  h <- hist(s, xlim=c(0, mxh), breaks=1000, axes=F, main=paste("$samplenm"), xlab="Read Length (bp)/# nucleosome footprints per read", ylab="Count")
   mxc <- max(h[["counts"]][h[["breaks"]]<=mxv])
   rect(0, 0, mxv, max(h[["counts"]]/2), col=alpha(mycol, 0.25), border=NA)
   # plot again to put rect in background
-  h <- hist(s, xlim=c(0, mxh), breaks=1000, axes=F, main=paste("$samplenm"), xlab="Read length (bp)/# nucleosome footprints per read", ylab="Count", add=T)
+  h <- hist(s, xlim=c(0, mxh), breaks=1000, axes=F, main=paste("$samplenm"), xlab="Read Length (bp)/# nucleosome footprints per read", ylab="Count", add=T)
   #abline(v=mxv, col=alpha(mycol, 0.25), lty=2, lwd=3)
   #abline(v=0, col=alpha(mycol, 0.25), lty=2, lwd=3)
   abline(v=m, col=mycol, lty=1)
