@@ -10,6 +10,7 @@ input_ccs = config.pop("ccs", None)
 env = config.pop("env", "envs/env.yml")
 ref = config.pop("ref", None)
 gmm_model = config.pop("gmm_model", False)
+gff = config.pop("gff", False)
 process_first_n = config.pop("process_first_n", None)
 # output wildcards
 output_types = ["m6a", "cpg", "nuc", "msp"]
@@ -163,7 +164,7 @@ rule ipdSummary:
         """
         ipdSummary \
             --reference {input.ccs_fasta} \
-            --pvalue 0.01 \
+            --pvalue 0.001 \
             --numWorkers {threads} \
             --quiet --identify m6A \
             --csv {output.csv} \
