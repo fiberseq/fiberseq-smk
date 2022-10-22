@@ -6,7 +6,7 @@ rule make_ml_data:
     input:
         bam="results/{sm}/unaligned.fiberseq.bam",
     output:
-        "results/{sm}/ml/{sm}.npz",
+        npz="results/{sm}/ml/{sm}.npz",
     conda:
         "m6a_cpu"
     log:
