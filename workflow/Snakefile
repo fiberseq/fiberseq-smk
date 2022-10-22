@@ -42,6 +42,7 @@ scattergather:
 include: "rules/common.smk"
 include: "rules/ccs.smk"
 include: "rules/qc.smk"
+include: "rules/ml.smk"
 
 
 n_chunks = len(scatter.chunks("temp/{scatteritem}.fake"))
