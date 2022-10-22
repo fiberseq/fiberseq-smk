@@ -21,7 +21,7 @@ rule make_ml_data:
             --train \
             --hifi {input.bam} - \
             -o {output.npz} \
-            -s 0.01 
+            -s 0.05 
         """
 
 
