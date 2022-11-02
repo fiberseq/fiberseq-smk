@@ -90,6 +90,15 @@ R --no-save --quiet << __R__
   mono_nuc_med <- fast_median(s, mono_lb, mono_ub)
   di_nuc_med <- fast_median(s, di_lb, di_ub)
 
+  # those nucs with size > mxh, are put into the mxh bin
+  f <- subset(s, V1>mxh)
+  g <- subset(s, V1<mxh)
+  h <- subset(s, V1==mxh)
+  h[,2] <- h[,2] + sum(f[,2])
+  numf <- sum(f[,2])
+  s <- rbind(g, h)
+  mxc <- max(s[,2])
+
   stats_file <- "$outstat"
   cat("# Note: ***Nucleosome stats***\n", file=stats_file, sep="", append=FALSE)
   cat("# Note: ", mono_lb, "bp <= mono_nuc <= ", mono_ub, "bp\n", file=stats_file, sep="", append=TRUE)
@@ -102,14 +111,7 @@ R --no-save --quiet << __R__
   cat("Percent(mono/all)=", round(100*r1,1), "%\n", file=stats_file, sep="", append=TRUE)
   r2 <- round(sum(subset(s, V1>=di_lb & V1<=di_ub)[,2])/sum(s[,2]), 4)
   cat("Percent(di/all)=", round(100*r2,1), "%\n", file=stats_file, sep="", append=TRUE)
-
-  # those nucs with size > mxh, are put into the mxh bin
-  f <- subset(s, V1>mxh)
-  g <- subset(s, V1<mxh)
-  h <- subset(s, V1==mxh)
-  h[,2] <- h[,2] + sum(f[,2])
-  s <- rbind(g, h)
-  mxc <- max(s[,2])
+  cat("Percent(NucLength)>", mxh, "bp=", round(numf/sum(s[,2])*100, 1), "%\n", file=stats_file, sep="", append=TRUE)
 
   mycol <- "darkgreen"
   pdf("$outpdf")
@@ -123,6 +125,7 @@ R --no-save --quiet << __R__
   lines(c(di_nuc_med, di_nuc_med), c(0, mxc*0.95), col=mycol, lty=1)
   msg1 <- paste(mono_nuc_med)
   msg2 <- paste(di_nuc_med)
+  msg3 <- paste(round(numf/sum(s[,2])*100, 1), "%>", mxh, "bp", sep="")
 
   xv <- 75
   offxv <- 8
@@ -136,6 +139,7 @@ R --no-save --quiet << __R__
   text(di_nuc_med+rtoff+3*offxv, mxc/div, msg2, col=mycol)
   text((mono_lb+mono_ub)/2, mxc, paste("%(mono/all)=", round(100*r1,1), "%", sep=""))
   text((di_lb+di_ub)/2, mxc, paste("%(di/all)=", round(100*r2,1), "%", sep=""))
+  text(mxh*0.9, mxc*0.5, msg3, col=mycol)
 
   axis(1, seq(0, mxh, 50))
   axis(2)
