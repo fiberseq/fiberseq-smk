@@ -2,7 +2,7 @@
 # author : sjn
 # date : Aug 22, 2022
 
-set -euo pipefail
+set -euox pipefail
 
 if [[ $# != 4 ]]; then
   printf "Expect $0 <sample-name> <input-file> <output-pdf> <output-stat.txt>\n"
@@ -67,12 +67,12 @@ R --no-save --quiet << __R__
 
   mycol <- "darkgreen"
   pdf("$outpdf")
-  h <- hist(s, xlim=c(mnh, 1), axes=F, main=paste("$samplenm", "$ftype", sep=":"), xlab="Log read quality score of each CCS read", ylab="Count", breaks=1000)
+  h <- hist(s, axes=F, main=paste("$samplenm", "$ftype", sep=":"), xlab="Log read quality score of each CCS read", ylab="Count", breaks=1000)
   abline(v=m, col=mycol, lty=1)
 
   rtoff <- 0.001/2
   msg <- paste(perc, "%>QV50", sep="")
-  text(quantile(s, 0.9), max(h[["counts"]])/1.5, msg, col=mycol)
+  text(0.9*max(s), max(h[["counts"]])/1.5, msg, col=mycol)
   text(m-rtoff, max(h[["counts"]])/1.2, round(m, 1), col=mycol)
 
   axis(1)
