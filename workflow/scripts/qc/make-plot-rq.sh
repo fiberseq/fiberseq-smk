@@ -2,7 +2,7 @@
 # author : sjn
 # date : Aug 22, 2022
 
-set -euox pipefail
+set -euo pipefail
 
 if [[ $# != 4 ]]; then
   printf "Expect $0 <sample-name> <input-file> <output-pdf> <output-stat.txt>\n"
