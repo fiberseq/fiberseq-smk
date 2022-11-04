@@ -17,8 +17,8 @@
 set -exuo pipefail
 
 if [[ $# != 5 ]]; then
-    printf "Expect $0 <sample-name> <input-file> <output-pdf> <output-ec-pdf> <output-stat.txt>\n"
-    exit -1
+  printf "Expect $0 <sample-name> <input-file> <output-pdf> <output-ec-pdf> <output-stat.txt>\n"
+  exit -1
 fi
 
 samplenm=$1
@@ -31,23 +31,24 @@ ftype=m6a
 #ec_outpdf=$(basename "${outpdf}" | sed 's/\(.*\)\..*/\1/')".ec.pdf"
 #ec_outpdf=$(dirname "${outpdf}")"/${ec_outpdf}"
 #ec_outpdf=$(dirname "${outpdf}")"/qc_ccs_passes.pdf"
-tmpd=/tmp/$(whoami)/$$
+tmpd=/tmp/`whoami`/$$
 if [[ ! -s $inp ]]; then
-    printf "Problem finding 1 file: %s\n" $inp
-    exit -1
+  printf "Problem finding 1 file: %s\n" $inp
+  exit -1
 fi
 
 if [ -s $tmpd ]; then
-    rm -rf $tmpd
+  rm -rf $tmpd
 fi
 mkdir -p $tmpd
 mkdir -p $(dirname "${outpdf}")
 
-ft extract --all - $inp |
-    cutnm total_m6a_bp,total_AT_bp,ec \
-        >$tmpd/$samplenm.$ftype
 
-R --no-save --quiet <<__R__
+ft extract --all - $inp \
+  | cutnm total_m6a_bp,total_AT_bp,ec \
+  > $tmpd/$samplenm.$ftype
+
+R --no-save --quiet << __R__
   maxx <- 0.30
   max_coverage <- 30
   s <- read.table("$tmpd/$samplenm.$ftype", header=TRUE, sep="\t", row.names=NULL)
