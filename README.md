@@ -9,6 +9,9 @@ A Snakemake workflow for making **fiberseq** calls.
 
 # Installation
 
+Make sure you have UCSC tools installed and in your path.  You can get them from here: [https://hgdownload.soe.ucsc.edu/admin/exe/](https://hgdownload.soe.ucsc.edu/admin/exe/)
+
+Then you can start with:
 ```bash
 git clone https://github.com/StergachisLab/fiberseq-smk
 cd fiberseq-smk
