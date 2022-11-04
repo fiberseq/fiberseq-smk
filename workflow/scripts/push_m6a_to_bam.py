@@ -1,10 +1,7 @@
 #!/usr/bin/env python3
-from distutils.log import debug
-from statistics import mode
 import pysam
 import sys
 import numpy as np
-from tqdm import tqdm
 import pandas as pd
 import numpy as np
 from sklearn.mixture import GaussianMixture

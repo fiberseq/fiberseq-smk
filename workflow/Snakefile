@@ -10,6 +10,8 @@ input_ccs = config.pop("ccs", None)
 env = config.pop("env", "envs/env.yml")
 ref = config.pop("ref", None)
 gmm_model = config.pop("gmm_model", False)
+gff = config.pop("gff", False)
+process_first_n = config.pop("process_first_n", None)
 # output wildcards
 output_types = ["m6a", "cpg", "nuc", "msp"]
 aligned = ["aligned", "unaligned"]
@@ -40,6 +42,7 @@ scattergather:
 include: "rules/common.smk"
 include: "rules/ccs.smk"
 include: "rules/qc.smk"
+include: "rules/ml.smk"
 
 
 n_chunks = len(scatter.chunks("temp/{scatteritem}.fake"))
@@ -147,6 +150,7 @@ rule ipdSummary:
         pbi=rules.index.output.pbi,
     output:
         csv=temp("temp/{sm}/ipdSummary.{scatteritem}.csv"),
+        gff=temp("temp/{sm}/ipdSummary.{scatteritem}.gff"),
     threads: config.get("ipd-threads", 16)
     conda:
         env
@@ -167,6 +171,7 @@ rule ipdSummary:
             --numWorkers {threads} \
             --quiet --identify m6A \
             --csv {output.csv} \
+            --gff {output.gff} \
             {input.actc} &> {log}
         """
 
@@ -305,7 +310,7 @@ rule nucleosome:
 
 rule merge:
     input:
-        bam=gather.chunks(rules.nucleosome.output.bam, allow_missing=True),
+        bam=get_nucleosome_bam,
     output:
         bam="results/{sm}/unaligned.fiberseq.bam",
     conda:
@@ -380,32 +385,28 @@ rule make_beds:
     input:
         bam="results/{sm}/{aligned}.fiberseq.bam",
     output:
-        #cpg=temp("temp/{sm}/{aligned}.cpg.bed"),
-        #msp=temp("temp/{sm}/{aligned}.msp.bed"),
-        #m6a=temp("temp/{sm}/{aligned}.m6a.bed"),
-        #nuc=temp("temp/{sm}/{aligned}.nuc.bed"),
-        bed=temp("temp/{sm}/{aligned}.{data}.bed"),
+        cpg=temp("temp/{sm}/{aligned}.cpg.bed"),
+        msp=temp("temp/{sm}/{aligned}.msp.bed"),
+        m6a=temp("temp/{sm}/{aligned}.m6a.bed"),
+        nuc=temp("temp/{sm}/{aligned}.nuc.bed"),
     conda:
         env
     log:
-        "logs/{sm}/make_beds/{aligned}_{data}.bed.log",
+        "logs/{sm}/make_beds/{aligned}_extract.bed.log",
     resources:
         disk_mb=8000,
         time=240,
     threads: 8
     benchmark:
-        "benchmarks/{sm}/make_beds/{aligned}_{data}.bed.tbl"
+        "benchmarks/{sm}/make_beds/{aligned}_extract_bed.tbl"
     params:
-        extract=workflow.source_path("scripts/extract_bed_from_bam.py"),
         aligned=lambda wc: "-r" if wc.aligned == "aligned" else "",
-        data=lambda wc: f"--{wc.data}",
     priority: 300
     shell:
         """
-        python {params.extract} \
-            --threads {threads} \
+        ft --threads {threads} extract \
             {params.aligned} {input.bam} \
-            {params.data} {output.bed} \
+            --cpg {output.cpg} --msp {output.msp} --m6a {output.m6a} --nuc {output.nuc} \
         2> {log}
         """
 
@@ -446,5 +447,5 @@ rule bigbed:
     shell:
         """
         sort -k1,1 -k2,2n {input.bed} > {output.bed} 2> {log}
-        bedToBigBed {output.bed} {input.fai} {output.bb} 2>> {log}
+        bedToBigBed -allow1bpOverlap {output.bed} {input.fai} {output.bb} 2>> {log}
         """
