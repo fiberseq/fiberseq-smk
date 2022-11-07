@@ -20,8 +20,8 @@ aligned = ["aligned", "unaligned"]
 samples = list(config.keys())
 
 # check for old version of the pipeline and warn users to update outputs.
+move_count = 0
 for sm in samples:
-    move_count = 0
     error_message = (
         "\033[93m"
         + "Results from an older version of the pipeline exist. "
@@ -43,8 +43,8 @@ for sm in samples:
         if os.path.exists(f"{old_out}.{index_type}"):
             move_count += 1
             error_message += f"\tmv {old_out}.{index_type} {new_out}.{index_type}\n"
-    if move_count > 0:
-        sys.exit(f"{error_message}\033[91m")
+if move_count > 0:
+    sys.exit(f"{error_message}\033[91m")
 
 # make sure there is an existing index
 if input_ccs is not None:
