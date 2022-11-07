@@ -44,7 +44,7 @@ for sm in samples:
             move_count += 1
             error_message += f"\tmv {old_out}.{index_type} {new_out}.{index_type}\n"
     if move_count > 0:
-        sys.exit(error_message)
+        sys.exit(error_message + "\033[0m")
 
 # make sure there is an existing index
 if input_ccs is not None:
