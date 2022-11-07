@@ -23,7 +23,8 @@ samples = list(config.keys())
 for sm in samples:
     move_count = 0
     error_message = (
-        "Results from an older version of the pipeline exist. "
+        "\033[93m"
+        + "Results from an older version of the pipeline exist. "  # change the color to yellow
         + "To continue and avoid rerunning steps please move this file:\n"
     )
     for aln in aligned:
