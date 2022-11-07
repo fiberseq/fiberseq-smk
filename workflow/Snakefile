@@ -25,17 +25,27 @@ for sm in samples:
     for aln in aligned:
         old_out = f"results/{sm}/{aln}.fiberseq.bam"
         new_out = f"results/{sm}/{sm}.{aln}.fiberseq.bam"
+
         index_type = "bai"
         if aln == "unaligned":
             index_type = "pbi"
 
-        if os.path.exists(old_out) or os.path.exists(f"{old_out}.{index_type}"):
-            index = f"\tmv {old_out}.{index_type} {new_out}.{index_type}\n"
+        # check ref
+        if os.path.exists(old_out):
             move_count += 1
             print(
                 "Results from an older version of the pipeline exist. "
                 + "To continue and avoid rerunning steps please move the files:\n"
-                + f"\tmv {old_out} {new_out}\n{index}",
+                + f"\tmv {old_out} {new_out}",
+                file=sys.stderr,
+            )
+        # check index
+        if os.path.exists(f"{old_out}.{index_type}"):
+            move_count += 1
+            print(
+                "Results from an older version of the pipeline exist. "
+                + "To continue and avoid rerunning steps please move the files:\n"
+                + f"\tmv {old_out}.{index_type} {new_out}.{index_type}\n",
                 file=sys.stderr,
             )
     if move_count > 0:
