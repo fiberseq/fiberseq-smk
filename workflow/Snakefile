@@ -22,6 +22,10 @@ samples = list(config.keys())
 # check for old version of the pipeline and warn users to update outputs.
 for sm in samples:
     move_count = 0
+    error_message = (
+        "Results from an older version of the pipeline exist. "
+        + "To continue and avoid rerunning steps please move this file:\n"
+    )
     for aln in aligned:
         old_out = f"results/{sm}/{aln}.fiberseq.bam"
         new_out = f"results/{sm}/{sm}.{aln}.fiberseq.bam"
@@ -33,22 +37,13 @@ for sm in samples:
         # check ref
         if os.path.exists(old_out):
             move_count += 1
-            print(
-                "Results from an older version of the pipeline exist. "
-                + "To continue and avoid rerunning steps please move this file:\n"
-                + f"\tmv {old_out} {new_out}",
-                file=sys.stderr,
-            )
+            error_message += f"\tmv {old_out} {new_out}"
         # check index
         if os.path.exists(f"{old_out}.{index_type}"):
             move_count += 1
-            print(
-                "Results from an older version of the pipeline exist. "
-                + "To continue and avoid rerunning steps please move this file:\n"
-                + f"\tmv {old_out}.{index_type} {new_out}.{index_type}\n",
-                file=sys.stderr,
-            )
+            error_message += f"\tmv {old_out}.{index_type} {new_out}.{index_type}\n"
     if move_count > 0:
+        print(error_message, file=sys.stderr)
         sys.exit(1)
 
 # make sure there is an existing index
