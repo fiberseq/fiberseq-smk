@@ -33,9 +33,9 @@ for sm in samples:
                 index = "\tmv {old_out}.bai {new_out}.bai\n"
             move_count += 1
             print(
-                f"Results from an older version of the pipeline exist."
+                "Results from an older version of the pipeline exist."
                 + "To continue and avoid rerunning steps please move the files:\n"
-                + "\tmv {old_out} {new_out}\n{index}",
+                + f"\tmv {old_out} {new_out}\n{index}",
                 file=sys.stderr,
             )
     if move_count > 0:
