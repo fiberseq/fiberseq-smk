@@ -21,7 +21,7 @@ samples = list(config.keys())
 
 # check for old version of the pipeline and warn users to update outputs.
 for sm in samples:
-    mv_count = 0
+    move_count = 0
     for aln in aligned:
         old_out = f"results/{sm}/{aln}.fiberseq.bam"
         new_out = f"results/{sm}/{sm}.{aln}.fiberseq.bam"
