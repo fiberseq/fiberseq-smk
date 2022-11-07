@@ -449,7 +449,7 @@ rule compress_bed:
     input:
         bed="temp/{sm}/{aligned}.{data}.bed",
     output:
-        bed="results/{sm}/{sm}.{aligned}.{data}.bed.gz",
+        bed="results/{sm}/bed/{sm}.{aligned}.{data}.bed.gz",
     conda:
         env
     log:
@@ -469,7 +469,7 @@ rule bigbed:
         fai=f"{ref}.fai",
         bed="temp/{sm}/aligned.{data}.bed",
     output:
-        bb="results/{sm}/{sm}.aligned.{data}.bed.bb",
+        bb="results/{sm}/bigbed/{sm}.aligned.{data}.bed.bb",
         bed=temp("temp/{sm}/aligned.{data}.bed.pre.bb"),
     conda:
         env
