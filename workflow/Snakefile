@@ -27,7 +27,7 @@ for sm in samples:
         new_out = f"results/{sm}/{sm}.{aln}.fiberseq.bam"
         if os.path.exists(old_out):
             # find index
-            if aln == "aligned":
+            if aln == "unaligned":
                 index = f"\tmv {old_out}.pbi {new_out}.pbi\n"
             else:
                 index = f"\tmv {old_out}.bai {new_out}.bai\n"
