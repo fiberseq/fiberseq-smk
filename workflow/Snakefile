@@ -1,4 +1,5 @@
 import os
+import sys
 from snakemake.utils import min_version
 
 min_version("7.8")
@@ -6,6 +7,7 @@ min_version("7.8")
 version: "0.1.0"
 
 scatter_threads = config.pop("scatter_threads", 8)
+max_threads = config.pop("max_threads", 24)
 input_ccs = config.pop("ccs", None)
 env = config.pop("env", "envs/env.yml")
 ref = config.pop("ref", None)
@@ -16,6 +18,28 @@ process_first_n = config.pop("process_first_n", None)
 output_types = ["m6a", "cpg", "nuc", "msp"]
 aligned = ["aligned", "unaligned"]
 samples = list(config.keys())
+
+# check for old version of the pipeline and warn users to update outputs.
+for sm in samples:
+    mv_count = 0
+    for aln in aligned:
+        old_out = f"results/{sm}/{aln}.fiberseq.bam"
+        new_out = f"results/{sm}/{sm}.{aln}.fiberseq.bam"
+        if os.path.exists(old_out):
+            # find index
+            if aln == "aligned":
+                index = "\tmv {old_out}.pbi {new_out}.pbi\n"
+            else:
+                index = "\tmv {old_out}.bai {new_out}.bai\n"
+            move_count += 1
+            print(
+                f"Results from an older version of the pipeline exist."
+                + "To continue and avoid rerunning steps please move the files:\n"
+                + "\tmv {old_out} {new_out}\n{index}",
+                file=sys.stderr,
+            )
+    if move_count > 0:
+        sys.exit(1)
 
 # make sure there is an existing index
 if input_ccs is not None:
@@ -375,7 +399,7 @@ rule align:
         disk_mb=8000,
         time=240,
         mem_mb=32 * 1024,
-    threads: 40
+    threads: max_threads
     benchmark:
         "benchmarks/{sm}/align/align.tbl"
     priority: 200
