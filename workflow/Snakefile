@@ -78,15 +78,16 @@ rule all:
         expand(rules.qc_html.input, sm=samples),
         expand("results/{sm}/qc/{sm}.qc.html", sm=samples),
         expand("results/{sm}/qc/{sm}.overview.html", sm=samples),
-        # bedfiles
+        # bed
         expand(
-            "results/{sm}/{sm}.{aligned}.{data}.bed.gz",
+            "results/{sm}/bed/{sm}.{aligned}.{data}.bed.gz",
             aligned=aligned,
             sm=samples,
             data=output_types,
         ),
+        # bigbed
         expand(
-            "results/{sm}/{sm}.aligned.{data}.bed.bb",
+            "results/{sm}/bigbed/{sm}.aligned.{data}.bed.bb",
             sm=samples,
             data=output_types,
         ),
