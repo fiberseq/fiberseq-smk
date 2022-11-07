@@ -21,6 +21,19 @@ samples = list(config.keys())
 if input_ccs is not None:
     assert os.path.exists(f"{input_ccs}.pbi"), f"pbi for {input_ccs} does not exist"
 
+# force the ref to exist.
+if ref is None:
+    sys.exit(
+        "Please provide a reference genome in the config file:\n"
+        + "\te.g. ref:/path/to/ref.fa\n"
+        + "Or in the command line under after --config:\n"
+        + "\te.g. --config ref=/path/to/ref.fa"
+    )
+    assert os.path.exists(
+        f"{ref}.fai"
+    ), f"Missing index for the ref: {ref}.fai\nCreate an index for {ref}:\n samtools faidx {ref}"
+
+
 # make sure all subreads have an index
 for sample, subreads in config.items():
     assert os.path.exists(f"{subreads}.pbi"), f"pbi for {subreads} does not exist"
@@ -56,27 +69,24 @@ wildcard_constraints:
 
 rule all:
     input:
-        expand("results/{sm}/unaligned.fiberseq.bam", sm=samples),
-        expand("results/{sm}/unaligned.fiberseq.bam.pbi", sm=samples),
-        expand("results/{sm}/qc/qc_msp_lengths.pdf", sm=samples),
-        expand("results/{sm}/qc/qc_nuc_lengths.pdf", sm=samples),
-        expand("results/{sm}/qc/qc_number_nucs_per_read.pdf", sm=samples),
-        expand("results/{sm}/qc/qc_readlength_per_nuc.pdf", sm=samples),
-        expand("results/{sm}/qc/qc_readlengths.pdf", sm=samples),
-        expand("results/{sm}/qc/qc_readquality.pdf", sm=samples),
-        expand("results/{sm}/qc/qc_m6a_per_read.pdf", sm=samples),
-        expand("results/{sm}/qc/qc_stats.txt", sm=samples),
-        expand("results/{sm}/qc/qc.html", sm=samples),
-        expand("results/{sm}/qc/overview.html", sm=samples),
+        # fiberseq bam
+        expand("results/{sm}/{sm}.unaligned.fiberseq.bam", sm=samples),
+        expand("results/{sm}/{sm}.unaligned.fiberseq.bam.pbi", sm=samples),
+        # aligned fiberseq bam
         align_results(samples),
+        # QC results
+        expand(rules.qc_html.input, sm=samples),
+        expand("results/{sm}/qc/{sm}.qc.html", sm=samples),
+        expand("results/{sm}/qc/{sm}.overview.html", sm=samples),
+        # bedfiles
         expand(
-            "results/{sm}/{aligned}.{data}.bed.gz",
+            "results/{sm}/{sm}.{aligned}.{data}.bed.gz",
             aligned=aligned,
             sm=samples,
             data=output_types,
         ),
         expand(
-            "results/{sm}/aligned.{data}.bed.bb",
+            "results/{sm}/{sm}.aligned.{data}.bed.bb",
             sm=samples,
             data=output_types,
         ),
@@ -205,7 +215,7 @@ rule train_gmm:
         bam=f"temp/{{sm}}/primrose.1-of-{n_chunks}.bam",
         csv=f"temp/{{sm}}/ipdSummary.1-of-{n_chunks}.csv",
     output:
-        model="results/{sm}/gmm_model.pkl",
+        model="results/{sm}/{sm}.gmm_model.pkl",
     conda:
         env
     log:
@@ -312,7 +322,7 @@ rule merge:
     input:
         bam=get_nucleosome_bam,
     output:
-        bam="results/{sm}/unaligned.fiberseq.bam",
+        bam="results/{sm}/{sm}.unaligned.fiberseq.bam",
     conda:
         env
     log:
@@ -354,8 +364,8 @@ rule align:
         bam=rules.merge.output.bam,
         ref=ref,
     output:
-        bam="results/{sm}/aligned.fiberseq.bam",
-        bai="results/{sm}/aligned.fiberseq.bam.bai",
+        bam="results/{sm}/{sm}.aligned.fiberseq.bam",
+        bai="results/{sm}/{sm}.aligned.fiberseq.bam.bai",
     conda:
         env
     log:
@@ -383,7 +393,7 @@ rule align:
 
 rule make_beds:
     input:
-        bam="results/{sm}/{aligned}.fiberseq.bam",
+        bam="results/{sm}/{sm}.{aligned}.fiberseq.bam",
     output:
         cpg=temp("temp/{sm}/{aligned}.cpg.bed"),
         msp=temp("temp/{sm}/{aligned}.msp.bed"),
@@ -411,11 +421,35 @@ rule make_beds:
         """
 
 
+rule fiber_table:
+    input:
+        bam=rules.align.output.bam,
+    output:
+        tbl="results/{sm}/{sm}.fiberseq.all.tbl.gz",
+    conda:
+        env
+    log:
+        "logs/{sm}/fiber_table/all_extract_bed.log",
+    resources:
+        disk_mb=8000,
+        time=240,
+    threads: 8
+    benchmark:
+        "benchmarks/{sm}/fiber_table/all_extract_bed.tbl"
+    priority: 300
+    shell:
+        """
+        ( ft --threads {threads} extract {input.bam} --all - \
+            | bgzip -@ {threads} > {output.tbl} \
+        ) 2> {log}
+        """
+
+
 rule compress_bed:
     input:
         bed="temp/{sm}/{aligned}.{data}.bed",
     output:
-        bed="results/{sm}/{aligned}.{data}.bed.gz",
+        bed="results/{sm}/{sm}.{aligned}.{data}.bed.gz",
     conda:
         env
     log:
@@ -435,7 +469,7 @@ rule bigbed:
         fai=f"{ref}.fai",
         bed="temp/{sm}/aligned.{data}.bed",
     output:
-        bb="results/{sm}/aligned.{data}.bed.bb",
+        bb="results/{sm}/{sm}.aligned.{data}.bed.bb",
         bed=temp("temp/{sm}/aligned.{data}.bed.pre.bb"),
     conda:
         env
