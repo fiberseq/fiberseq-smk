@@ -24,8 +24,8 @@ for sm in samples:
     move_count = 0
     error_message = (
         "\033[93m"
-        + "Results from an older version of the pipeline exist. "  # change the color to yellow
-        + "To continue and avoid rerunning steps please move this file:\n"
+        + "Results from an older version of the pipeline exist. "
+        + "To continue and avoid rerunning steps please move these files:\n"
     )
     for aln in aligned:
         old_out = f"results/{sm}/{aln}.fiberseq.bam"
@@ -44,8 +44,7 @@ for sm in samples:
             move_count += 1
             error_message += f"\tmv {old_out}.{index_type} {new_out}.{index_type}\n"
     if move_count > 0:
-        print(error_message, file=sys.stderr)
-        sys.exit(1)
+        sys.exit(error_message)
 
 # make sure there is an existing index
 if input_ccs is not None:
