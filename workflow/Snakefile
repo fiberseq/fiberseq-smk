@@ -35,7 +35,7 @@ for sm in samples:
             move_count += 1
             print(
                 "Results from an older version of the pipeline exist. "
-                + "To continue and avoid rerunning steps please move the files:\n"
+                + "To continue and avoid rerunning steps please move this file:\n"
                 + f"\tmv {old_out} {new_out}",
                 file=sys.stderr,
             )
@@ -44,7 +44,7 @@ for sm in samples:
             move_count += 1
             print(
                 "Results from an older version of the pipeline exist. "
-                + "To continue and avoid rerunning steps please move the files:\n"
+                + "To continue and avoid rerunning steps please move this file:\n"
                 + f"\tmv {old_out}.{index_type} {new_out}.{index_type}\n",
                 file=sys.stderr,
             )
