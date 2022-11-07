@@ -37,7 +37,7 @@ for sm in samples:
         # check ref
         if os.path.exists(old_out):
             move_count += 1
-            error_message += f"\tmv {old_out} {new_out}"
+            error_message += f"\tmv {old_out} {new_out}\n"
         # check index
         if os.path.exists(f"{old_out}.{index_type}"):
             move_count += 1
