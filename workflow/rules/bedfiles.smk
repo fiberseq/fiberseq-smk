@@ -12,7 +12,8 @@ rule make_beds:
     log:
         "logs/{sm}/make_beds/{aligned}_extract.bed.log",
     resources:
-        disk_mb=8000,
+        disk_mb=8 * 1024,
+        mem_mb=16 * 1024,
         time=240,
     threads: 8
     benchmark:
@@ -39,7 +40,8 @@ rule fiber_table:
     log:
         "logs/{sm}/fiber_table/all_extract_bed.log",
     resources:
-        disk_mb=8000,
+        disk_mb=8 * 1024,
+        mem_mb=16 * 1024,
         time=240,
     threads: 8
     benchmark:
