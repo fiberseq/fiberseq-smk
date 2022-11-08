@@ -213,3 +213,15 @@ rule qc_html:
         """
         tcsh {params.script} {wildcards.sm} {output.overview_html} {output.main_html} {input} 2> {log}
         """
+
+
+rule qc_pdfs:
+    input:
+        qc0a=rules.qc_msp.output.pdf,
+        qc1a=rules.qc_nuc.output.pdf,
+        qc2a=rules.qc_m6a.output.pdf,
+        qc3a=rules.qc_m6a.output.ccs_pdf,
+        qc4a=rules.qc_nucs_per_read.output.pdf,
+        qc5a=rules.qc_readlength_per_nuc.output.pdf,
+        qc6a=rules.qc_readlengths.output.pdf,
+        qc7a=rules.qc_rq.output.pdf,
