@@ -79,6 +79,9 @@ rule ipdSummary:
         "logs/{sm}/ipdSummary/{scatteritem}.log",
     benchmark:
         "benchmarks/{sm}/ipdSummary/{scatteritem}.tbl"
+    params:
+        max_coverage=max_coverage,
+        max_alignments=max_alignments,
     priority: 10
     shell:
         """
@@ -86,6 +89,8 @@ rule ipdSummary:
             --reference {input.ccs_fasta} \
             --pvalue 0.001 \
             --numWorkers {threads} \
+            --maxCoverage {params.max_coverage} \
+            --maxAlignments {params.max_alignments} \
             --quiet --identify m6A \
             --csv {output.csv} \
             --gff {output.gff} \
