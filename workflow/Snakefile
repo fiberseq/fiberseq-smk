@@ -119,8 +119,7 @@ rule all:
         # aligned fiberseq bam
         align_results(samples),
         # QC results
-        expand(rules.qc_pdfs.input, sm=samples),
-        expand(rules.qc_html.output, sm=samples),
+        expand(rules.qc_results.input, sm=samples),
         # bed
         expand(
             "results/{sm}/bed/{sm}.{aligned}.{data}.bed.gz",

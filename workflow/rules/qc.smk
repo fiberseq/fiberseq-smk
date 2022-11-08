@@ -215,7 +215,7 @@ rule qc_html:
         """
 
 
-rule qc_pdfs:
+rule qc_results:
     input:
         qc0a=rules.qc_msp.output.pdf,
         qc1a=rules.qc_nuc.output.pdf,
@@ -225,3 +225,5 @@ rule qc_pdfs:
         qc5a=rules.qc_readlength_per_nuc.output.pdf,
         qc6a=rules.qc_readlengths.output.pdf,
         qc7a=rules.qc_rq.output.pdf,
+        html=rules.qc_html.output.main_html,
+        overview_html=rules.qc_html.output.overview_html,
