@@ -23,10 +23,10 @@ rule make_beds:
     priority: 300
     shell:
         """
-        ft --threads {threads} extract \
-            {params.aligned} {input.bam} \
+        (ft --threads {threads} extract {params.aligned} {input.bam} \
             --cpg {output.cpg} --msp {output.msp} --m6a {output.m6a} --nuc {output.nuc} \
-        &> {log}
+            || echo "ft extract failed"
+        ) &> {log}
         """
 
 
