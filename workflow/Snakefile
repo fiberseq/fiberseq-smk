@@ -19,7 +19,7 @@ process_first_n = config.pop("process_first_n", None)
 # max ipdsummary coverage
 max_coverage = config.pop("max_coverage", 20)
 # max number of alignments to load in 1 kbp window for ipdsummary
-max_alignments = config.pop("max_alignments", 50)
+max_alignments = config.pop("max_alignments", 100)
 # list of input samples
 samples = list(config.keys())
 
