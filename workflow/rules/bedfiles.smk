@@ -25,7 +25,6 @@ rule make_beds:
         """
         (ft --threads {threads} extract {params.aligned} {input.bam} \
             --cpg {output.cpg} --msp {output.msp} --m6a {output.m6a} --nuc {output.nuc} \
-            || echo "ft extract failed"
         ) &> {log}
         """
 
