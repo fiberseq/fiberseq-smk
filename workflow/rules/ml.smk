@@ -4,7 +4,7 @@ localrules:
 
 rule make_ml_data:
     input:
-        bam="results/{sm}/unaligned.fiberseq.bam",
+        bam=rules.merge.output.bam,
     output:
         npz="results/{sm}/ml/{sm}.npz",
     conda:
