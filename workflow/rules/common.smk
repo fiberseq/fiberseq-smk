@@ -43,6 +43,14 @@ def get_gmm_model(wc):
     return []
 
 
+def get_ipd_results(sm):
+    if save_ipd:
+        csv = "results/{sm}/ipdSummary/{sm}.{scatteritem}.csv.gz"
+        gff = "results/{sm}/ipdSummary/{sm}.{scatteritem}.gff.gz"
+        return gather.chunks(csv, sm=sm) + gather.chunks(gff, sm=sm)
+    return []
+
+
 def get_nucleosome_bam(wc):
     fmt = "temp/{sm}/nuc.{scatteritem}.bam"
     if process_first_n is None:

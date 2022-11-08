@@ -12,6 +12,7 @@ input_ccs = config.pop("ccs", None)
 env = config.pop("env", "envs/env.yml")
 ref = config.pop("ref", None)
 gmm_model = config.pop("gmm_model", False)
+save_ipd = config.pop("save_ipd", False)
 gff = config.pop("gff", False)
 process_first_n = config.pop("process_first_n", None)
 # output wildcards
@@ -27,7 +28,6 @@ error_message = (
     + "To continue and avoid rerunning steps please move these files:\n\033[96m"
 )
 for sm in samples:
-
     for aln in aligned:
         old_out = f"results/{sm}/{aln}.fiberseq.bam"
         new_out = f"results/{sm}/{sm}.{aln}.fiberseq.bam"
@@ -82,13 +82,23 @@ scattergather:
     chunks=default_n_chunks,
 
 
-include: "rules/common.smk"
-include: "rules/ccs.smk"
-include: "rules/qc.smk"
-include: "rules/ml.smk"
-
-
 n_chunks = len(scatter.chunks("temp/{scatteritem}.fake"))
+
+
+# functions used across the workflow
+include: "rules/common.smk"
+# rules for running ccs
+include: "rules/ccs.smk"
+# pacbio tools: actc, ipdSummary, primrose
+include: "rules/pacbio-tools.smk"
+# make the fiberseq bam
+include: "rules/fiberseq-bam.smk"
+# make bed files from the fiberseq bam
+include: "rules/bedfiles.smk"
+# run qc on the fiberseq bam
+include: "rules/qc.smk"
+# make data from ML models for calling m6A (optional)
+include: "rules/ml.smk"
 
 
 wildcard_constraints:
@@ -100,14 +110,13 @@ wildcard_constraints:
 rule all:
     input:
         # fiberseq bam
-        expand("results/{sm}/{sm}.unaligned.fiberseq.bam", sm=samples),
-        expand("results/{sm}/{sm}.unaligned.fiberseq.bam.pbi", sm=samples),
+        expand(rules.merge.output.bam, sm=samples),
+        expand(rules.index_merge.output.pbi, sm=samples),
         # aligned fiberseq bam
         align_results(samples),
         # QC results
         expand(rules.qc_html.input, sm=samples),
-        expand("results/{sm}/qc/{sm}.qc.html", sm=samples),
-        expand("results/{sm}/qc/{sm}.overview.html", sm=samples),
+        expand(rules.qc_html.output, sm=samples),
         # bed
         expand(
             "results/{sm}/bed/{sm}.{aligned}.{data}.bed.gz",
@@ -121,396 +130,5 @@ rule all:
             sm=samples,
             data=output_types,
         ),
-
-
-rule actc:
-    input:
-        ccs=get_ccs_bam,
-        pbi=get_ccs_pbi,
-        subreads=get_subreads,
-    output:
-        bam=temp("temp/{sm}/actc.{scatteritem}.bam"),
-        fasta=temp("temp/{sm}/actc.{scatteritem}.fasta"),
-    threads: scatter_threads
-    conda:
-        env
-    log:
-        "logs/{sm}/actc/{scatteritem}.log",
-    benchmark:
-        "benchmarks/{sm}/actc/{scatteritem}.tbl"
-    priority: 10
-    shell:
-        """
-        actc -j {threads} {input.subreads} {input.ccs} {output.bam} 2> {log}
-        """
-
-
-rule index:
-    input:
-        bam=rules.actc.output.bam,
-    output:
-        pbi=temp(f"{rules.actc.output.bam}.pbi"),
-    threads: 1
-    conda:
-        env
-    log:
-        "logs/{sm}/index/{scatteritem}.log",
-    benchmark:
-        "benchmarks/{sm}/index/{scatteritem}.tbl"
-    priority: 20
-    shell:
-        """
-        pbindex {input.bam} &> {log}
-        """
-
-
-rule index_ccs_fasta:
-    input:
-        fasta=rules.actc.output.fasta,
-    output:
-        fai=temp(f"{rules.actc.output.fasta}.fai"),
-    threads: 1
-    conda:
-        env
-    log:
-        "logs/{sm}/index_ccs_fasta/{scatteritem}.log",
-    benchmark:
-        "benchmarks/{sm}/index_ccs_fasta/{scatteritem}.tbl"
-    priority: 20
-    shell:
-        """
-        samtools faidx {input.fasta} &> {log}
-        """
-
-
-rule ipdSummary:
-    input:
-        ccs_fasta=rules.actc.output.fasta,
-        fai=rules.index_ccs_fasta.output.fai,
-        actc=rules.actc.output.bam,
-        pbi=rules.index.output.pbi,
-    output:
-        csv=temp("temp/{sm}/ipdSummary.{scatteritem}.csv"),
-        gff=temp("temp/{sm}/ipdSummary.{scatteritem}.gff"),
-    threads: config.get("ipd-threads", 16)
-    conda:
-        env
-    resources:
-        time=120,
-        mem_mb=64 * 1024,
-        disk_mb=16 * 1024,
-    log:
-        "logs/{sm}/ipdSummary/{scatteritem}.log",
-    benchmark:
-        "benchmarks/{sm}/ipdSummary/{scatteritem}.tbl"
-    priority: 10
-    shell:
-        """
-        ipdSummary \
-            --reference {input.ccs_fasta} \
-            --pvalue 0.001 \
-            --numWorkers {threads} \
-            --quiet --identify m6A \
-            --csv {output.csv} \
-            --gff {output.gff} \
-            {input.actc} &> {log}
-        """
-
-
-rule primrose:
-    input:
-        bam=get_ccs_bam,
-        pbi=get_ccs_pbi,
-    output:
-        bam=temp("temp/{sm}/primrose.{scatteritem}.bam"),
-        pbi=temp("temp/{sm}/primrose.{scatteritem}.bam.pbi"),
-    threads: scatter_threads
-    conda:
-        env
-    log:
-        "logs/{sm}/primrose/{scatteritem}.log",
-    benchmark:
-        "benchmarks/{sm}/primrose/{scatteritem}.tbl"
-    priority: 100
-    shell:
-        """
-        primrose --min-passes 3 -j {threads} \
-             --keep-kinetics \
-            {input.bam} {output.bam} \
-            &> {log}
-        """
-
-
-rule train_gmm:
-    input:
-        bam=f"temp/{{sm}}/primrose.1-of-{n_chunks}.bam",
-        csv=f"temp/{{sm}}/ipdSummary.1-of-{n_chunks}.csv",
-    output:
-        model="results/{sm}/{sm}.gmm_model.pkl",
-    conda:
-        env
-    log:
-        "logs/{sm}/train_gmm/train.log",
-    params:
-        gmm=workflow.source_path("scripts/push_m6a_to_bam.py"),
-    benchmark:
-        "benchmarks/{sm}/train_gmm/train.tbl"
-    resources:
-        disk_mb=16 * 1024,
-        mem_mb=16 * 1024,
-        time=200,
-    threads: 4
-    priority: 60
-    shell:
-        """
-        python {params.gmm} -v --threads {threads} \
-            {input.csv} {input.bam} \
-            --train -o {output.model} \
-            2> {log}
-        """
-
-
-rule gmm:
-    input:
-        get_gmm_model,  # can be empty if we are training per fiber
-        ccs=rules.primrose.output.bam,
-        pbi=rules.primrose.output.pbi,
-        csv=rules.ipdSummary.output.csv,
-    output:
-        bam=temp("temp/{sm}/gmm.{scatteritem}.bam"),
-    threads: 4
-    resources:
-        mem_mb=16 * 1024,
-    conda:
-        env
-    log:
-        "logs/{sm}/gmm/{scatteritem}.log",
-    params:
-        gmm=workflow.source_path("scripts/push_m6a_to_bam.py"),
-        model=lambda wc: " --min-prediction-value 0.999999 --model "
-        + get_gmm_model(wc)
-        if gmm_model
-        else "",
-    benchmark:
-        "benchmarks/{sm}/gmm/{scatteritem}.tbl"
-    priority: 1000  # Run this as fast as possible so we can delete the csv from idpSummary.
-    shell:
-        """
-        python {params.gmm} -v {params.model} --threads {threads} {input.csv} {input.ccs} > {output.bam} 2> {log}
-        """
-
-
-rule train_hmm:
-    input:
-        bam=f"temp/{{sm}}/gmm.1-of-{n_chunks}.bam",
-    output:
-        model=temp("temp/{sm}/hmm_model.json"),
-    conda:
-        env
-    log:
-        "logs/{sm}/train_hmm/train.log",
-    params:
-        nuc=workflow.source_path("scripts/add_nucleosomes.py"),
-    benchmark:
-        "benchmarks/{sm}/train_hmm/train.tbl"
-    resources:
-        disk_mb=16 * 1024,
-        mem_mb=16 * 1024,
-        time=200,
-    threads: 4
-    priority: 2000
-    shell:
-        """
-        python {params.nuc} --threads {threads} {input.bam} {output.model} 2> {log}
-        """
-
-
-rule nucleosome:
-    input:
-        bam=rules.gmm.output.bam,
-        model=rules.train_hmm.output.model,
-    output:
-        bam=temp("temp/{sm}/nuc.{scatteritem}.bam"),
-    conda:
-        env
-    log:
-        "logs/{sm}/nucleosome/{scatteritem}.log",
-    params:
-        nuc=workflow.source_path("scripts/add_nucleosomes.py"),
-    benchmark:
-        "benchmarks/{sm}/nucleosome/{scatteritem}.tbl"
-    threads: 4
-    resources:
-        disk_mb=16 * 1024,
-    priority: 70
-    shell:
-        """
-        python {params.nuc} -m {input.model} --threads {threads} {input.bam} {output.bam} 2> {log}
-        """
-
-
-rule merge:
-    input:
-        bam=get_nucleosome_bam,
-    output:
-        bam="results/{sm}/{sm}.unaligned.fiberseq.bam",
-    conda:
-        env
-    log:
-        "logs/{sm}/merge/samtools.cat.log",
-    resources:
-        disk_mb=8000,
-        time=120,
-    threads: 4
-    benchmark:
-        "benchmarks/{sm}/merge/samtools.cat.tbl"
-    priority: 100
-    shell:
-        """
-        samtools cat -@ {threads} -o {output.bam} {input.bam} 2> {log}
-        """
-
-
-rule index_merge:
-    input:
-        bam=rules.merge.output.bam,
-    output:
-        pbi=f"{rules.merge.output.bam}.pbi",
-    conda:
-        env
-    log:
-        "logs/{sm}/index_merge/index.tbl",
-    benchmark:
-        "benchmarks/{sm}/index_merge/index.tbl"
-    threads: 1
-    priority: 100
-    shell:
-        """
-        pbindex {input.bam} &> {log}
-        """
-
-
-rule align:
-    input:
-        bam=rules.merge.output.bam,
-        ref=ref,
-    output:
-        bam="results/{sm}/{sm}.aligned.fiberseq.bam",
-        bai="results/{sm}/{sm}.aligned.fiberseq.bam.bai",
-    conda:
-        env
-    log:
-        "logs/{sm}/align/align.log",
-    resources:
-        disk_mb=8000,
-        time=240,
-        mem_mb=32 * 1024,
-    threads: max_threads
-    benchmark:
-        "benchmarks/{sm}/align/align.tbl"
-    priority: 200
-    shell:
-        """
-        pbmm2 align \
-            -j {threads} \
-            --preset CCS --sort \
-            --sort-memory 2G \
-            --log-level INFO \
-            --unmapped \
-            {input.ref} {input.bam} {output.bam} \
-        2> {log}
-        """
-
-
-rule make_beds:
-    input:
-        bam="results/{sm}/{sm}.{aligned}.fiberseq.bam",
-    output:
-        cpg=temp("temp/{sm}/{aligned}.cpg.bed"),
-        msp=temp("temp/{sm}/{aligned}.msp.bed"),
-        m6a=temp("temp/{sm}/{aligned}.m6a.bed"),
-        nuc=temp("temp/{sm}/{aligned}.nuc.bed"),
-    conda:
-        env
-    log:
-        "logs/{sm}/make_beds/{aligned}_extract.bed.log",
-    resources:
-        disk_mb=8000,
-        time=240,
-    threads: 8
-    benchmark:
-        "benchmarks/{sm}/make_beds/{aligned}_extract_bed.tbl"
-    params:
-        aligned=lambda wc: "-r" if wc.aligned == "aligned" else "",
-    priority: 300
-    shell:
-        """
-        ft --threads {threads} extract \
-            {params.aligned} {input.bam} \
-            --cpg {output.cpg} --msp {output.msp} --m6a {output.m6a} --nuc {output.nuc} \
-        2> {log}
-        """
-
-
-rule fiber_table:
-    input:
-        bam=rules.align.output.bam,
-    output:
-        tbl="results/{sm}/{sm}.fiberseq.all.tbl.gz",
-    conda:
-        env
-    log:
-        "logs/{sm}/fiber_table/all_extract_bed.log",
-    resources:
-        disk_mb=8000,
-        time=240,
-    threads: 8
-    benchmark:
-        "benchmarks/{sm}/fiber_table/all_extract_bed.tbl"
-    priority: 300
-    shell:
-        """
-        ( ft --threads {threads} extract {input.bam} --all - \
-            | bgzip -@ {threads} > {output.tbl} \
-        ) 2> {log}
-        """
-
-
-rule compress_bed:
-    input:
-        bed="temp/{sm}/{aligned}.{data}.bed",
-    output:
-        bed="results/{sm}/bed/{sm}.{aligned}.{data}.bed.gz",
-    conda:
-        env
-    log:
-        "logs/{sm}/compress_bed/{aligned}_{data}.log",
-    threads: 4
-    benchmark:
-        "benchmarks/{sm}/compress_bed/{aligned}_{data}.tbl"
-    priority: 300
-    shell:
-        """
-        cat {input.bed} | bgzip -@ {threads} > {output.bed} 2> {log}
-        """
-
-
-rule bigbed:
-    input:
-        fai=f"{ref}.fai",
-        bed="temp/{sm}/aligned.{data}.bed",
-    output:
-        bb="results/{sm}/bigbed/{sm}.aligned.{data}.bed.bb",
-        bed=temp("temp/{sm}/aligned.{data}.bed.pre.bb"),
-    conda:
-        env
-    log:
-        "logs/{sm}/bigbed/{data}.log",
-    benchmark:
-        "benchmarks/{sm}/bigbed/{data}.tbl"
-    priority: 300
-    shell:
-        """
-        sort -k1,1 -k2,2n {input.bed} > {output.bed} 2> {log}
-        bedToBigBed -allow1bpOverlap {output.bed} {input.fai} {output.bb} 2>> {log}
-        """
+        # get ipdSummary files if requested
+        get_ipd_results(samples),
