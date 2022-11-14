@@ -1,9 +1,9 @@
 rule qc_msp:
     input:
-        bed="results/{sm}/unaligned.msp.bed.gz",
+        bed="results/{sm}/bed/{sm}.unaligned.msp.bed.gz",
     output:
-        pdf="results/{sm}/qc/qc_msp_lengths.pdf",
-        txt="temp/{sm}/qc_msp.intermediate.stat.txt",
+        pdf="results/{sm}/qc/{sm}.qc_msp_lengths.pdf",
+        txt=temp("temp/{sm}/qc_msp.intermediate.stat.txt"),
     conda:
         env
     log:
@@ -22,10 +22,10 @@ rule qc_msp:
 
 rule qc_nuc:
     input:
-        bed="results/{sm}/unaligned.nuc.bed.gz",
+        bed="results/{sm}/bed/{sm}.unaligned.nuc.bed.gz",
     output:
-        pdf="results/{sm}/qc/qc_nuc_lengths.pdf",
-        txt="temp/{sm}/qc_nuc.intermediate.stat.txt",
+        pdf="results/{sm}/qc/{sm}.qc_nuc_lengths.pdf",
+        txt=temp("temp/{sm}/qc_nuc.intermediate.stat.txt"),
     conda:
         env
     log:
@@ -44,11 +44,11 @@ rule qc_nuc:
 
 rule qc_m6a:
     input:
-        bam="results/{sm}/unaligned.fiberseq.bam",
+        bam="results/{sm}/{sm}.unaligned.fiberseq.bam",
     output:
-        pdf="results/{sm}/qc/qc_m6a_per_read.pdf",
-        ccs_pdf="results/{sm}/qc/qc_ccs_passes.pdf",
-        txt="temp/{sm}/qc_m6a.intermediate.stat.txt",
+        pdf="results/{sm}/qc/{sm}.qc_m6a_per_read.pdf",
+        ccs_pdf="results/{sm}/qc/{sm}.qc_ccs_passes.pdf",
+        txt=temp("temp/{sm}/qc_m6a.intermediate.stat.txt"),
     conda:
         env
     log:
@@ -67,10 +67,10 @@ rule qc_m6a:
 
 rule qc_nucs_per_read:
     input:
-        bed="results/{sm}/unaligned.nuc.bed.gz",
+        bed="results/{sm}/bed/{sm}.unaligned.nuc.bed.gz",
     output:
-        pdf="results/{sm}/qc/qc_number_nucs_per_read.pdf",
-        txt="temp/{sm}/qc_number_nucs_per_read.intermediate.stat.txt",
+        pdf="results/{sm}/qc/{sm}.qc_number_nucs_per_read.pdf",
+        txt=temp("temp/{sm}/qc_number_nucs_per_read.intermediate.stat.txt"),
     conda:
         env
     log:
@@ -89,10 +89,10 @@ rule qc_nucs_per_read:
 
 rule qc_readlength_per_nuc:
     input:
-        bam="results/{sm}/unaligned.fiberseq.bam",
+        bam="results/{sm}/{sm}.unaligned.fiberseq.bam",
     output:
-        pdf="results/{sm}/qc/qc_readlength_per_nuc.pdf",
-        txt="temp/{sm}/qc_readlength_per_nuc.intermediate.stat.txt",
+        pdf="results/{sm}/qc/{sm}.qc_readlength_per_nuc.pdf",
+        txt=temp("temp/{sm}/qc_readlength_per_nuc.intermediate.stat.txt"),
     conda:
         env
     log:
@@ -111,10 +111,10 @@ rule qc_readlength_per_nuc:
 
 rule qc_readlengths:
     input:
-        bam="results/{sm}/unaligned.fiberseq.bam",
+        bam="results/{sm}/{sm}.unaligned.fiberseq.bam",
     output:
-        pdf="results/{sm}/qc/qc_readlengths.pdf",
-        txt="temp/{sm}/qc_readlengths.intermediate.stat.txt",
+        pdf="results/{sm}/qc/{sm}.qc_readlengths.pdf",
+        txt=temp("temp/{sm}/qc_readlengths.intermediate.stat.txt"),
     conda:
         env
     log:
@@ -133,10 +133,10 @@ rule qc_readlengths:
 
 rule qc_rq:
     input:
-        bam="results/{sm}/unaligned.fiberseq.bam",
+        bam="results/{sm}/{sm}.unaligned.fiberseq.bam",
     output:
-        pdf="results/{sm}/qc/qc_readquality.pdf",
-        txt="temp/{sm}/qc_readquality.intermediate.stat.txt",
+        pdf="results/{sm}/qc/{sm}.qc_readquality.pdf",
+        txt=temp("temp/{sm}/qc_readquality.intermediate.stat.txt"),
     conda:
         env
     log:
@@ -169,7 +169,7 @@ rule qc_combine_stats:
     log:
         "logs/{sm}/qc/combine.log",
     benchmark:
-        "benchmarks/{sm}/qc/combine.tbl"
+        "benchmarks/{sm}/qc/{sm}.combine.tbl"
     threads: 1
     priority: 20
     shell:
@@ -197,8 +197,8 @@ rule qc_html:
         qc7a=rules.qc_rq.output.pdf,
         qc7b=rules.qc_rq.output.txt,
     output:
-        overview_html="results/{sm}/qc/overview.html",
-        main_html="results/{sm}/qc/qc.html",
+        overview_html="results/{sm}/qc/{sm}.overview.html",
+        main_html="results/{sm}/qc/{sm}.qc.html",
     conda:
         env
     log:
@@ -213,3 +213,17 @@ rule qc_html:
         """
         tcsh {params.script} {wildcards.sm} {output.overview_html} {output.main_html} {input} 2> {log}
         """
+
+
+rule qc_results:
+    input:
+        qc0a=rules.qc_msp.output.pdf,
+        qc1a=rules.qc_nuc.output.pdf,
+        qc2a=rules.qc_m6a.output.pdf,
+        qc3a=rules.qc_m6a.output.ccs_pdf,
+        qc4a=rules.qc_nucs_per_read.output.pdf,
+        qc5a=rules.qc_readlength_per_nuc.output.pdf,
+        qc6a=rules.qc_readlengths.output.pdf,
+        qc7a=rules.qc_rq.output.pdf,
+        html=rules.qc_html.output.main_html,
+        overview_html=rules.qc_html.output.overview_html,

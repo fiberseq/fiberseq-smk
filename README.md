@@ -121,31 +121,31 @@ Example output files if your sample name is `test`:
 
 ```bash 
 # bam files 
-results/test/unaligned.fiberseq.bam
-results/test/unaligned.fiberseq.bam.pbi
+results/test/test.unaligned.fiberseq.bam
+results/test/test.unaligned.fiberseq.bam.pbi
 # bed files
-results/test/unaligned.cpg.bed.gz
-results/test/unaligned.m6a.bed.gz
-results/test/unaligned.msp.bed.gz
-results/test/unaligned.nuc.bed.gz
+results/test/bed/test.unaligned.cpg.bed.gz
+results/test/bed/test.unaligned.m6a.bed.gz
+results/test/bed/test.unaligned.msp.bed.gz
+results/test/bed/test.unaligned.nuc.bed.gz
 ```
 </td>
 <td>
 
 ```bash
 # aligned bam files 
-results/test/aligned.fiberseq.bam
-results/test/aligned.fiberseq.bam.bai
+results/test/test.aligned.fiberseq.bam
+results/test/test.aligned.fiberseq.bam.bai
 # aligned bed files
-results/test/aligned.cpg.bed.gz
-results/test/aligned.m6a.bed.gz
-results/test/aligned.msp.bed.gz
-results/test/aligned.nuc.bed.gz
+results/test/bed/test.aligned.cpg.bed.gz
+results/test/bed/test.aligned.m6a.bed.gz
+results/test/bed/test.aligned.msp.bed.gz
+results/test/bed/test.aligned.nuc.bed.gz
 # aligned big bed file
-results/test/aligned.nuc.bed.bb
-results/test/aligned.m6a.bed.bb
-results/test/aligned.cpg.bed.bb
-results/test/aligned.msp.bed.bb
+results/test/bigbed/test.aligned.nuc.bed.bb
+results/test/bigbed/test.aligned.m6a.bed.bb
+results/test/bigbed/test.aligned.cpg.bed.bb
+results/test/bigbed/test.aligned.msp.bed.bb
 ```
 </td>
 </tr>

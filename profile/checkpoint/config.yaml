@@ -28,4 +28,4 @@ use-conda: True
 show-failed-logs: True 
 latency-wait: 30
 max-jobs-per-second: 50
-cluster-status: profile/extras/status-sacct.sh
+cluster-status: ../extras/status-sacct.sh

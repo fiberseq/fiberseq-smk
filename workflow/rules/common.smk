@@ -9,7 +9,9 @@ def get_subreads(wc):
 
 def align_results(sm):
     if ref is not None:
-        return expand("results/{sm}/aligned.fiberseq.bam", sm=sm)
+        out = expand("results/{sm}/{sm}.fiberseq.all.tbl.gz", sm=sm)
+        out += expand("results/{sm}/{sm}.aligned.fiberseq.bam", sm=sm)
+        return out
     return []
 
 
@@ -38,6 +40,14 @@ def get_gmm_model(wc):
     elif gmm_model is not False and os.path.exists(gmm_model):
         print("Using the input GMM model")
         return gmm_model
+    return []
+
+
+def get_ipd_results(sm):
+    if save_ipd:
+        csv = "results/{sm}/ipdSummary/{sm}.{scatteritem}.csv.gz"
+        gff = "results/{sm}/ipdSummary/{sm}.{scatteritem}.gff.gz"
+        return gather.chunks(csv, sm=sm) + gather.chunks(gff, sm=sm)
     return []
 
 
