@@ -36,7 +36,7 @@ def get_ccs_pbi(wc):
 def get_gmm_model(wc):
     if gmm_model is True:
         print("Making a GMM model using many fibers")
-        return f"results/{wc.sm}/gmm_model.pkl"
+        return f"results/{wc.sm}/{wc.sm}_gmm_model.pkl"
     elif gmm_model is not False and os.path.exists(gmm_model):
         print("Using the input GMM model")
         return gmm_model
