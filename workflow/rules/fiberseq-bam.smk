@@ -72,6 +72,7 @@ rule predict_m6a_with_fibertools_rs:
     threads: 8
     resources:
         mem_mb=16 * 1024,
+        gpus=1,
     conda:
         env
     log:
@@ -81,7 +82,7 @@ rule predict_m6a_with_fibertools_rs:
     priority: 1000
     shell:
         """
-        ft predict-m6a --threads {threads} -s {input.ccs} {output.bam} 2> {log}
+        ft predict-m6a --threads {threads} -c {input.ccs} {output.bam} 2> {log}
         """
 
 

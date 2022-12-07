@@ -2,6 +2,7 @@ default-resources:
   - disk_mb=4096
   - mem_mb=4096
   - time=40
+  - gpus=0
 cluster:
   mkdir -p cluster_logs/{rule} &&
   sbatch
@@ -12,6 +13,7 @@ cluster:
     --mem={resources.mem_mb} 
     --tmp={resources.disk_mb}
     --time={resources.time}
+    --gpus={resources.gpus}
     --job-name=smk-{rule}-{wildcards}
     --output=cluster_logs/{rule}/{rule}-{wildcards}-%j.out
     --export=all
