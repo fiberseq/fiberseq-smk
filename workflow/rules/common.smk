@@ -3,8 +3,12 @@ def get_chunk(wc):
     return f"{digits[0]}/{digits[1]}"
 
 
-def get_subreads(wc):
+def get_input_bam(wc):
     return config[wc.sm]
+
+
+def get_input_pbi(wc):
+    return f"{get_input_bam(wc)}.pbi"
 
 
 def align_results(sm):
@@ -15,18 +19,13 @@ def align_results(sm):
     return []
 
 
-def get_input_ccs(wc):
-    return input_ccs
-
-
-def get_input_pbi(wc):
-    return f"{get_input_ccs(wc)}.pbi"
-
-
 def get_ccs_bam(wc):
-    if input_ccs is None:
+    if input_type.upper() == "SUBREADS":
         return "temp/{sm}/ccs.{scatteritem}.bam"
-    return "temp/{sm}/split_ccs/ccs.{scatteritem}.bam"
+    elif input_type.upper() == "CCS":
+        return "temp/{sm}/split_ccs/ccs.{scatteritem}.bam"
+    else:
+        raise Exception(f"Unknown input type: {input_type}")
 
 
 def get_ccs_pbi(wc):

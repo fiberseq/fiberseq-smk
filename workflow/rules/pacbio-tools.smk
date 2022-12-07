@@ -3,7 +3,7 @@ rule actc:
     input:
         ccs=get_ccs_bam,
         pbi=get_ccs_pbi,
-        subreads=get_subreads,
+        subreads=get_input_bam,
     output:
         bam=temp("temp/{sm}/actc.{scatteritem}.bam"),
         fasta=temp("temp/{sm}/actc.{scatteritem}.fasta"),

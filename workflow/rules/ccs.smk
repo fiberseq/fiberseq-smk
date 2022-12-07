@@ -1,7 +1,7 @@
 # NO CCS FILE PROVIDED SO WE MUST GENERATE ONE
 rule ccs:
     input:
-        bam=get_subreads,
+        bam=get_input_bam,
     output:
         bam=temp("temp/{sm}/ccs.{scatteritem}.bam"),
         pbi=temp("temp/{sm}/ccs.{scatteritem}.bam.pbi"),
@@ -34,7 +34,7 @@ rule ccs:
 # TODO check that there are hifi kenetics files for each subfile
 rule ccs_zmws:
     input:
-        bam=get_input_ccs,
+        bam=get_input_bam,
     output:
         txt=temp("temp/{sm}/ccs_zmws/ccs_zmws.txt"),
     threads: 1
@@ -78,7 +78,7 @@ rule split_ccs_zmws:
 
 rule split_ccs:
     input:
-        bam=get_input_ccs,
+        bam=get_input_bam,
         pbi=get_input_pbi,
         txt="temp/{sm}/split_ccs_zmws/{scatteritem}.txt",
     output:

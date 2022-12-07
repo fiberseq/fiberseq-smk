@@ -9,7 +9,7 @@ version: "0.1.0"
 # process the input configuration file/options.
 scatter_threads = config.pop("scatter_threads", 8)
 max_threads = config.pop("max_threads", 24)
-input_ccs = config.pop("ccs", None)
+input_type = config.pop("input_type", "subreads")
 env = config.pop("env", "envs/env.yml")
 ref = config.pop("ref", None)
 gmm_model = config.pop("gmm_model", False)
@@ -56,10 +56,6 @@ for sm in samples:
             error_message += f"\tmv {old_out}.{index_type} {new_out}.{index_type}\n"
 if move_count > 0:
     sys.exit(f"{error_message}\033[91m")
-
-# make sure there is an existing index if ccs data is passed
-if input_ccs is not None:
-    assert os.path.exists(f"{input_ccs}.pbi"), f"pbi for {input_ccs} does not exist"
 
 # force the reference to exist.
 if ref is None:
