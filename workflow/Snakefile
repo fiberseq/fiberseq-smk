@@ -112,7 +112,9 @@ include: "rules/qc.smk"
 include: "rules/ml.smk"
 
 
-print(is_tool("ft"))
+is_tool("ft")
+is_tool("cutnm")
+is_tool("bedtools")
 print(is_tool("bedtoolsx"))
 
 
