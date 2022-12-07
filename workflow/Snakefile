@@ -112,6 +112,7 @@ include: "rules/qc.smk"
 include: "rules/ml.smk"
 
 
+# check that the required tools are installed
 is_tool("ft")
 is_tool("cutnm")
 is_tool("bedtools")
@@ -119,7 +120,6 @@ is_tool("fibertools")
 is_tool("bamsieve")
 if not predict_with_hifi:
     is_tool("ipdSummary")
-print(is_tool("bedtoolsx"))
 
 
 wildcard_constraints:
