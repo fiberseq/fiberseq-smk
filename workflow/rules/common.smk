@@ -106,3 +106,54 @@ def get_number_of_chunks():
         )
     else:
         raise Exception(f"Unknown input type: {input_type}")
+
+
+def check_for_tools():
+    is_tool("ft")
+    is_tool("cutnm")
+    is_tool("bedtools")
+    is_tool("fibertools")
+    is_tool("bamsieve")
+    if not predict_with_hifi:
+        is_tool("ipdSummary")
+
+
+def check_for_old_outputs():
+    move_count = 0
+    error_message = (
+        "\033[93m"
+        + "Results from an older version of the pipeline exist. "
+        + "To continue and avoid rerunning steps please move these files:\n\033[96m"
+    )
+    for sm in samples:
+        for aln in aligned:
+            old_out = f"results/{sm}/{aln}.fiberseq.bam"
+            new_out = f"results/{sm}/{sm}.{aln}.fiberseq.bam"
+
+            index_type = "bai"
+            if aln == "unaligned":
+                index_type = "pbi"
+
+            # check ref
+            if os.path.exists(old_out):
+                move_count += 1
+                error_message += f"\tmv {old_out} {new_out}\n"
+            # check index
+            if os.path.exists(f"{old_out}.{index_type}"):
+                move_count += 1
+                error_message += f"\tmv {old_out}.{index_type} {new_out}.{index_type}\n"
+    if move_count > 0:
+        sys.exit(f"{error_message}\033[91m")
+
+
+def check_for_reference():
+    if ref is None:
+        sys.exit(
+            "Please provide a reference genome in the config file:\n"
+            + "\te.g. ref:/path/to/ref.fa\n"
+            + "Or in the command line under after --config:\n"
+            + "\te.g. --config ref=/path/to/ref.fa"
+        )
+    assert os.path.exists(
+        f"{ref}.fai"
+    ), f"Missing index for the ref: {ref}.fai\nCreate an index for {ref}:\n samtools faidx {ref}"

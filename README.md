@@ -46,8 +46,7 @@ snakemake \
   --config \
     env="fiberseq-smk" `# sets the conda env for the jobs, always the same` \
     test=.test/subreads.bam `# path to the subreads, and the key sets the sample name` \
-    ccs=.test/ccs.bam `# optional, precomputed CCS bam, needed for multiplexed data` \
-    ref=.test/ref.fa `# optional, reference to align results to`  
+    ref=.test/ref.fa `# reference to align results to`  
 ```
 If you find this too verbose you can instead include the config options in a configuration file:
 ```bash
@@ -61,54 +60,45 @@ env: fiberseq-smk
 test: .test/subreads.bam
 # optional path to a reference fasta to align the results to
 ref: .test/hg38.analysisSet.fa
-# optional path to the ccs bam file to avoid recomputing (required for multiplexed data)
-ccs: .test/ccs.bam
 ```
 
+# Running with precomputed CCS data
+Add to the config line the following option:
+```bash
+    input_type=ccs
+```
+And replace the subread bam file(s) with ccs file(s).
+
+# Running on a cluster with distributed resources
+Replace the `profile/local` argument with `profile/checkpoint` or `profile/compute` or make your own snakemake profile.
+
+# Multiplexed data
+If you have multiplexed data, you have to pass a `ccs` bam into the pipeline that has already been processed with `lima`. In general, you can pass a pre-generated ccs bam file to save on compute. For directions on this see [section above](#running-with-precomputed-ccs-data) on `ccs` inputs.
+
+# Use `fibertools-rs` for m6A predictions
+If you want to use `fibertools-rs` for m6A predictions, you can add the following to your config options:
+```bash
+    predict_with_hifi=True
+```
+You will also likely have a precomputed `ccs` bam file, in which case you will also add:
+```bash
+    input_type=ccs
+```
 
 # Test case
-**Before running your own data** please run this small test case included in the repository.
-
-## Local test case
+**Before running your own data** please run this small test case included in the repository. 
 ```bash
 snakemake \
   --profile profile/local `# sets up where and how jobs are submitted` \
   --config \
     env="fiberseq-smk" `# sets the conda env for the jobs` \
     test=.test/subreads.bam `# path to the subreads, and the key sets the sample name` \
-    ccs=.test/ccs.bam `# optional precomputed CCS bam, needed for multiplexed data` \
-    ref=.test/ref.fa `# optional, reference to align results to` \
+    ref=.test/ref.fa `# reference to align results to` \
   -p 
 ```
+In addition, please clear this test case and then try again with the distributed resources (e.g. `profile/compute/`). 
 
-## Submitting the test case to the cluster 
-You can also try submitting this test case to the cluster. Note the profile is currently configured for the Stergachis Lab cluster, you may need to modify it.
-```bash
-snakemake \
-  --profile profile/compute `# sets up where and how jobs are submitted` \
-  --config \
-    env="fiberseq-smk" `# sets the conda env for the jobs` \
-    test=.test/subreads.bam `# path to the subreads, and the key sets the sample name` \
-    ccs=.test/ccs.bam `# optional precomputed CCS bam, needed for multiplexed data` \
-    ref=.test/ref.fa `# optional, reference to align results to` \
-  -p 
-```
 
-## Submitting the test case to checkpoint 
-Similarly you can submit to the `checkpoint` nodes with: 
-```bash
-snakemake \
-  --profile profile/compute `# sets up where and how jobs are submitted` \
-  --config \
-    env="fiberseq-smk" `# sets the conda env for the jobs` \
-    test=.test/subreads.bam `# path to the subreads, and the key sets the sample name` \
-    ccs=.test/ccs.bam `# optional precomputed CCS bam, needed for multiplexed data` \
-    ref=.test/ref.fa `# optional, reference to align results to` \
-  -p 
-```
-
-## Multiplexed data
-If you have multiplexed data, you have to pass a `ccs` bam into the pipeline that has already been processed with `lima`. In general, you can pass a pre-generated ccs bam file to save on compute.
 # Output files
 Example output files if your sample name is `test`:
 <table>
