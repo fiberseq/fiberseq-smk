@@ -30,6 +30,10 @@ output_types = ["m6a", "cpg", "nuc", "msp"]
 aligned = ["aligned", "unaligned"]
 
 
+# functions used across the workflow
+include: "rules/common.smk"
+
+
 # check for old version of the pipeline and warn users to update outputs.
 move_count = 0
 error_message = (
@@ -69,19 +73,11 @@ if ref is None:
         f"{ref}.fai"
     ), f"Missing index for the ref: {ref}.fai\nCreate an index for {ref}:\n samtools faidx {ref}"
 
+# make sure pbi files exist for the input bams
+check_input_bams_for_index()
 
-# make sure all subreads have an index
-for sample, subreads in config.items():
-    assert os.path.exists(f"{subreads}.pbi"), f"pbi for {subreads} does not exist"
-
-
-# Two chunks per GB in the subreads
-default_n_chunks = min(
-    [
-        int(2 * os.path.getsize(subreads) / 1024**3) + 1
-        for sample, subreads in config.items()
-    ]
-)
+# define number of chunks based on input file sizes
+default_n_chunks = get_number_of_chunks()
 
 
 scattergather:
@@ -92,8 +88,6 @@ scattergather:
 n_chunks = len(scatter.chunks("temp/{scatteritem}.fake"))
 
 
-# functions used across the workflow
-include: "rules/common.smk"
 # rules for running ccs
 include: "rules/ccs.smk"
 # pacbio tools: actc, ipdSummary, primrose

@@ -80,3 +80,29 @@ def is_tool(name):
             f"Cannot find {name} in PATH. Please see the README for installation instructions."
         )
     return which(name)
+
+
+def check_input_bams_for_index():
+    for sample, input_bam in config.items():
+        assert os.path.exists(f"{input_bam}.pbi"), f"pbi for {input_bam} does not exist"
+
+
+def get_number_of_chunks():
+    # Two chunks per GB in the subreads
+    if input_type.upper() == "SUBREADS":
+        return min(
+            [
+                int(2 * os.path.getsize(input_bam) / 1024**3) + 1
+                for sample, input_bam in config.items()
+            ]
+        )
+    # Two chunks per GB in the subreads
+    elif input_type.upper() == "CCS":
+        return min(
+            [
+                int(0.1 * os.path.getsize(input_bam) / 1024**3) + 1
+                for sample, input_bam in config.items()
+            ]
+        )
+    else:
+        raise Exception(f"Unknown input type: {input_type}")
