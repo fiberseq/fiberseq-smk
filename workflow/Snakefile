@@ -112,7 +112,7 @@ include: "rules/qc.smk"
 include: "rules/ml.smk"
 
 
-print(is_tool(ft))
+print(is_tool("ft"))
 
 
 wildcard_constraints:
