@@ -9,33 +9,51 @@ A Snakemake workflow for making **fiberseq** calls.
 
 # Installation
 
+## Install dependencies
+### UCSC tools
 Make sure you have UCSC tools installed and in your path.  You can get them from here: [https://hgdownload.soe.ucsc.edu/admin/exe/](https://hgdownload.soe.ucsc.edu/admin/exe/)
 
 If you are on `hyak` you can add my copy to your path by adding this to your `.bashrc`:
 ```
 PATH=$PATH:/mmfs1/home/mvollger/software/ucsc_bin
 ```
+### `fibertools-rs`
+See install the [fibertools-rs install instructions](https://github.com/mrvollger/fibertools-rs#install) and make sure `ft` is in your path.
+If you are on `hyak` you can add my copy to your path by adding this to your `.bashrc`:
+```bash
+PATH=$PATH:/mmfs1/gscratch/stergachislab/mvollger/projects/large_home/.cargo/bin/
+```
 
-Then you can start with:
+### `SMRTLINK` tools
+```
+# Add the SMRTlink tools to your path
+export PATH=$PATH:/path/to/smrtlink/tools
+```
+If you are on `hyak` you can add our copy to your path by adding this to your `.bashrc`:
+```bash
+PATH=$PATH:/gscratch/stergachislab/install_dir/smrtlink/smrtcmds/bin/
+```
+
+### `cutnm`
+Download and add cutnm to your path
+```bash
+wget https://raw.githubusercontent.com/sjneph/cutnm/master/src/cutnm
+chmod 755 cutnm
+export PATH=$PATH:/path/to/cutnm
+```
+
+## Install the workflow
+
 ```bash
 git clone https://github.com/StergachisLab/fiberseq-smk
 cd fiberseq-smk
 conda create -n fiberseq-smk
 mamba env update -n fiberseq-smk --file workflow/envs/env.yml 
 conda activate fiberseq-smk
-# Add the SMRTlink tools to your path
-export PATH=$PATH:/path/to/smrtlink/tools
-# Download and add cutnm to your path
-wget https://raw.githubusercontent.com/sjneph/cutnm/master/src/cutnm
-chmod 755 cutnm
-export PATH=$PATH:/path/to/cutnm
-# Download and build ft as shown at https://github.com/mrvollger/fibertools-rs.  Add ft to your path.
+
 ```
 
-On the Stergachis Lab's cluster, you can add the following line to your `~/.bashrc` to load the needed `SMRTlink` tools:
-```bash
-PATH=$PATH:/gscratch/stergachislab/install_dir/smrtlink/smrtcmds/bin/
-```
+
 
 # Usage
 
