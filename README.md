@@ -18,7 +18,8 @@ If you are on `hyak` you can add my copy to your path by adding this to your `.b
 PATH=$PATH:/mmfs1/home/mvollger/software/ucsc_bin
 ```
 ### `fibertools-rs`
-See install the [fibertools-rs install instructions](https://github.com/mrvollger/fibertools-rs#install) and make sure `ft` is in your path.
+See the [fibertools-rs install instructions](https://github.com/mrvollger/fibertools-rs#install) and make sure `ft` is in your path.
+
 If you are on `hyak` you can add my copy to your path by adding this to your `.bashrc`:
 ```bash
 PATH=$PATH:/mmfs1/gscratch/stergachislab/mvollger/projects/large_home/.cargo/bin/
@@ -50,9 +51,7 @@ cd fiberseq-smk
 conda create -n fiberseq-smk
 mamba env update -n fiberseq-smk --file workflow/envs/env.yml 
 conda activate fiberseq-smk
-
 ```
-
 
 
 # Usage
