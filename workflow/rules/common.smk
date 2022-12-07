@@ -77,5 +77,7 @@ def is_tool(name):
     from shutil import which
 
     if which(name) is None:
-        raise Exception(f"Cannot find {name} in PATH")
+        exit(
+            f"Cannot find {name} in PATH. Please see the README for installation instructions."
+        )
     return which(name)
