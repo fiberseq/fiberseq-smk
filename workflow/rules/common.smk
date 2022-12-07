@@ -100,7 +100,7 @@ def get_number_of_chunks():
     elif input_type.upper() == "CCS":
         return min(
             [
-                int(0.1 * os.path.getsize(input_bam) / 1024**3) + 1
+                int(0.05 * os.path.getsize(input_bam) / 1024**3) + 1
                 for sample, input_bam in config.items()
             ]
         )
