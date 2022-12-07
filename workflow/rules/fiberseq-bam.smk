@@ -104,7 +104,7 @@ rule train_hmm:
     priority: 2000
     shell:
         """
-        fibertools -t {threads} add-nucleosomes {input.bam} {output.model} 2> {log}
+        fibertools -t {threads} add-nucleosomes -i {input.bam} -o {output.model} 2> {log}
         """
 
 
@@ -126,7 +126,7 @@ rule nucleosome:
     priority: 70
     shell:
         """
-        fibertools -t {threads} add-nucleosomes -m {input.model} {input.bam} {output.bam} 2> {log}
+        fibertools -t {threads} add-nucleosomes -m {input.model} -i {input.bam} -o {output.bam} 2> {log}
         """
 
 
