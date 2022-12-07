@@ -16,6 +16,8 @@ gmm_model = config.pop("gmm_model", False)
 save_ipd = config.pop("save_ipd", False)
 gff = config.pop("gff", False)
 process_first_n = config.pop("process_first_n", None)
+# use the fibertool-rs prediction instead of ipdSummary
+predict_with_hifi = config.pop("predict_with_hifi", False)
 # max ipdsummary coverage
 max_coverage = config.pop("max_coverage", 20)
 # max number of alignments to load in 1 kbp window for ipdsummary

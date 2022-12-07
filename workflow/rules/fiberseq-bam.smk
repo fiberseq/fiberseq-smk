@@ -1,4 +1,6 @@
-
+#
+# RUN IF WE ARE USING THE IPDSUMMARY + GMM MODEL
+#
 rule train_gmm:
     input:
         bam=f"temp/{{sm}}/primrose.1-of-{n_chunks}.bam",
@@ -58,17 +60,40 @@ rule gmm:
         """
 
 
+#
+# RUN IF WE ARE USING THE FIBERTOOLS-RS MODEL
+#
+rule predict_m6a_with_fibertools_rs:
+    input:
+        ccs=rules.primrose.output.bam,
+        pbi=rules.primrose.output.pbi,
+    output:
+        bam=temp("temp/{sm}/ft.{scatteritem}.bam"),
+    threads: 8
+    resources:
+        mem_mb=16 * 1024,
+    conda:
+        env
+    log:
+        "logs/{sm}/predict_m6a_with_fibertools_rs/{scatteritem}.log",
+    benchmark:
+        "benchmarks/{sm}/predict_m6a_with_fibertools_rs/{scatteritem}.tbl"
+    priority: 1000
+    shell:
+        """
+        ft predict-m6a --threads {threads} -s {input.ccs} {output.bam} 2> {log}
+        """
+
+
 rule train_hmm:
     input:
-        bam=f"temp/{{sm}}/gmm.1-of-{n_chunks}.bam",
+        bam=get_first_m6a_bam,
     output:
         model=temp("temp/{sm}/hmm_model.json"),
     conda:
         env
     log:
         "logs/{sm}/train_hmm/train.log",
-    params:
-        nuc=workflow.source_path("../scripts/add_nucleosomes.py"),
     benchmark:
         "benchmarks/{sm}/train_hmm/train.tbl"
     resources:
@@ -79,13 +104,13 @@ rule train_hmm:
     priority: 2000
     shell:
         """
-        python {params.nuc} --threads {threads} {input.bam} {output.model} 2> {log}
+        fibertools -t {threads} add-nucleosomes {input.bam} {output.model} 2> {log}
         """
 
 
 rule nucleosome:
     input:
-        bam=rules.gmm.output.bam,
+        bam=get_m6a_bam,
         model=rules.train_hmm.output.model,
     output:
         bam=temp("temp/{sm}/nuc.{scatteritem}.bam"),
@@ -93,8 +118,6 @@ rule nucleosome:
         env
     log:
         "logs/{sm}/nucleosome/{scatteritem}.log",
-    params:
-        nuc=workflow.source_path("../scripts/add_nucleosomes.py"),
     benchmark:
         "benchmarks/{sm}/nucleosome/{scatteritem}.tbl"
     threads: 4
@@ -103,7 +126,7 @@ rule nucleosome:
     priority: 70
     shell:
         """
-        python {params.nuc} -m {input.model} --threads {threads} {input.bam} {output.bam} 2> {log}
+        fibertools -t {threads} add-nucleosomes -m {input.model} {input.bam} {output.bam} 2> {log}
         """
 
 

@@ -43,6 +43,18 @@ def get_gmm_model(wc):
     return []
 
 
+def get_m6a_bam(wc):
+    if predict_with_hifi is True:
+        return f"temp/{wc.sm}/ft.{wc.scatteritem}.bam"
+    return f"temp/{wc.sm}/gmm.{wc.scatteritem}.bam"
+
+
+def get_first_m6a_bam(wc):
+    if predict_with_hifi is True:
+        return f"temp/{wc.sm}/ft.1-of-{n_chunks}.bam"
+    return f"temp/{wc.sm}/gmm.1-of-{n_chunks}.bam"
+
+
 def get_ipd_results(sm):
     if save_ipd:
         csv = "results/{sm}/ipdSummary/{sm}.{scatteritem}.csv.gz"
