@@ -69,3 +69,11 @@ def get_nucleosome_bam(wc):
         return gather.chunks(fmt, allow_missing=True)
     scatteritems = [f"{i+1}-of-{n_chunks}" for i in range(process_first_n)]
     return expand(fmt, scatteritem=scatteritems, allow_missing=True)
+
+
+def is_tool(name):
+    """Check whether `name` is on PATH and marked as executable."""
+    # from whichcraft import which
+    from shutil import which
+
+    return which(name) is not None

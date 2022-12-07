@@ -112,6 +112,9 @@ include: "rules/qc.smk"
 include: "rules/ml.smk"
 
 
+print(is_tool(ft))
+
+
 wildcard_constraints:
     sm="|".join(samples),
     data="|".join(output_types),
