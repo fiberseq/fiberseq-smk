@@ -76,4 +76,6 @@ def is_tool(name):
     # from whichcraft import which
     from shutil import which
 
-    return which(name) is not None
+    if which(name) is None:
+        raise Exception(f"Cannot find {name} in PATH")
+    return which(name)
