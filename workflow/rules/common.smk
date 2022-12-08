@@ -1,3 +1,7 @@
+SUBREAD_NAMES = ["SUBREADS", "SUBREAD"]
+CCS_NAMES = ["CCS", "CCSREADS", "CCSREAD", "HIFI"]
+
+
 def get_chunk(wc):
     digits = str(wc.scatteritem).split("-of-")
     return f"{digits[0]}/{digits[1]}"
@@ -20,9 +24,9 @@ def align_results(sm):
 
 
 def get_ccs_bam(wc):
-    if input_type.upper() == "SUBREADS":
+    if input_type.upper() in SUBREAD_NAMES:
         return "temp/{sm}/ccs.{scatteritem}.bam"
-    elif input_type.upper() == "CCS":
+    elif input_type.upper() in CCS_NAMES:
         return "temp/{sm}/split_ccs/ccs.{scatteritem}.bam"
     else:
         raise Exception(f"Unknown input type: {input_type}")
@@ -89,7 +93,7 @@ def check_input_bams_for_index():
 
 def get_number_of_chunks():
     # Two chunks per GB in the subreads
-    if input_type.upper() == "SUBREADS":
+    if input_type.upper() in SUBREAD_NAMES:
         return min(
             [
                 int(2 * os.path.getsize(input_bam) / 1024**3) + 1
@@ -97,7 +101,7 @@ def get_number_of_chunks():
             ]
         )
     # One chunk per GB in the subreads, note CCS bam will be ~1/10 the size
-    elif input_type.upper() == "CCS":
+    elif input_type.upper() in CCS_NAMES:
         return min(
             [
                 int(os.path.getsize(input_bam) / 1024**3) + 1
