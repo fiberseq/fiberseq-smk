@@ -145,7 +145,7 @@ rule align:
         disk_mb=8000,
         time=40,
         mem_mb=16 * 1024,
-    threads: 8
+    threads: 4
     benchmark:
         "benchmarks/{sm}/align/align.{scatteritem}.tbl"
     priority: 2000
