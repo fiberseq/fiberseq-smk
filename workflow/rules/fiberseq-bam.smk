@@ -175,7 +175,7 @@ rule merge:
     resources:
         disk_mb=8000,
         time=120,
-    threads: 4
+    threads: 12
     benchmark:
         "benchmarks/{sm}/merge/samtools.cat.tbl"
     priority: 3000
