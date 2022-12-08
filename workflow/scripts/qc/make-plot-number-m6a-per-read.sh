@@ -18,7 +18,7 @@ set -exuo pipefail
 
 if [[ $# != 5 ]]; then
   printf "Expect $0 <sample-name> <input-file> <output-pdf> <output-ec-pdf> <output-stat.txt>\n"
-  exit -1
+  exit 1
 fi
 
 samplenm=$1
@@ -34,7 +34,7 @@ ftype=m6a
 tmpd=/tmp/`whoami`/$$
 if [[ ! -s $inp ]]; then
   printf "Problem finding 1 file: %s\n" $inp
-  exit -1
+  exit 1
 fi
 
 if [ -s $tmpd ]; then
