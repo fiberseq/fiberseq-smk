@@ -28,7 +28,8 @@ if [ ! -s $inp ]; then
   exit -1
 fi
 
-ft extract --all - $inp \
+#ft extract --all - $inp \
+zcat $inp \
   | cutnm rq \
   | awk '(NR>1)' \
   > $tmpd/$samplenm.$ftype

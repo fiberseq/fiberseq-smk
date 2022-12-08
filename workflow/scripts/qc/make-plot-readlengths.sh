@@ -28,7 +28,8 @@ fi
 mkdir -p $tmpd
 
 # putting things in bins of size 10
-ft extract --all - $inp \
+#ft extract --all - $inp \
+zcat $inp \
   | cutnm fiber_length \
   | awk '{ $1=int($1/10); $1=$1*10; print $1 }' \
   | sort -gk1,1 \

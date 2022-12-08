@@ -44,7 +44,8 @@ mkdir -p $tmpd
 mkdir -p $(dirname "${outpdf}")
 
 
-ft extract --all - $inp \
+#ft extract --all - $inp \
+zcat $inp \
   | cutnm total_m6a_bp,total_AT_bp,ec \
   > $tmpd/$samplenm.$ftype
 

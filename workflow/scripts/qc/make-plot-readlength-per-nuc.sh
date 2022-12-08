@@ -34,7 +34,8 @@ fi
 mkdir -p $tmpd
 mkdir -p $(dirname "${outpdf}")
 
-ft extract --all - $inp \
+#ft extract --all - $inp \
+zcat $inp \
   | cutnm fiber_length,nuc_starts \
   | awk '{ lng=gsub(/,/, "", $2); if ( lng > 1 ) { print int($1/lng) } }' \
   > $tmpd/$samplenm.$ftype

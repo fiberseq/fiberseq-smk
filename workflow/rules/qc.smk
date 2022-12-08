@@ -44,7 +44,7 @@ rule qc_nuc:
 
 rule qc_m6a:
     input:
-        bam=rules.merge.output.bam,
+        tbl=rules.fiber_table.output.tbl,
     output:
         pdf="results/{sm}/qc/{sm}.qc_m6a_per_read.pdf",
         ccs_pdf="results/{sm}/qc/{sm}.qc_ccs_passes.pdf",
@@ -61,7 +61,7 @@ rule qc_m6a:
     priority: 20
     shell:
         """
-        sh {params.script} {wildcards.sm} {input.bam} {output.pdf} {output.ccs_pdf} {output.txt} 2> {log}
+        sh {params.script} {wildcards.sm} {input.tbl} {output.pdf} {output.ccs_pdf} {output.txt} 2> {log}
         """
 
 
@@ -89,7 +89,7 @@ rule qc_nucs_per_read:
 
 rule qc_readlength_per_nuc:
     input:
-        bam=rules.merge.output.bam,
+        tbl=rules.fiber_table.output.tbl,
     output:
         pdf="results/{sm}/qc/{sm}.qc_readlength_per_nuc.pdf",
         txt=temp("temp/{sm}/qc_readlength_per_nuc.intermediate.stat.txt"),
@@ -105,13 +105,13 @@ rule qc_readlength_per_nuc:
     priority: 20
     shell:
         """
-        sh {params.script} {wildcards.sm} {input.bam} {output.pdf} {output.txt} 2> {log}
+        sh {params.script} {wildcards.sm} {input.tbl} {output.pdf} {output.txt} 2> {log}
         """
 
 
 rule qc_readlengths:
     input:
-        bam=rules.merge.output.bam,
+        tbl=rules.fiber_table.output.tbl,
     output:
         pdf="results/{sm}/qc/{sm}.qc_readlengths.pdf",
         txt=temp("temp/{sm}/qc_readlengths.intermediate.stat.txt"),
@@ -127,13 +127,13 @@ rule qc_readlengths:
     priority: 20
     shell:
         """
-        sh {params.script} {wildcards.sm} {input.bam} {output.pdf} {output.txt} 2> {log}
+        sh {params.script} {wildcards.sm} {input.tbl} {output.pdf} {output.txt} 2> {log}
         """
 
 
 rule qc_rq:
     input:
-        bam=rules.merge.output.bam,
+        tbl=rules.fiber_table.output.tbl,
     output:
         pdf="results/{sm}/qc/{sm}.qc_readquality.pdf",
         txt=temp("temp/{sm}/qc_readquality.intermediate.stat.txt"),
@@ -149,7 +149,7 @@ rule qc_rq:
     priority: 20
     shell:
         """
-        sh {params.script} {wildcards.sm} {input.bam} {output.pdf} {output.txt} 2> {log}
+        sh {params.script} {wildcards.sm} {input.tbl} {output.pdf} {output.txt} 2> {log}
         """
 
 
