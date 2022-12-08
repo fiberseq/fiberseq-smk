@@ -154,7 +154,7 @@ rule align:
         pbmm2 align \
             -j {threads} \
             --preset CCS --sort \
-            --sort-memory 2G \
+            --sort-memory 1G \
             --log-level INFO \
             --unmapped \
             {input.ref} {input.bam} {output.bam} \
