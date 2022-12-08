@@ -93,24 +93,17 @@ def check_input_bams_for_index():
 
 
 def get_number_of_chunks():
-    # Two chunks per GB in the subreads
-    if input_type.upper() in SUBREAD_NAMES:
-        return min(
-            [
-                int(2 * os.path.getsize(input_bam) / 1024**3) + 1
-                for sample, input_bam in config.items()
-            ]
-        )
-    # One chunk per GB in the subreads, note CCS bam will be ~1/10 the size
-    elif input_type.upper() in CCS_NAMES:
-        return min(
-            [
-                int(os.path.getsize(input_bam) / 1024**3) + 1
-                for sample, input_bam in config.items()
-            ]
-        )
+    GB_size = min([os.path.getsize(input_bam) for sample, input_bam in config.items()])
+    if predict_with_hifi:
+        if input_type.upper() in SUBREAD_NAMES:
+            return int(GB_size / 10) + 1
+        elif input_type.upper() in CCS_NAMES:
+            return int(GB_size) + 1
     else:
-        raise Exception(f"Unknown input type: {input_type}")
+        if input_type.upper() in SUBREAD_NAMES:
+            return int(GB_size) + 1
+        elif input_type.upper() in CCS_NAMES:
+            return 10 * int(GB_size) + 1
 
 
 def check_for_tools():
