@@ -44,7 +44,7 @@ rule qc_nuc:
 
 rule qc_m6a:
     input:
-        bam="results/{sm}/{sm}.unaligned.fiberseq.bam",
+        bam=rules.merge.output.bam,
     output:
         pdf="results/{sm}/qc/{sm}.qc_m6a_per_read.pdf",
         ccs_pdf="results/{sm}/qc/{sm}.qc_ccs_passes.pdf",
@@ -89,7 +89,7 @@ rule qc_nucs_per_read:
 
 rule qc_readlength_per_nuc:
     input:
-        bam="results/{sm}/{sm}.unaligned.fiberseq.bam",
+        bam=rules.merge.output.bam,
     output:
         pdf="results/{sm}/qc/{sm}.qc_readlength_per_nuc.pdf",
         txt=temp("temp/{sm}/qc_readlength_per_nuc.intermediate.stat.txt"),
@@ -111,7 +111,7 @@ rule qc_readlength_per_nuc:
 
 rule qc_readlengths:
     input:
-        bam="results/{sm}/{sm}.unaligned.fiberseq.bam",
+        bam=rules.merge.output.bam,
     output:
         pdf="results/{sm}/qc/{sm}.qc_readlengths.pdf",
         txt=temp("temp/{sm}/qc_readlengths.intermediate.stat.txt"),
@@ -133,7 +133,7 @@ rule qc_readlengths:
 
 rule qc_rq:
     input:
-        bam="results/{sm}/{sm}.unaligned.fiberseq.bam",
+        bam=rules.merge.output.bam,
     output:
         pdf="results/{sm}/qc/{sm}.qc_readquality.pdf",
         txt=temp("temp/{sm}/qc_readquality.intermediate.stat.txt"),
