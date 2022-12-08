@@ -96,11 +96,11 @@ def get_number_of_chunks():
                 for sample, input_bam in config.items()
             ]
         )
-    # Two chunks per GB in the subreads
+    # One chunk per GB in the subreads, note CCS bam will be ~1/10 the size
     elif input_type.upper() == "CCS":
         return min(
             [
-                int(0.2 * os.path.getsize(input_bam) / 1024**3) + 1
+                int(os.path.getsize(input_bam) / 1024**3) + 1
                 for sample, input_bam in config.items()
             ]
         )
