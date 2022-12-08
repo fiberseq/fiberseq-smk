@@ -123,7 +123,7 @@ rule nucleosome:
     threads: 4
     resources:
         disk_mb=16 * 1024,
-    priority: 70
+    priority: 1000
     shell:
         """
         fibertools -t {threads} add-nucleosomes -m {input.model} -i {input.bam} -o {output.bam} 2> {log}
@@ -148,7 +148,7 @@ rule align:
     threads: 8
     benchmark:
         "benchmarks/{sm}/align/align.{scatteritem}.tbl"
-    priority: 200
+    priority: 2000
     shell:
         """
         pbmm2 align \
@@ -178,7 +178,7 @@ rule merge:
     threads: 4
     benchmark:
         "benchmarks/{sm}/merge/samtools.cat.tbl"
-    priority: 100
+    priority: 3000
     shell:
         """
         samtools merge \
