@@ -34,7 +34,7 @@ rule make_beds:
 
 rule fiber_table:
     input:
-        bam=rules.align.output.bam,
+        bam=rules.merge.output.bam,
     output:
         tbl="results/{sm}/{sm}.fiberseq.all.tbl.gz",
     conda:
