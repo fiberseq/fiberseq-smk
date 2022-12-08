@@ -34,7 +34,7 @@ If you are on `hyak` you can add our copy to your path by adding this to your `.
 ```bash
 PATH=$PATH:/gscratch/stergachislab/install_dir/smrtlink/smrtcmds/bin/
 ```
-
+Note, `SMRTLINK` is not needed if you choose to predict m6A with HiFi kinetics.
 ### `cutnm`
 Download and add cutnm to your path
 ```bash
