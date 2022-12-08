@@ -72,7 +72,6 @@ rule predict_m6a_with_fibertools_rs:
     threads: 8
     resources:
         mem_mb=16 * 1024,
-        gpus=1,
     conda:
         env
     log:
@@ -82,7 +81,7 @@ rule predict_m6a_with_fibertools_rs:
     priority: 1000
     shell:
         """
-        ft predict-m6a --threads {threads} -c {input.ccs} {output.bam} 2> {log}
+        ft predict-m6a --threads {threads} -s {input.ccs} {output.bam} 2> {log}
         """
 
 
@@ -127,7 +126,7 @@ rule nucleosome:
     priority: 70
     shell:
         """
-        fibertools -t {threads} add-nucleosomes -m {input.model} -i {input.bam} -o {output.bam} 2> {log}
+        fibertools -t {threads} add-nucleosomes -m {input.model} -i {input.bam} {output.bam} 2> {log}
         """
 
 
@@ -135,7 +134,7 @@ rule merge:
     input:
         bam=get_nucleosome_bam,
     output:
-        bam=temp("temp/{sm}/{sm}.unaligned.fiberseq.bam"),
+        bam=temp("results/{sm}/{sm}.unaligned.fiberseq.bam"),
     conda:
         env
     log:
@@ -157,7 +156,7 @@ rule index_merge:
     input:
         bam=rules.merge.output.bam,
     output:
-        pbi=f"{rules.merge.output.bam}.pbi",
+        pbi=temp(f"{rules.merge.output.bam}.pbi"),
     conda:
         env
     log:

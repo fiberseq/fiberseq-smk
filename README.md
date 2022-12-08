@@ -128,9 +128,6 @@ Example output files if your sample name is `test`:
 <td>
 
 ```bash 
-# bam files 
-results/test/test.unaligned.fiberseq.bam
-results/test/test.unaligned.fiberseq.bam.pbi
 # bed files
 results/test/bed/test.unaligned.cpg.bed.gz
 results/test/bed/test.unaligned.m6a.bed.gz
