@@ -93,7 +93,9 @@ def check_input_bams_for_index():
 
 
 def get_number_of_chunks():
-    GB_size = min([os.path.getsize(input_bam) for sample, input_bam in config.items()])
+    GB_size = min(
+        [os.path.getsize(input_bam) / 1024**3 for sample, input_bam in config.items()]
+    )
     if predict_with_hifi:
         if input_type.upper() in SUBREAD_NAMES:
             return int(GB_size / 10) + 1
