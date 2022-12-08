@@ -135,7 +135,7 @@ rule merge:
     input:
         bam=get_nucleosome_bam,
     output:
-        bam="results/{sm}/{sm}.unaligned.fiberseq.bam",
+        bam=temp("temp/{sm}/{sm}.unaligned.fiberseq.bam"),
     conda:
         env
     log:

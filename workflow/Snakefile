@@ -65,7 +65,7 @@ include: "rules/pacbio-tools.smk"
 # make the fiberseq bam
 include: "rules/fiberseq-bam.smk"
 # make bed files from the fiberseq bam
-include: "rules/bedfiles.smk"
+include: "rules/bed-files.smk"
 # run qc on the fiberseq bam
 include: "rules/qc.smk"
 # make data from ML models for calling m6A (optional)
