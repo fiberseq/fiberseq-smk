@@ -20,10 +20,14 @@ rule make_beds:
         "benchmarks/{sm}/make_beds/{aligned}_extract_bed.tbl"
     params:
         aligned=lambda wc: "-r" if wc.aligned == "aligned" else "",
+        min_ml_score=min_ml_score,
     priority: 300
     shell:
         """
-        ft --threads {threads} extract {params.aligned} {input.bam} \
+        ft extract \
+            --threads {threads} -m {params.min_ml_score} \
+            {params.aligned} \
+            {input.bam} \
             --cpg {output.cpg} --msp {output.msp} --m6a {output.m6a} --nuc {output.nuc} 
         """
 
@@ -42,12 +46,14 @@ rule fiber_table:
         mem_mb=16 * 1024,
         time=240,
     threads: 8
+    params:
+        min_ml_score=min_ml_score,
     benchmark:
         "benchmarks/{sm}/fiber_table/all_extract_bed.tbl"
     priority: 300
     shell:
         """
-        ( ft --threads {threads} extract {input.bam} --all - \
+        ( ft --threads {threads} extract {input.bam} -m {params.min_ml_score} --all - \
             | bgzip -@ {threads} > {output.tbl} \
         ) 2> {log}
         """
