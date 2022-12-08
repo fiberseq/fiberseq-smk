@@ -10,7 +10,7 @@ set -euo pipefail
 
 if [[ $# != 4 ]]; then
   printf "Expect $0 <sample-name> <input-file> <output-pdf> <output-stat.txt>\n"
-  exit -1
+  exit 1
 fi
 
 samplenm=$1
@@ -20,7 +20,7 @@ outstat=$4
 
 if [ ! -s $inp ]; then
   printf "Problem finding 1 file: %s\n" $inp
-  exit -1
+  exit 1
 fi
 
 ftype=nuc

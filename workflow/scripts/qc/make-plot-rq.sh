@@ -6,7 +6,7 @@ set -euo pipefail
 
 if [[ $# != 4 ]]; then
   printf "Expect $0 <sample-name> <input-file> <output-pdf> <output-stat.txt>\n"
-  exit -1
+  exit 1
 fi
 
 samplenm=$1
@@ -25,7 +25,7 @@ mkdir -p $(dirname "${outpdf}")
 
 if [ ! -s $inp ]; then
   printf "Problem finding 1 file: %s\n" 
-  exit -1
+  exit 1
 fi
 
 #ft extract --all - $inp \

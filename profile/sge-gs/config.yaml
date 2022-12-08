@@ -1,0 +1,26 @@
+default-resources:
+  - disk_mb=4096
+  - mem_mb=4096
+  - time=40
+cluster:
+  mkdir -p cluster_logs/{rule} &&
+  qsub 
+    -pe serial {threads}
+    -l mfree=$(({resources.mem_mb} / {threads}))M
+    -l h_rt={resources.time}m
+    -o cluster_logs/{rule}
+    -j y
+    -l disk_free={resources.disk_mb}M
+    -terse
+jobs: 2000
+rerun-incomplete: True
+rerun-triggers: mtime 
+cluster-cancel: qdel
+cluster-cancel-nargs: 5000
+restart-times: 2
+printshellcmds: True
+reason: True
+use-conda: True
+show-failed-logs: True 
+latency-wait: 30
+max-jobs-per-second: 50
