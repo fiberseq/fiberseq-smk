@@ -1,7 +1,7 @@
 
 rule make_beds:
     input:
-        bam="results/{sm}/{sm}.{aligned}.fiberseq.bam",
+        bam=rules.merge.output.bam,
     output:
         cpg=temp("temp/{sm}/{aligned}.cpg.bed"),
         msp=temp("temp/{sm}/{aligned}.msp.bed"),

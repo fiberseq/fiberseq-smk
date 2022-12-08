@@ -66,8 +66,9 @@ def get_ipd_results(sm):
     return []
 
 
-def get_nucleosome_bam(wc):
-    fmt = "temp/{sm}/nuc.{scatteritem}.bam"
+def get_scattered_bams(wc):
+    # fmt = "temp/{sm}/nuc.{scatteritem}.bam"
+    fmt = "temp/{sm}/align.{scatteritem}.bam"
     if process_first_n is None:
         return gather.chunks(fmt, allow_missing=True)
     scatteritems = [f"{i+1}-of-{n_chunks}" for i in range(process_first_n)]

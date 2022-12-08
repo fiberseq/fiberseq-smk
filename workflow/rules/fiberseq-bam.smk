@@ -130,11 +130,44 @@ rule nucleosome:
         """
 
 
+rule align:
+    input:
+        bam=rules.nucleosome.output.bam,
+        ref=ref,
+    output:
+        bam=temp("temp/{sm}/align.{scatteritem}.bam"),
+        bai=temp("temp/{sm}/align.{scatteritem}.bam.bai"),
+    conda:
+        env
+    log:
+        "logs/{sm}/align/align.{scatteritem}.log",
+    resources:
+        disk_mb=8000,
+        time=40,
+        mem_mb=16 * 1024,
+    threads: 8
+    benchmark:
+        "benchmarks/{sm}/align/align.{scatteritem}.tbl"
+    priority: 200
+    shell:
+        """
+        pbmm2 align \
+            -j {threads} \
+            --preset CCS --sort \
+            --sort-memory 2G \
+            --log-level INFO \
+            --unmapped \
+            {input.ref} {input.bam} {output.bam} \
+        2> {log}
+        """
+
+
 rule merge:
     input:
-        bam=get_nucleosome_bam,
+        bams=get_scattered_bams,
     output:
-        bam=temp("results/{sm}/{sm}.unaligned.fiberseq.bam"),
+        bam="results/{sm}/{sm}.fiberseq.bam",
+        bai="results/{sm}/{sm}.fiberseq.bam.bai",
     conda:
         env
     log:
@@ -148,7 +181,12 @@ rule merge:
     priority: 100
     shell:
         """
-        samtools cat -@ {threads} -o {output.bam} {input.bam} 2> {log}
+        samtools merge \
+            -@ {threads} --write-index \
+            -o {output.bam}##idx##{output.bai} \
+            {input.bams} \
+            2> {log
+        #samtools cat -@ {threads} -o {output.bam} {input.bam} 2> {log}
         """
 
 
@@ -168,36 +206,4 @@ rule index_merge:
     shell:
         """
         pbindex {input.bam} &> {log}
-        """
-
-
-rule align:
-    input:
-        bam=rules.merge.output.bam,
-        ref=ref,
-    output:
-        bam="results/{sm}/{sm}.aligned.fiberseq.bam",
-        bai="results/{sm}/{sm}.aligned.fiberseq.bam.bai",
-    conda:
-        env
-    log:
-        "logs/{sm}/align/align.log",
-    resources:
-        disk_mb=8000,
-        time=240,
-        mem_mb=32 * 1024,
-    threads: max_threads
-    benchmark:
-        "benchmarks/{sm}/align/align.tbl"
-    priority: 200
-    shell:
-        """
-        pbmm2 align \
-            -j {threads} \
-            --preset CCS --sort \
-            --sort-memory 2G \
-            --log-level INFO \
-            --unmapped \
-            {input.ref} {input.bam} {output.bam} \
-        2> {log}
         """
