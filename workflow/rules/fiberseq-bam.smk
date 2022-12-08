@@ -185,8 +185,7 @@ rule merge:
             -@ {threads} --write-index \
             -o {output.bam}##idx##{output.bai} \
             {input.bams} \
-            2> {log
-        #samtools cat -@ {threads} -o {output.bam} {input.bam} 2> {log}
+            2> {log}
         """
 
 
