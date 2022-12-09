@@ -4,15 +4,15 @@
 
 # Histogram of per read length/#nucleosomes (bin sz=1, range 0-2000bp)
 #  Collapse all reads > 2000 to 2000
-#  Vertical line at median value between 0-300 bp/nuc 
+#  Vertical line at median value between 0-300 bp/nuc
 # Can you actually make this with xlim 0-1500, and say on the chart the % of fibers in the bin >1500
 # Get % reads with readlength/#nucs < 300 and put in stats file
 
 set -euo pipefail
 
 if [[ $# != 4 ]]; then
-  printf "Expect $0 <sample-name> <input-file> <output-pdf> <output-stat.txt>\n"
-  exit 1
+    printf "Expect $0 <sample-name> <input-file> <output-pdf> <output-stat.txt>\n"
+    exit 1
 fi
 
 samplenm=$1
@@ -21,26 +21,24 @@ outpdf=$3
 outstat=$4
 
 ftype=readlength.div.number.nucleosomes
-tmpd=/tmp/`whoami`/$$
+tmpd=/tmp/$(whoami)/$$
 
 if [[ ! -s $inp ]]; then
-  printf "Problem finding 1 file: %s\n" $inp
-  exit 1
+    printf "Problem finding 1 file: %s\n" $inp
+    exit 1
 fi
 
 if [[ -s $tmpd ]]; then
-  rm -rf $tmpd
+    rm -rf $tmpd
 fi
 mkdir -p $tmpd
 mkdir -p $(dirname "${outpdf}")
 
-#ft extract --all - $inp \
-zcat $inp \
-  | cutnm fiber_length,nuc_starts \
-  | awk '{ lng=gsub(/,/, "", $2); if ( lng > 1 ) { print int($1/lng) } }' \
-  > $tmpd/$samplenm.$ftype
+hck -F fiber_length -F nuc_starts -z $inp |
+    awk '{ lng=gsub(/,/, "", $2); if ( lng > 1 ) { print int($1/lng) } }' \
+        >$tmpd/$samplenm.$ftype
 
-R --no-save --quiet << __R__
+R --no-save --quiet <<__R__
   library(scales)
   ss <- scan("$tmpd/$samplenm.$ftype")
   mxh <- 1500

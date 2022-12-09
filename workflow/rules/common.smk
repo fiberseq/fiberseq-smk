@@ -110,7 +110,7 @@ def get_number_of_chunks():
 
 def check_for_tools():
     is_tool("ft")
-    is_tool("cutnm")
+    is_tool("hck")
     is_tool("bedtools")
     is_tool("fibertools")
     is_tool("bamsieve")

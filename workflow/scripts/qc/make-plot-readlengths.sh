@@ -5,8 +5,8 @@
 set -euo pipefail
 
 if [[ $# != 4 ]]; then
-  printf "Expect $0 <sample-name> <input-file> <output-pdf> <output-stat.txt>\n"
-  exit 1
+    printf "Expect $0 <sample-name> <input-file> <output-pdf> <output-stat.txt>\n"
+    exit 1
 fi
 
 samplenm=$1
@@ -15,29 +15,28 @@ outpdf=$3
 outstat=$4
 
 ftype=readlengths
-tmpd=/tmp/`whoami`/$$
+tmpd=/tmp/$(whoami)/$$
 
 if [ ! -s $inp ]; then
-  printf "Problem finding 1 file: %s\n" $inp
-  exit 1
+    printf "Problem finding 1 file: %s\n" $inp
+    exit 1
 fi
 
 if [ -s $tmpd ]; then
-  rm -rf $tmpd
+    rm -rf $tmpd
 fi
 mkdir -p $tmpd
 
 # putting things in bins of size 10
 #ft extract --all - $inp \
-zcat $inp \
-  | cutnm fiber_length \
-  | awk '{ $1=int($1/10); $1=$1*10; print $1 }' \
-  | sort -gk1,1 \
-  | uniq -c \
-  | awk '{ print $2"\t"$1 }' \
-  > $tmpd/$samplenm.$ftype
+hck -z -F fiber_length $inp |
+    awk '{ $1=int($1/10); $1=$1*10; print $1 }' |
+    sort -gk1,1 |
+    uniq -c |
+    awk '{ print $2"\t"$1 }' \
+        >$tmpd/$samplenm.$ftype
 
-R --no-save --quiet << __R__
+R --no-save --quiet <<__R__
   # 0.0 <= quantile <= 1.0
   fast_kth <- function(array_2d, lower_b, upper_b, quantile) {
     reads <- subset(array_2d, V1>=lower_b & V1<=upper_b)

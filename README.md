@@ -36,16 +36,7 @@ PATH=$PATH:/gscratch/stergachislab/install_dir/smrtlink/smrtcmds/bin/
 ```
 Note, `SMRTLINK` is not needed if you choose to predict m6A with HiFi kinetics.
 
-### `cutnm`
-Download and add cutnm to your path
-```bash
-wget https://raw.githubusercontent.com/sjneph/cutnm/master/src/cutnm
-chmod 755 cutnm
-export PATH=$PATH:/path/to/cutnm
-```
-
 ## Install the workflow
-
 ```bash
 git clone https://github.com/StergachisLab/fiberseq-smk
 cd fiberseq-smk
@@ -56,7 +47,6 @@ conda activate fiberseq-smk
 
 
 # Usage
-
 You can run data using the following command, read the comments to learn more about the config options:
 ```bash
 snakemake \
@@ -93,14 +83,10 @@ Replace the `profile/local` argument with `profile/checkpoint` or `profile/compu
 # Multiplexed data
 If you have multiplexed data, you have to pass a `ccs` bam into the pipeline that has already been processed with `lima`. In general, you can pass a pre-generated ccs bam file to save on compute. For directions on this see [section above](#running-with-precomputed-ccs-data) on `ccs` inputs.
 
-# Use `fibertools-rs` for m6A predictions
-If you want to use `fibertools-rs` for m6A predictions, you can add the following to your config options:
+# Use deprecated m6A calling with `ipdSummary`
+If you want to use `ipdSummary` for m6A predictions, you can add the following to your config options:
 ```bash
-    predict_with_hifi=True
-```
-You will also likely have a precomputed `ccs` bam file, in which case you will also add:
-```bash
-    input_type=ccs
+    ipdsummary=True
 ```
 
 # Test case
