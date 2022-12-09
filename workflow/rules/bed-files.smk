@@ -113,15 +113,16 @@ rule bigwig:
     benchmark:
         "benchmarks/{sm}/bigwig/{data}.tbl"
     resources:
-        disk_mb=8000,
+        disk_mb=16 * 1024,
         mem_mb=16 * 1024,
         time=240,
     threads: 8
     priority: 300
     shell:
         """
-        (
-            bedtools genomecov -split -bg -i {input.bed} -g {input.fai} \
+        (cut -f 1 {input.fai} \
+            | parallel -n 1 -k \
+                'zcat {input.bed} | grep -w "^{{}}" | bedtools genomecov -split -bg -g {input.fai} -i -'
             | sort -S 4G --parallel={threads} -k1,1 -k2,2n \
             > {output.bed} \
         ) 2> {log} 
