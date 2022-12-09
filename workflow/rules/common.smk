@@ -17,8 +17,8 @@ def get_input_pbi(wc):
 
 def align_results(sm):
     if ref is not None:
-        out = expand("results/{sm}/{sm}.fiberseq.all.tbl.gz", sm=sm)
-        out += expand("results/{sm}/{sm}.aligned.fiberseq.bam", sm=sm)
+        out = expand(rules.fiber_table.output, sm=sm)
+        out += expand(rules.merge.output, sm=sm)
         return out
     return []
 
@@ -163,7 +163,6 @@ def bigwig_results(bigwig):
     if bigwig:
         return expand(
             rules.bigwig.output.bw,
-            aligned=aligned,
             sm=samples,
             data=output_types,
         )

@@ -100,7 +100,7 @@ rule all:
         ),
         # bigbed
         expand(
-            "results/{sm}/bigbed/{sm}.aligned.{data}.bed.bb",
+            rules.bigwig.output.bb,
             sm=samples,
             data=output_types,
         ),
