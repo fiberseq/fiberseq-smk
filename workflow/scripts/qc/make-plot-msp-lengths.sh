@@ -5,8 +5,8 @@
 set -euo pipefail
 
 if [[ $# != 4 ]]; then
-  printf "Expect $0 <sample-name> <input-file> <output-pdf> <output-stat.txt>\n"
-  exit 1
+    printf "Expect $0 <sample-name> <input-file> <output-pdf> <output-stat.txt>\n"
+    exit 1
 fi
 
 samplenm=$1
@@ -15,22 +15,22 @@ outpdf=$3
 outstat=$4
 
 ftype=msp
-tmpd=/tmp/`whoami`/$$
+tmpd=/tmp/$(whoami)/$$
 
 if [ ! -s $inp ]; then
-  printf "Problem finding 1 file: %s\n" $inp
-  exit 1
+    printf "Problem finding 1 file: %s\n" $inp
+    exit 1
 fi
 
 if [ -s $tmpd ]; then
-  rm -rf $tmpd
+    rm -rf $tmpd
 fi
 mkdir -p $tmpd
 mkdir -p $(dirname "${outpdf}")
 
-zcat $inp \
-  | awk '{ print $(NF-1) }' \
-  | awk 'BEGIN {OFS="\t"; vals[-1]=-1; delete vals[-1]} ; { \
+zcat $inp |
+    awk '{ print $(NF-1) }' |
+    awk 'BEGIN {OFS="\t"; vals[-1]=-1; delete vals[-1]} ; { \
           lng=split($0, a, ","); \
           for ( i=1; i<=lng; ++i ) { \
             if ( a[i] in vals ) { vals[a[i]] += 1 } \
@@ -38,11 +38,11 @@ zcat $inp \
           } \
         } END { \
           for ( v in vals ) { print v, vals[v] } \
-        }' \
-  | sort -gk1,1 \
-  > $tmpd/$samplenm.$ftype
+        }' |
+    sort -gk1,1 \
+        >$tmpd/$samplenm.$ftype
 
-R --no-save --quiet << __R__
+R --no-save --quiet <<__R__
   fast_median <- function(array_2d, lower_b, upper_b) {
     msps <- subset(array_2d, V1>=lower_b & V1<=upper_b)
     sn <- sum(msps[,2])
