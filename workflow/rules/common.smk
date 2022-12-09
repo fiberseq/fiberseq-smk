@@ -88,7 +88,7 @@ def is_tool(name):
     return which(name)
 
 
-def check_input_bam():
+def check_input_bams():
     # check to make sure we have subreads with the old pipeline
     if input_type.upper() in CCS_NAMES and use_ipdsummary:
         raise Exception(
