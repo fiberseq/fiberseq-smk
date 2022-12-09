@@ -8,6 +8,13 @@ def get_chunk(wc):
 
 
 def get_input_bam(wc):
+    # check to make sure we have subreads with the old pipeline
+    if input_type.upper() in CCS_NAMES and ipdsummary:
+        raise Exception(
+            f"Cannot use input type {input_type} with ipdSummary. SUBREAD input is required.\n"
+            + "If you only have CCS input the config option ipdsummary must be set to False."
+        )
+
     return config[wc.sm]
 
 
