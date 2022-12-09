@@ -193,7 +193,7 @@ rule index_merge:
     input:
         bam=rules.merge.output.bam,
     output:
-        pbi=temp(f"{rules.merge.output.bam}.pbi"),
+        pbi=f"{rules.merge.output.bam}.pbi",
     conda:
         env
     log:

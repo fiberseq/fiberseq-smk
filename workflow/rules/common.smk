@@ -19,6 +19,7 @@ def align_results(sm):
     if ref is not None:
         out = expand(rules.fiber_table.output, sm=sm)
         out += expand(rules.merge.output, sm=sm)
+        out += expand(rules.index_merge.output, sm=sm)
         return out
     return []
 
