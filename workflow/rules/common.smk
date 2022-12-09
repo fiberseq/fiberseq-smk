@@ -157,3 +157,14 @@ def check_for_reference():
     assert os.path.exists(
         f"{ref}.fai"
     ), f"Missing index for the ref: {ref}.fai\nCreate an index for {ref}:\n samtools faidx {ref}"
+
+
+def bigwig_results(bigwig):
+    if bigwig:
+        return expand(
+            rules.bigwig.output,
+            aligned=aligned,
+            sm=samples,
+            data=output_types,
+        )
+    return []
