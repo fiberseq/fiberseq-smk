@@ -111,3 +111,11 @@ rule all:
         get_ipd_results(samples),
         # get bigwig files if requested
         bigwig_results(bigwig),
+
+
+rule help:
+    message:
+        "Displaying config options"
+    run:
+        for key, value in config.items():
+            print(f"{key}: {value}")
