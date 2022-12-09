@@ -106,3 +106,5 @@ rule all:
         ),
         # get ipdSummary files if requested
         get_ipd_results(samples),
+        # get bigwig files if requested
+        bigwig_results(bigwig),

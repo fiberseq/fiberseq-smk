@@ -162,7 +162,7 @@ def check_for_reference():
 def bigwig_results(bigwig):
     if bigwig:
         return expand(
-            rules.bigwig.output,
+            rules.bigwig.output.bw,
             aligned=aligned,
             sm=samples,
             data=output_types,

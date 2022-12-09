@@ -104,7 +104,7 @@ rule bigwig:
         fai=f"{ref}.fai",
         bed="temp/{sm}/aligned.{data}.bed",
     output:
-        bw="results/{sm}/bigwig/{sm}.aligned.{data}.bed.bw",
+        bw="results/{sm}/bigwig/{sm}.aligned.{data}.bw",
         bed=temp("temp/{sm}/aligned.{data}.bed.pre.bw"),
     conda:
         env
@@ -117,6 +117,6 @@ rule bigwig:
         """
         bedtools genomecov --split --bg -i {input.bed} -g {input.fai} \
             | sort -k1,1 -k2,2n \
-            > {output.bed} 2> {log}
+            > {output.bed} 2> {log} 
         bedGraphToBigWig {output.bed} {input.fai} {output.bw} 2>> {log}
         """
