@@ -112,12 +112,17 @@ rule bigwig:
         "logs/{sm}/bigwig/{data}.log",
     benchmark:
         "benchmarks/{sm}/bigwig/{data}.tbl"
+    resources:
+        disk_mb=8000,
+        mem_mb=16 * 1024,
+        time=120,
+    threads: 4
     priority: 300
     shell:
         """
         (
             bedtools genomecov -split -bg -i {input.bed} -g {input.fai} \
-            | sort -k1,1 -k2,2n \
+            | sort --parallel={threads} -k1,1 -k2,2n \
             > {output.bed} \
         ) 2> {log} 
         bedGraphToBigWig {output.bed} {input.fai} {output.bw} 2>> {log}
