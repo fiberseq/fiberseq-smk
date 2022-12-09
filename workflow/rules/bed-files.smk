@@ -25,7 +25,7 @@ rule make_beds:
     shell:
         """
         ft extract \
-            --threads {threads} -m {params.min_ml_score} \
+            -v --threads {threads} -m {params.min_ml_score} \
             {params.aligned} \
             {input.bam} \
             --cpg {output.cpg} --msp {output.msp} --m6a {output.m6a} --nuc {output.nuc} 
@@ -53,7 +53,7 @@ rule fiber_table:
     priority: 300
     shell:
         """
-        ( ft --threads {threads} extract {input.bam} -m {params.min_ml_score} --all - \
+        ( ft -v --threads {threads} extract {input.bam} -m {params.min_ml_score} --all - \
             | bgzip -@ {threads} > {output.tbl} \
         ) 2> {log}
         """
