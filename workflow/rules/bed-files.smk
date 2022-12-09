@@ -115,8 +115,10 @@ rule bigwig:
     priority: 300
     shell:
         """
-        bedtools genomecov --split --bg -i {input.bed} -g {input.fai} \
+        (
+            bedtools genomecov -split -bg -i {input.bed} -g {input.fai} \
             | sort -k1,1 -k2,2n \
-            > {output.bed} 2> {log} 
+            > {output.bed} \
+        ) 2> {log} 
         bedGraphToBigWig {output.bed} {input.fai} {output.bw} 2>> {log}
         """
