@@ -58,14 +58,14 @@ R --no-save --quiet <<__R__
   pdf("$outpdf")
   df <- as.data.frame(cbind(coverage, p))
   colnames(df) <- c("cvg", "prop")
-  ndf <- subset(df, cvg>7)
+  ndf <- subset(df, cvg>0)
   p <- ndf[,2]
   mp <- median(p) # median calculated after removing those with low coverage
   u <- subset(ndf, prop>maxx)
   v <- subset(ndf, prop<=maxx)
   if ( dim(u)[1] > 0 ) { u[,2] <- maxx }
   ndf <- as.data.frame(rbind(v, u))
-  xlab <- "Proportion of adenines with m6A per read (for reads with 8+ CCS coverage)"
+  xlab <- "Proportion of adenines with m6A per read (for reads with 0+ CCS coverage)"
   h <- hist(ndf[,2], axes=FALSE, main="$samplenm", xlab=xlab, ylab="Count", breaks=1000, xlim=c(0,maxx))
   mycol <- "darkgreen"
   abline(v=mp, col=mycol, lty=1)
@@ -91,12 +91,12 @@ R --no-save --quiet <<__R__
   text(max(coverage)-rtoff*3, max(h[["counts"]])/2, paste(round(pcov,2), "%>", max_coverage, sep=""), col=mycol)
   dev.off()
 
-  # use p and mp which have been filtered for coverage>7
+  # use p and mp which have been filtered for coverage>0
   pv1 <- round(100 * length(p[p<0.01])/length(p), 1)
   pv2 <- round(100 * length(p[p<0.2])/length(p), 1)
   stats_file <- "$outstat"
   cat("# Note: ***#m6A/#ATs stats***\n", file=stats_file, sep="", append=FALSE)
-  cat("# Note: #m6A/#ATs filtered to reads with CCS Coverage > 7\n", file=stats_file, sep="", append=TRUE)
+  cat("# Note: #m6A/#ATs filtered to reads with CCS Coverage > 0\n", file=stats_file, sep="", append=TRUE)
   cat("Proportion(#m6A/#ATs)<0.01=", pv1, "%\n", file=stats_file, sep="", append=TRUE)
   cat("Proportion(#m6A/#ATs)<0.2=", pv2, "%\n", file=stats_file, sep="", append=TRUE)
   cat("Median(#m6A/#ATs)=", mp, "\n", file=stats_file, sep="", append=TRUE)
