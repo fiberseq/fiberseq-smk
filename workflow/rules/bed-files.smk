@@ -122,7 +122,7 @@ rule bigwig:
         """
         (cut -f 1 {input.fai} \
             | parallel -n 1 -k \
-                'zcat {input.bed} | grep -w "^{{}}" | bedtools genomecov -split -bg -g {input.fai} -i -'
+                'grep -w "^{{}}" {input.bed} | bedtools genomecov -split -bg -g {input.fai} -i -'
             | sort -S 4G --parallel={threads} -k1,1 -k2,2n \
             > {output.bed} \
         ) 2> {log} 
