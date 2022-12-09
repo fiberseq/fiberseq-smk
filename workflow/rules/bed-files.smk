@@ -120,6 +120,7 @@ rule bigwig:
     priority: 300
     shell:
         """
+        # bedtools genomecov is slow with -split, so we do it in parallel
         (cut -f 1 {input.fai} \
             | parallel -n 1 -k \
                 'grep -w "^{{}}" {input.bed} | bedtools genomecov -split -bg -g {input.fai} -i -'
