@@ -177,7 +177,7 @@ rule merge:
         time=120,
     threads: 12
     benchmark:
-        "benchmarks/{sm}/merge/samtools.cat.tbl"
+        "benchmarks/{sm}/merge/samtools.merge.tbl"
     priority: 3000
     shell:
         """
