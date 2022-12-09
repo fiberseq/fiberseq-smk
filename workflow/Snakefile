@@ -9,7 +9,7 @@ version: "0.1.0"
 # process the input configuration file/options.
 scatter_threads = config.pop("scatter_threads", 8)
 max_threads = config.pop("max_threads", 24)
-input_type = config.pop("input_type", "subreads")
+input_type = config.pop("input_type", "ccs")
 env = config.pop("env", "envs/env.yml")
 ref = config.pop("ref", None)
 gmm_model = config.pop("gmm_model", False)
