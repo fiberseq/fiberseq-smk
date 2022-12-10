@@ -180,7 +180,7 @@ def bigwig_results(bigwig):
 
 
 def summarise_runtimes(inputs, sample):
-    rtn = "Sample\tJob\tWall Hours\tCPU Hours\tCount\n"
+    rtn = "Sample\tJob\tWall-hours\tCPU-hours\tCount\n"
     for job, files in inputs.items():
         hours, cpu_hours = 0, 0
         for f in files:
