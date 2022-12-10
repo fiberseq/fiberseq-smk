@@ -133,7 +133,7 @@ rule help_benchmark:
         ),
         primrose=gather.chunks(rules.primrose.benchmark, allow_missing=True),
     output:
-        temp("results/{sm}/{sm}.runtimes.txt"),
+        temp("temp/{sm}/{sm}.runtimes.txt"),
     run:
         out = summarise_runtimes(input, wildcards.sm)
         with open(output[0], "w") as f:
