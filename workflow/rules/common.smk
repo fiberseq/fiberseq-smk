@@ -177,3 +177,8 @@ def bigwig_results(bigwig):
             data=output_types,
         )
     return []
+
+
+def summarise_runtimes(inputs):
+    for key, value in inputs.items():
+        print(key)
