@@ -149,6 +149,6 @@ rule benchmarks:
     shell:
         """
         echo "Sample\tJob\tWall-hours\tCPU-hours\tCount" > {output}
-        cat {input} | sort -k 1,1 -k4,4g -r >> {output}
+        cat {input} | sort -k 1,1 -k4,4g >> {output}
         cat {output} | column -t
         """
