@@ -128,7 +128,7 @@ rule help_benchmark:
             rules.bigbed.benchmark, data=output_types, allow_missing=True
         ),
         fiber_table=gather.chunks(rules.fiber_table.benchmark, allow_missing=True),
-        m6a=gather.chunks(
+        call_m6a=gather.chunks(
             rules.predict_m6a_with_fibertools_rs.benchmark, allow_missing=True
         ),
         primrose=gather.chunks(rules.primrose.benchmark, allow_missing=True),
