@@ -9,6 +9,7 @@ rule ccs:
         txt=temp("temp/{sm}/ccs.{scatteritem}.ccs_report.txt"),
     resources:
         mem_mb=16 * 1024,
+        time=80,
     threads: scatter_threads
     conda:
         env
