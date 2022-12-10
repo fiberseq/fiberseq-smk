@@ -17,8 +17,9 @@ def parse():
     parser.add_argument(
         "-o",
         "--out",
-        help="Output files",
-        nargs="+",
+        help="Output file",
+        required=True,
+        #nargs="+",
     )
     parser.add_argument(
         "-s", "--scatteritem", help="scatteritem chunk to save", required=True
