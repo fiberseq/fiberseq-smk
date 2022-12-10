@@ -144,4 +144,4 @@ rule benchmarks:
     input:
         expand(rules.help_benchmark.output, sm=samples),
     shell:
-        "cat {input}"
+        "cat {input} | column -t"
