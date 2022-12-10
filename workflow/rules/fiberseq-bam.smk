@@ -71,6 +71,7 @@ rule predict_m6a_with_fibertools_rs:
         bam=temp("temp/{sm}/ft.{scatteritem}.bam"),
     threads: 8
     resources:
+        gpus=1,
         mem_mb=16 * 1024,
     conda:
         env
