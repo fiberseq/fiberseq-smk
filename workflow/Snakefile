@@ -121,16 +121,21 @@ rule help:
             print(f"{key}: {value}")
 
 
-rule benchmarks:
+rule help_benchmark:
     input:
-        align=gather.chunks(rules.align.benchmark, sm=samples),
-        bigbed=gather.chunks(rules.bigbed.benchmark, sm=samples, data=output_types),
-        fiber_table=gather.chunks(rules.fiber_table.benchmark, sm=samples),
-        m6a=gather.chunks(rules.predict_m6a_with_fibertools_rs.benchmark, sm=samples),
-        primrose=gather.chunks(rules.primrose.benchmark, sm=samples),
+        align=gather.chunks(rules.align.benchmark),
+        bigbed=gather.chunks(rules.bigbed.benchmark, data=output_types),
+        fiber_table=gather.chunks(rules.fiber_table.benchmark),
+        m6a=gather.chunks(rules.predict_m6a_with_fibertools_rs.benchmark),
+        primrose=gather.chunks(rules.primrose.benchmark),
     message:
         "Benchmarking results"
     output:
-        "results/benchmarks.txt",
+        "results/{sm}/{sm}.runtimes.txt",
     run:
         summarise_runtimes(input)
+
+
+rule benchmarks:
+    input:
+        expand(rules.help_benchmark.output, sm=samples),
