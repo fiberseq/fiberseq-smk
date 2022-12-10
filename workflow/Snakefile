@@ -132,6 +132,7 @@ rule help_benchmark:
             rules.predict_m6a_with_fibertools_rs.benchmark, allow_missing=True
         ),
         primrose=gather.chunks(rules.primrose.benchmark, allow_missing=True),
+        nucleosome=gather.chunks(rules.nucleosome.benchmark, allow_missing=True),
     output:
         temp("temp/{sm}/{sm}.runtimes.txt"),
     run:
