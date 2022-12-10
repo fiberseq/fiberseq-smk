@@ -109,12 +109,9 @@ rule all:
         bigwig_results(bigwig),
 
 
-rule help:
-    message:
-        "Displaying config options"
-    run:
-        for key, value in config.items():
-            print(f"{key}: {value}")
+localrules:
+    help_benchmark,
+    benchmarks,
 
 
 rule help_benchmark:
