@@ -130,4 +130,5 @@ rule benchmarks:
         "results/benchmarks.txt",
     shell:
         """
+        echo {input}
         """
