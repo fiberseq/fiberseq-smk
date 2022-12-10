@@ -180,10 +180,12 @@ def bigwig_results(bigwig):
 
 
 def summarise_runtimes(inputs):
+    rtn += "Job\tWall Hours\tCPU Hours\tCount"
     for job, files in inputs.items():
         hours, cpu_hours = 0, 0
         for f in files:
             second_line = open(f).readlines()[1].split()
             hours += float(second_line[0]) / 3600
             cpu_hours += float(second_line[9]) / 3600
-        print(f"{job}: {hours:.2f} wall hours, {cpu_hours:.2f} cpu hours")
+        rtn += f"{job}\t{hours:.4f}\t{cpu_hours:.4f}\t{len(files)}"
+    return rtn

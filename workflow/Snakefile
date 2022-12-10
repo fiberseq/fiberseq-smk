@@ -135,7 +135,10 @@ rule help_benchmark:
     output:
         "results/{sm}/{sm}.runtimes.txt",
     run:
-        summarise_runtimes(input)
+        out = summarise_runtimes(input)
+        print(out)
+        with open(output[0], "w") as f:
+            f.write(out)
 
 
 rule benchmarks:
