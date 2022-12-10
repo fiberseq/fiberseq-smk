@@ -147,6 +147,7 @@ rule benchmarks:
         "results/benchmarks.txt",
     shell:
         """
-        cat {input} > {output}
+        echo "Sample\tJob\tWall-hours\tCPU-hours\tCount" > {output}
+        cat {input} >> {output}
         cat {output} | column -t
         """
