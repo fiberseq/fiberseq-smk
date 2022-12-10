@@ -119,3 +119,8 @@ rule help:
     run:
         for key, value in config.items():
             print(f"{key}: {value}")
+
+
+rule benchmarks:
+    input:
+        expand(rules.predict_m6a_with_fibertools_rs.benchmark, sm=samples),
