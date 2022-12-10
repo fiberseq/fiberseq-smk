@@ -121,7 +121,7 @@ rule help_benchmark:
     input:
         unpack(help_benchmark_input),
     output:
-        temp("temp/{sm}/{sm}.runtimes.txt"),
+        "results/{sm}/{sm}.runtimes.txt",
     run:
         out = summarise_runtimes(input, wildcards.sm)
         with open(output[0], "w") as f:
@@ -131,11 +131,9 @@ rule help_benchmark:
 rule benchmarks:
     input:
         expand(rules.help_benchmark.output, sm=samples),
-    output:
-        "results/benchmarks.txt",
     shell:
         """
-        echo "Sample\tJob\tWall-hours\tCPU-hours\tCount" > {output}
-        cat {input} | sort -k 1,1 -k4,4g >> {output}
-        cat {output} | column -t
+        (echo "Sample\tJob\tWall-hours\tCPU-hours\tCount"; \
+            cat {input} | sort -k 1,1 -k4,4g
+        ) | column -t
         """
