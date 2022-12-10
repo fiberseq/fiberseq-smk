@@ -179,13 +179,13 @@ def bigwig_results(bigwig):
     return []
 
 
-def summarise_runtimes(inputs):
-    rtn = "Job\tWall Hours\tCPU Hours\tCount\n"
+def summarise_runtimes(inputs, sample):
+    rtn = "Sample\tJob\tWall Hours\tCPU Hours\tCount\n"
     for job, files in inputs.items():
         hours, cpu_hours = 0, 0
         for f in files:
             second_line = open(f).readlines()[1].split()
             hours += float(second_line[0]) / 3600
             cpu_hours += float(second_line[9]) / 3600
-        rtn += f"{job}\t{hours:.4f}\t{cpu_hours:.4f}\t{len(files)}\n"
+        rtn += f"{sample}\t{job}\t{hours:.4f}\t{cpu_hours:.4f}\t{len(files)}\n"
     return rtn
