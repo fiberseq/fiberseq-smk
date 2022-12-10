@@ -69,7 +69,7 @@ rule split_ccs_zmws:
     shell:
         """
         python {params.split_zmws} \
-            --scateritem {wildcards.scatteritem} \
+            --scatteritem {wildcards.scatteritem} \
             {input.txt} -o {output.txt} 2> {log}
         """
 
