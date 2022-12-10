@@ -143,5 +143,10 @@ rule help_benchmark:
 rule benchmarks:
     input:
         expand(rules.help_benchmark.output, sm=samples),
+    output:
+        "results/benchmarks.txt",
     shell:
-        "cat {input} | column -t"
+        """
+        cat {input} > {output}
+        cat {output} | column -t
+        """
