@@ -126,3 +126,8 @@ rule benchmarks:
         gather.chunks(rules.predict_m6a_with_fibertools_rs.benchmark, sm=samples),
     message:
         "Benchmarking results"
+    output:
+        "results/benchmarks.txt",
+    shell:
+        """
+        """
