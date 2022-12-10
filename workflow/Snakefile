@@ -123,4 +123,4 @@ rule help:
 
 rule benchmarks:
     input:
-        expand(rules.predict_m6a_with_fibertools_rs.benchmark, sm=samples),
+        gather.chunks(rules.predict_m6a_with_fibertools_rs.benchmark, sm=samples),
