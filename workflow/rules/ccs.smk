@@ -55,24 +55,22 @@ rule split_ccs_zmws:
     input:
         txt=rules.ccs_zmws.output.txt,
     output:
-        txt=temp(
-            scatter.chunks(
-                "temp/{sm}/split_ccs_zmws/{scatteritem}.txt", allow_missing=True
-            )
-        ),
+        txt=temp("temp/{sm}/split_ccs_zmws/{scatteritem}.txt"),
+    log:
+        "logs/{sm}/split_ccs_zmws/{scatteritem}.log",
+    benchmark:
+        "benchmarks/{sm}/split_ccs_zmws/{scatteritem}.tbl"
+    priority: 20
+    params:
+        split_zmws=workflow.source_path("../scripts/split_zmws.py"),
     threads: 1
     conda:
         env
-    log:
-        "logs/{sm}/split_ccs_zmws/split_ccs_zmws.log",
-    benchmark:
-        "benchmarks/{sm}/split_ccs_zmws/split_ccs_zmws.tbl"
-    params:
-        split_zmws=workflow.source_path("../scripts/split_zmws.py"),
-    priority: 20
     shell:
         """
-        python {params.split_zmws} {input.txt} -o {output.txt} 2> {log}
+        python {params.split_zmws} \
+            --scateritem {wildcards.scatteritem} \
+            {input.txt} -o {output.txt} 2> {log}
         """
 
 

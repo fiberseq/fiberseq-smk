@@ -54,15 +54,10 @@ check_for_reference()
 check_input_bams_for_index()
 
 # define number of chunks based on input file sizes
-default_n_chunks = get_number_of_chunks()
-
-
-scattergather:
-    chunks=default_n_chunks,
-
-
-# number of chunks used in scatter gather
-n_chunks = len(scatter.chunks("temp/{scatteritem}.fake"))
+# default_n_chunks = get_number_of_chunks()
+# scattergather:
+#    chunks=default_n_chunks,
+# n_chunks = len(scatter.chunks("temp/{scatteritem}.fake"))
 
 
 # rules for running ccs
@@ -83,6 +78,7 @@ wildcard_constraints:
     sm="|".join(samples),
     data="|".join(output_types),
     aligned="|".join(aligned),
+    scatteritem="\d+-of-\d+",
 
 
 rule all:
@@ -123,16 +119,7 @@ rule help:
 
 rule help_benchmark:
     input:
-        align=gather.chunks(rules.align.benchmark, allow_missing=True),
-        bigbed=gather.chunks(
-            rules.bigbed.benchmark, data=output_types, allow_missing=True
-        ),
-        fiber_table=gather.chunks(rules.fiber_table.benchmark, allow_missing=True),
-        call_m6a=gather.chunks(
-            rules.predict_m6a_with_fibertools_rs.benchmark, allow_missing=True
-        ),
-        primrose=gather.chunks(rules.primrose.benchmark, allow_missing=True),
-        nucleosome=gather.chunks(rules.nucleosome.benchmark, allow_missing=True),
+        unpack(help_benchmark_input),
     output:
         temp("temp/{sm}/{sm}.runtimes.txt"),
     run:

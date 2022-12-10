@@ -3,8 +3,8 @@
 #
 rule train_gmm:
     input:
-        bam=f"temp/{{sm}}/primrose.1-of-{n_chunks}.bam",
-        csv=f"temp/{{sm}}/ipdSummary.1-of-{n_chunks}.csv",
+        bam=train_gmm_input_bam,
+        csv=train_gmm_input_csv,
     output:
         model="results/{sm}/{sm}.gmm_model.pkl",
     conda:

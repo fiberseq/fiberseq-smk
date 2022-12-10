@@ -21,6 +21,9 @@ def parse():
         nargs="+",
     )
     parser.add_argument(
+        "-s", "--scatteritem", help="scatteritem chunk to save", required=True
+    )
+    parser.add_argument(
         "-v", "--verbose", help="increase logging verbosity", action="store_true"
     )
     args = parser.parse_args()
@@ -33,11 +36,13 @@ def parse():
 def main():
     args = parse()
     zmws = [line for line in open(args.zmw, "r")]
-    n_chunks = len(args.out)
-    for zmw_batch, out_file in zip(split(zmws, n_chunks), args.out):
-        with open(out_file, "w") as f:
-            for zmw in zmw_batch:
-                f.write(zmw)
+    digits = args.scatteritem.split("-of-")
+    cur_chunk, n_chunks = int(digits[0]), int(digits[1])
+    for idx, zmw_batch in enumerate(split(zmws, n_chunks)):
+        if idx + 1 == cur_chunk:
+            with open(args.out, "w") as f:
+                for zmw in zmw_batch:
+                    f.write(zmw)
 
 
 if __name__ == "__main__":

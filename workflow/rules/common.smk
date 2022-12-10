@@ -54,6 +54,7 @@ def get_m6a_bam(wc):
 
 
 def get_first_m6a_bam(wc):
+    n_chunks = get_number_of_chunks(wc.sm)
     if predict_with_hifi is True:
         return f"temp/{wc.sm}/ft.1-of-{n_chunks}.bam"
     return f"temp/{wc.sm}/gmm.1-of-{n_chunks}.bam"
@@ -63,17 +64,20 @@ def get_ipd_results(sm):
     if save_ipd:
         csv = "results/{sm}/ipdSummary/{sm}.{scatteritem}.csv.gz"
         gff = "results/{sm}/ipdSummary/{sm}.{scatteritem}.gff.gz"
-        return gather.chunks(csv, sm=sm) + gather.chunks(gff, sm=sm)
+        return custom_gather(csv, sm=sm) + custom_gather(gff, sm=sm)
     return []
 
 
 def get_scattered_bams(wc):
     # fmt = "temp/{sm}/nuc.{scatteritem}.bam"
     fmt = "temp/{sm}/align.{scatteritem}.bam"
-    if process_first_n is None:
-        return gather.chunks(fmt, allow_missing=True)
-    scatteritems = [f"{i+1}-of-{n_chunks}" for i in range(process_first_n)]
-    return expand(fmt, scatteritem=scatteritems, allow_missing=True)
+    return custom_gather(fmt, sm=wc.sm)
+
+
+# if process_first_n is None:
+#    return gather.chunks(fmt, allow_missing=True)
+# scatteritems = [f"{i+1}-of-{n_chunks}" for i in range(process_first_n)]
+# return expand(fmt, scatteritem=scatteritems, allow_missing=True)
 
 
 def is_tool(name):
@@ -102,10 +106,9 @@ def check_input_bams_for_index():
         assert os.path.exists(f"{input_bam}.pbi"), f"pbi for {input_bam} does not exist"
 
 
-def get_number_of_chunks():
-    GB_size = min(
-        [os.path.getsize(input_bam) / 1024**3 for sample, input_bam in config.items()]
-    )
+def get_number_of_chunks(sample):
+    input_bam = config[sample]
+    GB_size = os.path.getsize(input_bam) / 1024**3
     if predict_with_hifi:
         if input_type.upper() in SUBREAD_NAMES:
             return int(GB_size / 10) + 1
@@ -116,6 +119,7 @@ def get_number_of_chunks():
             return int(GB_size) + 1
         elif input_type.upper() in CCS_NAMES:
             return 10 * int(GB_size) + 1
+    raise Exception(f"Unknown input type: {input_type}")
 
 
 def check_for_tools():
@@ -123,7 +127,7 @@ def check_for_tools():
     is_tool("hck")
     is_tool("bedtools")
     is_tool("fibertools")
-    is_tool("bamsieve")
+    # is_tool("bamsieve")
     if not predict_with_hifi:
         is_tool("ipdSummary")
 
@@ -189,3 +193,56 @@ def summarise_runtimes(inputs, sample):
             cpu_hours += float(second_line[9]) / 3600
         rtn += f"{sample}\t{job}\t{hours:.4f}\t{cpu_hours:.4f}\t{len(files)}\n"
     return rtn
+
+
+def custom_scatteritems(sm):
+    n_chunks = get_number_of_chunks(sm)
+    chunks_to_process = n_chunks
+    if process_first_n is not None:
+        chunks_to_process = process_first_n
+    scatteritems = [f"{i+1}-of-{n_chunks}" for i in range(chunks_to_process)]
+    return scatteritems
+
+
+def custom_gather(format_of_file, sm=None, data=None):
+    allow_missing = True
+    scatteritems = custom_scatteritems(sm)
+    return expand(
+        format_of_file,
+        sm=sm,
+        data=data,
+        scatteritem=scatteritems,
+        allow_missing=allow_missing,
+    )
+
+
+def custom_scatter(samples):
+    fmt = "temp/{sm}/split_ccs_zmws/{scatteritem}.txt"
+    scatteritems = custom_scatteritems(sm)
+    return expand(fmt, scatteritem=scatteritems, allow_missing=True)
+
+
+def train_gmm_input_bam(wc):
+    n_chunks = get_number_of_chunks(wc.sm)
+    item = f"1-of-{n_chunks}"
+    return format(rules.primrose.output.bam, scatteritem=item, sm=wc.sm)
+
+
+def train_gmm_input_csv(wc):
+    n_chunks = get_number_of_chunks(wc.sm)
+    item = f"1-of-{n_chunks}"
+    return format(rules.ipdSummary.output.csv, scatteritem=item, sm=wc.sm)
+
+
+def help_benchmark_input(wc):
+    sm = wc.sm
+    return {
+        "align": custom_gather(rules.align.benchmark, sm=sm),
+        "bigbed": custom_gather(rules.bigbed.benchmark, data=output_types, sm=sm),
+        "fiber_table": custom_gather(rules.fiber_table.benchmark, sm=sm),
+        "call_m6a": custom_gather(
+            rules.predict_m6a_with_fibertools_rs.benchmark, sm=sm
+        ),
+        "primrose": custom_gather(rules.primrose.benchmark, sm=sm),
+        "nucleosome": custom_gather(rules.nucleosome.benchmark, sm=sm),
+    }
