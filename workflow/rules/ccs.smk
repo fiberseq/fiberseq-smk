@@ -8,7 +8,7 @@ rule ccs:
         json=temp("temp/{sm}/ccs.{scatteritem}.zmw_metrics.json.gz"),
         txt=temp("temp/{sm}/ccs.{scatteritem}.ccs_report.txt"),
     resources:
-        mem_mb=16 * 1024,
+        mem_mb=32 * 1024,
         disk_mb=16 * 1024,
         time=80,
     threads: scatter_threads
