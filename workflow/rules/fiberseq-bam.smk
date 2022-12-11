@@ -41,6 +41,7 @@ rule gmm:
     threads: 4
     resources:
         mem_mb=16 * 1024,
+        time=120,
     conda:
         env
     log:
