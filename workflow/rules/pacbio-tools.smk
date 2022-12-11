@@ -115,8 +115,8 @@ rule compress_ipdSummary:
     priority: 900
     shell:
         """
-        bgzip -@ {threads} -c {input.csv} &> {log}
-        bgzip -@ {threads} -c {input.gff} &>> {log}
+        bgzip -@ {threads} -c {input.csv} > {output.csv} 2> {log}
+        bgzip -@ {threads} -c {input.gff} > {output.gff} 2>> {log}
         """
 
 
