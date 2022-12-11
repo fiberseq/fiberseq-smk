@@ -16,7 +16,7 @@ cluster:
     --output=cluster_logs/{rule}/{rule}-{wildcards}-%j.out
     --export=all
     --parsable # Required to pass job IDs to scancel
-jobs: 1000
+jobs: 2000
 rerun-incomplete: True
 rerun-triggers: mtime 
 cluster-cancel: scancel
