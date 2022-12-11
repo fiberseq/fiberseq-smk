@@ -20,7 +20,7 @@ rule train_gmm:
         mem_mb=16 * 1024,
         time=200,
     threads: 4
-    priority: 60
+    priority: 1000
     shell:
         """
         python {params.gmm} -v --threads {threads} \
@@ -127,7 +127,7 @@ rule nucleosome:
     resources:
         disk_mb=16 * 1024,
         time=80,
-    priority: 1000
+    priority: 100
     shell:
         """
         fibertools -t {threads} add-nucleosomes -m {input.model} -i {input.bam} -o {output.bam} 2> {log}
@@ -152,7 +152,7 @@ rule align:
     threads: 8
     benchmark:
         "benchmarks/{sm}/align/align.{scatteritem}.tbl"
-    priority: 2000
+    priority: 100
     shell:
         """
         pbmm2 align \
