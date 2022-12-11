@@ -126,6 +126,7 @@ rule nucleosome:
     threads: 4
     resources:
         disk_mb=16 * 1024,
+        time=80,
     priority: 1000
     shell:
         """
