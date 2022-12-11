@@ -60,11 +60,15 @@ def get_first_m6a_bam(wc):
     return f"temp/{wc.sm}/gmm.1-of-{n_chunks}.bam"
 
 
-def get_ipd_results(sm):
+def get_ipd_results(samples):
     if save_ipd:
         csv = "results/{sm}/ipdSummary/{sm}.{scatteritem}.csv.gz"
         gff = "results/{sm}/ipdSummary/{sm}.{scatteritem}.gff.gz"
-        return custom_gather(csv, sm=sm) + custom_gather(gff, sm=sm)
+        rtn = []
+        for sm in samples:
+            rtn += custom_gather(csv, sm=sm)
+            rtn += custom_gather(gff, sm=sm)
+        return rtn
     return []
 
 
@@ -214,12 +218,6 @@ def custom_gather(format_of_file, sm=None, data=None):
         scatteritem=scatteritems,
         allow_missing=allow_missing,
     )
-
-
-def custom_scatter(samples):
-    fmt = "temp/{sm}/split_ccs_zmws/{scatteritem}.txt"
-    scatteritems = custom_scatteritems(sm)
-    return expand(fmt, scatteritem=scatteritems, allow_missing=True)
 
 
 def train_gmm_input_bam(wc):
