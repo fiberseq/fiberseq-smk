@@ -79,10 +79,12 @@ rule predict_m6a_with_fibertools_rs:
         "logs/{sm}/predict_m6a_with_fibertools_rs/{scatteritem}.log",
     benchmark:
         "benchmarks/{sm}/predict_m6a_with_fibertools_rs/{scatteritem}.tbl"
+    params:
+        keep="" if input_type in CCS_NAMES else "--keep",
     priority: 1000
     shell:
         """
-        ft predict-m6a -v --threads {threads} -c {input.ccs} {output.bam} 2> {log}
+        ft predict-m6a -v --threads {threads} {params.keep} -c {input.ccs} {output.bam} 2> {log}
         """
 
 
