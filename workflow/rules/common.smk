@@ -115,7 +115,7 @@ def get_number_of_chunks(sample):
     GB_size = os.path.getsize(input_bam) / 1024**3
     if predict_with_hifi:
         if input_type.upper() in SUBREAD_NAMES:
-            return int(GB_size / 10) + 1
+            return int(GB_size / 5) + 1
         elif input_type.upper() in CCS_NAMES:
             return int(GB_size) + 1
     else:
