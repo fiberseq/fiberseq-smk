@@ -112,11 +112,11 @@ rule compress_ipdSummary:
         "logs/{sm}/compress_ipdSummary/{scatteritem}.log",
     benchmark:
         "benchmarks/{sm}/compress_ipdSummary/{scatteritem}.tbl"
-    priority: 10_000
+    priority: 900
     shell:
         """
-        bgzip -@ {threads} {input.csv} &> {log}
-        bgzip -@ {threads} {input.gff} &>> {log}
+        bgzip -@ {threads} -c {input.csv} &> {log}
+        bgzip -@ {threads} -c {input.gff} &>> {log}
         """
 
 
