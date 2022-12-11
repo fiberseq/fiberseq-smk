@@ -22,7 +22,7 @@ jobs: 2000
 rerun-incomplete: True
 rerun-triggers: mtime 
 cluster-cancel: scancel
-cluster-cancel-nargs: 5000
+cluster-cancel-nargs: 500 # cancel 500 jobs at a time, all will still be canceled
 restart-times: 2
 printshellcmds: True
 reason: True
