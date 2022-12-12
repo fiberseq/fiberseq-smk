@@ -15,20 +15,21 @@ rule make_beds:
         disk_mb=8 * 1024,
         mem_mb=16 * 1024,
         time=240,
-    threads: 8
+    threads: 16
     benchmark:
         "benchmarks/{sm}/make_beds/{aligned}_extract_bed.tbl"
     params:
         aligned=lambda wc: "-r" if wc.aligned == "aligned" else "",
+        samflags=lambda wc: "-F 4" if wc.aligned == "aligned" else "-F 2304",
         min_ml_score=min_ml_score,
     priority: 300
     shell:
         """
-        ft extract \
-            -v --threads {threads} -m {params.min_ml_score} \
-            {params.aligned} \
-            {input.bam} \
-            --cpg {output.cpg} --msp {output.msp} --m6a {output.m6a} --nuc {output.nuc} 
+        samtools view -@ {threads} -u {params.samflags} {input.bam} \
+            | ft extract \
+                -v --threads {threads} -m {params.min_ml_score} \
+                {params.aligned} \
+                --cpg {output.cpg} --msp {output.msp} --m6a {output.m6a} --nuc {output.nuc} 
         """
 
 
@@ -53,7 +54,8 @@ rule fiber_table:
     priority: 300
     shell:
         """
-        ( ft -v --threads {threads} extract {input.bam} -m {params.min_ml_score} --all - \
+        (samtools view -@ {threads} -u -F 2304 {input.bam} \
+            | ft -v --threads {threads} extract -m {params.min_ml_score} --all - \
             | bgzip -@ {threads} > {output.tbl} \
         ) 2> {log}
         """
