@@ -10,7 +10,7 @@ rule ccs:
     resources:
         mem_mb=16 * 1024,
         disk_mb=16 * 1024,
-        time=80,
+        time=200,
     threads: scatter_threads
     conda:
         env
