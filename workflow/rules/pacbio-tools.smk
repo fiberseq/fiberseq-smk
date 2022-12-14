@@ -100,8 +100,8 @@ rule ipdSummary:
 
 rule compress_ipdSummary:
     input:
-        gff=rules.ipdSummary.output.csv,
-        csv=rules.ipdSummary.output.gff,
+        csv=rules.ipdSummary.output.csv,
+        gff=rules.ipdSummary.output.gff,
     output:
         csv="results/{sm}/ipdSummary/{sm}.{scatteritem}.csv.gz",
         gff="results/{sm}/ipdSummary/{sm}.{scatteritem}.gff.gz",
