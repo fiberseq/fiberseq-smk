@@ -171,8 +171,8 @@ rule merge:
     input:
         bams=get_scattered_bams,
     output:
-        bam="results/{sm}/{sm}.fiberseq.bam",
-        bai="results/{sm}/{sm}.fiberseq.bam.bai",
+        bam=protected("results/{sm}/{sm}.fiberseq.bam"),
+        bai=protected("results/{sm}/{sm}.fiberseq.bam.bai"),
     conda:
         env
     log:

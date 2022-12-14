@@ -27,5 +27,5 @@ reason: True
 use-conda: True
 show-failed-logs: True 
 latency-wait: 30
-max-jobs-per-second: 50
+max-jobs-per-second: 100
 cluster-status: status-sacct.sh
