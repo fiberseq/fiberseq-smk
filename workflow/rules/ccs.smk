@@ -39,13 +39,13 @@ rule ccs_zmws:
         bam=get_input_bam,
     output:
         txt=temp("temp/{sm}/ccs_zmws/ccs_zmws.txt"),
-    threads: 1
     conda:
         env
     log:
         "logs/{sm}/ccs_zmws/ccs_zmws.log",
     benchmark:
         "benchmarks/{sm}/ccs_zmws/ccs_zmws.tbl"
+    threads: 8
     priority: 20
     shell:
         """
