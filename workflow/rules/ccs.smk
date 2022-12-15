@@ -49,7 +49,15 @@ rule ccs_zmws:
     priority: 20
     shell:
         """
-        bamsieve --show-zmws {input.bam} > {output.txt} 2> {log}
+        (samtools view -F 2304 -@ {threads} {input.bam} \
+            | cut -f 1 \
+            | sed 's#/ccs##g' \
+            | sed 's#/$##g' \
+            | sed 's#.*/##g' \
+            | sort -g -S 1G --parallel 8 \
+            > {output.txt} \
+        ) 2> {log}
+        #bamsieve --show-zmws {input.bam} > {output.txt} 2> {log}
         """
 
 
