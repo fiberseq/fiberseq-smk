@@ -51,6 +51,7 @@ You can run data using the following command, read the comments to learn more ab
 snakemake \
   --profile profile/local `# sets up where and how jobs are submitted` \
   --config \
+    input_type=subreads `# choose between subreads or ccs` \
     env="fiberseq-smk" `# sets the conda env for the jobs, always the same` \
     test=.test/subreads.bam `# path to the subreads, and the key sets the sample name` \
     ref=.test/ref.fa `# reference to align results to`  
@@ -59,22 +60,14 @@ If you find this too verbose you can instead include the config options in a con
 ```bash
 snakemake --profile profile/local --configfile config.yaml 
 ```
-And then specify the options in the `config.yaml`, for example:
-```yaml
-# sets the conda env for the jobs, always the same
-env: fiberseq-smk
-# choose any sample name followed by a path to the subreads
-test: .test/subreads.bam
-# optional path to a reference fasta to align the results to
-ref: .test/hg38.analysisSet.fa
-```
+See `config/config.yml` for an example configuration file.
 
-# Running with precomputed CCS data
+# Starting with SUBREADS instead of CCS
 Add to the config line the following option:
 ```bash
-    input_type=ccs
+    input_type=subreads
 ```
-And replace the subread bam file(s) with ccs file(s).
+And replace the ccs bam file(s) with subread bam file(s).
 
 # Running on a cluster with distributed resources
 Replace the `profile/local` argument with `profile/checkpoint` or `profile/compute` or make your own snakemake profile.
@@ -89,17 +82,7 @@ If you want to use `ipdSummary` for m6A predictions, you can add the following t
 ```
 
 # Test case
-**Before running your own data** please run this small test case included in the repository. 
-```bash
-snakemake \
-  --profile profile/local `# sets up where and how jobs are submitted` \
-  --config \
-    env="fiberseq-smk" `# sets the conda env for the jobs` \
-    test=.test/subreads.bam `# path to the subreads, and the key sets the sample name` \
-    ref=.test/ref.fa `# reference to align results to` \
-  -p 
-```
-In addition, please clear this test case and then try again with the distributed resources (e.g. `profile/compute/`). 
+**Before running your own data** please run this small test case included in the repository shown in the `Usage` section. In addition, please clear this test case and then try again with the distributed resources (e.g. `profile/compute/`). 
 
 
 # Output files
@@ -124,8 +107,7 @@ results/test/bed/test.unaligned.nuc.bed.gz
 
 ```bash
 # aligned bam files 
-results/test/test.aligned.fiberseq.bam
-results/test/test.aligned.fiberseq.bam.bai
+results/test/test.fiberseq.bam
 # aligned bed files
 results/test/bed/test.aligned.cpg.bed.gz
 results/test/bed/test.aligned.m6a.bed.gz
@@ -159,15 +141,10 @@ For all records in all the bed files the first and last block position do not re
 - MM/ML: Bam tags for sorting m6a and 5mC methylation information. See the SAM spec for details.
 
 # TODO
-- [x] Make an extract tool
-- [x] Add primrose
-- [x] Add unknown case to end of fiber calls
-- [x] Add a ccs input option
 - [ ] Add a sample tag to the bam header.
 - [ ] Add a pipeline version to the bam header (git commit).
 - [ ] Add env version to the output somewhere. 
-- [ ] Can we check for de-multiplexing automatically?
-
+- [ ] Split out the bed part of the pipeline.
 
 # Workflow
 
