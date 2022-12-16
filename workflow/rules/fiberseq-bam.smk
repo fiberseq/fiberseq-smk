@@ -81,7 +81,7 @@ rule predict_m6a_with_fibertools_rs:
     benchmark:
         "benchmarks/{sm}/predict_m6a_with_fibertools_rs/{scatteritem}.tbl"
     params:
-        keep="" if input_type in CCS_NAMES else "--keep",
+        keep="" if input_type.upper() in CCS_NAMES else "--keep",
     priority: 1000
     shell:
         """
@@ -186,7 +186,7 @@ rule merge:
     priority: 3000
     shell:
         """
-        samtools merge \
+        samtools merge -c \
             -@ {threads} --write-index \
             -o {output.bam}##idx##{output.bai} \
             {input.bams} \
