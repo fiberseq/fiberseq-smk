@@ -24,6 +24,12 @@ If you are on `hyak` you can add my copy to your path by adding this to your `.b
 ```bash
 PATH=$PATH:/mmfs1/gscratch/stergachislab/mvollger/projects/large_home/.cargo/bin/
 ```
+You will also need to my PyTorch lib to your environment:
+```bash
+export LIBTORCH=/mmfs1/gscratch/stergachislab/mvollger/projects/large_home/libs/libtorch_1.12.0_cu116
+export LD_LIBRARY_PATH=${LIBTORCH}/lib:$LD_LIBRARY_PATH
+export DYLD_LIBRARY_PATH=${LIBTORCH}/lib:$LD_LIBRARY_PATH
+```
 
 ### `SMRTLINK` tools
 ```
