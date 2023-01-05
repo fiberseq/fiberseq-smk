@@ -85,7 +85,7 @@ rule predict_m6a_with_fibertools_rs:
     priority: 1000
     shell:
         """
-        ft predict-m6a -v --threads {threads} {params.keep} -c {input.ccs} {output.bam} 2> {log}
+        ft predict-m6a -v --threads {threads} {params.keep} -s {input.ccs} {output.bam} 2> {log}
         """
 
 
