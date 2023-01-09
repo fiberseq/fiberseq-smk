@@ -20,7 +20,6 @@ save_ipd = config.pop("save_ipd", False)
 gff = config.pop("gff", False)
 process_first_n = config.pop("process_first_n", None)
 min_ml_score = config.pop("min_ml_score", 200)
-# make big wig density files
 bigwig = config.pop("bigwig", False)
 # use the fibertool-rs prediction instead of ipdSummary
 use_ipdsummary = config.pop("ipdsummary", False)
@@ -29,6 +28,10 @@ predict_with_hifi = False if use_ipdsummary else True
 max_coverage = config.pop("max_coverage", 20)
 # max number of alignments to load in 1 kbp window for ipdsummary
 max_alignments = config.pop("max_alignments", 100)
+# instead of running the pipeline make bed files with the input bam file(s)
+make_beds = config.pop("make_beds", False)
+if make_beds:
+    bigwig = True
 # list of input samples
 samples = list(config.keys())
 
@@ -84,32 +87,40 @@ wildcard_constraints:
     scatteritem="\d+-of-\d+",
 
 
-rule all:
-    input:
-        # fiberseq bam
-        expand(rules.merge.output.bam, sm=samples),
-        expand(rules.index_merge.output.pbi, sm=samples),
-        # aligned fiberseq bam
-        align_results(samples),
-        # QC results
-        expand(rules.qc_results.input, sm=samples),
-        # bed
-        expand(
-            "results/{sm}/bed/{sm}.{aligned}.{data}.bed.gz",
-            aligned=aligned,
-            sm=samples,
-            data=output_types,
-        ),
-        # bigbed
-        expand(
-            rules.bigbed.output.bb,
-            sm=samples,
-            data=output_types,
-        ),
-        # get ipdSummary files if requested
-        get_ipd_results(samples),
-        # get bigwig files if requested
-        bigwig_results(bigwig),
+if not make_beds:  # run standard fiberseq-smk
+
+    rule all:
+        input:
+            # fiberseq bam
+            expand(rules.merge.output.bam, sm=samples),
+            expand(rules.index_merge.output.pbi, sm=samples),
+            # aligned fiberseq bam
+            align_results(samples),
+            # QC results
+            expand(rules.qc_results.input, sm=samples),
+
+
+else:  # run bed making pipeline
+
+    rule all:
+        input:
+            # bed
+            expand(
+                "results/{sm}/bed/{sm}.{aligned}.{data}.bed.gz",
+                aligned=aligned,
+                sm=samples,
+                data=output_types,
+            ),
+            # bigbed
+            expand(
+                rules.bigbed.output.bb,
+                sm=samples,
+                data=output_types,
+            ),
+            # get ipdSummary files if requested
+            get_ipd_results(samples),
+            # get bigwig files if requested
+            bigwig_results(bigwig),
 
 
 localrules:
@@ -126,6 +137,8 @@ rule help_benchmark:
         out = summarise_runtimes(input, wildcards.sm)
         with open(output[0], "w") as f:
             f.write(out)
+
+
 
 
 rule benchmarks:

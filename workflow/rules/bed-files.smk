@@ -1,7 +1,10 @@
-
+#
+# these rules are only run for the make_beds pipeline
+#
 rule make_beds:
     input:
-        bam=rules.merge.output.bam,
+        bam=get_input_bam,
+        #bam=rules.merge.output.bam,
     output:
         cpg=temp("temp/{sm}/{aligned}.cpg.bed"),
         msp=temp("temp/{sm}/{aligned}.msp.bed"),
@@ -30,34 +33,6 @@ rule make_beds:
                 -v --threads {threads} -m {params.min_ml_score} \
                 {params.aligned} \
                 --cpg {output.cpg} --msp {output.msp} --m6a {output.m6a} --nuc {output.nuc} 
-        """
-
-
-rule fiber_table:
-    input:
-        bam=rules.merge.output.bam,
-    output:
-        tbl="results/{sm}/{sm}.fiberseq.all.tbl.gz",
-    conda:
-        env
-    log:
-        "logs/{sm}/fiber_table/all_extract_bed.log",
-    resources:
-        disk_mb=8 * 1024,
-        mem_mb=16 * 1024,
-        time=240,
-    threads: 8
-    params:
-        min_ml_score=min_ml_score,
-    benchmark:
-        "benchmarks/{sm}/fiber_table/all_extract_bed.tbl"
-    priority: 300
-    shell:
-        """
-        (samtools view -@ {threads} -u -F 2304 {input.bam} \
-            | ft -v --threads {threads} extract -m {params.min_ml_score} --all - \
-            | bgzip -@ {threads} > {output.tbl} \
-        ) 2> {log}
         """
 
 

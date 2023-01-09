@@ -132,7 +132,6 @@ def check_for_tools():
     is_tool("hck")
     is_tool("bedtools")
     is_tool("fibertools")
-    is_tool("bamsieve")
     if not predict_with_hifi:
         is_tool("ipdSummary")
 
