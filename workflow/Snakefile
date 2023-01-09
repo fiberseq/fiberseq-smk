@@ -98,6 +98,8 @@ if not make_beds:  # run standard fiberseq-smk
             align_results(samples),
             # QC results
             expand(rules.qc_results.input, sm=samples),
+            # get ipdSummary files if requested
+            get_ipd_results(samples),
 
 
 else:  # run bed making pipeline
@@ -117,8 +119,6 @@ else:  # run bed making pipeline
                 sm=samples,
                 data=output_types,
             ),
-            # get ipdSummary files if requested
-            get_ipd_results(samples),
             # get bigwig files if requested
             bigwig_results(bigwig),
 
