@@ -2,7 +2,7 @@
 # author : sjn
 # date : Aug 22, 2022
 
-set -euo pipefail
+set -euox pipefail
 
 if [[ $# != 4 ]]; then
     printf "Expect $0 <sample-name> <input-file> <output-pdf> <output-stat.txt>\n"
@@ -10,7 +10,7 @@ if [[ $# != 4 ]]; then
 fi
 
 samplenm=$1
-inp=$2 # "*_unaligned.msp.bed.gz"
+inp=$2 # fiber-all-table.tbl.gz
 outpdf=$3
 outstat=$4
 
@@ -28,8 +28,12 @@ fi
 mkdir -p $tmpd
 mkdir -p $(dirname "${outpdf}")
 
-zcat $inp |
-    awk '{ print $(NF-1) }' |
+hck -z -F msp_lengths $inp |
+    awk 'NR > 1' |
+    awk '$1 != "."' |
+    rev |
+    sed 's;,;;' |
+    rev |
     awk 'BEGIN {OFS="\t"; vals[-1]=-1; delete vals[-1]} ; { \
           lng=split($0, a, ","); \
           for ( i=1; i<=lng; ++i ) { \

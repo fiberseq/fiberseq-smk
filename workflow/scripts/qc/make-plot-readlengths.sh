@@ -10,7 +10,7 @@ if [[ $# != 4 ]]; then
 fi
 
 samplenm=$1
-inp=$2 # "*_unaligned.fiberseq.bam"
+inp=$2 # fiber-all-table.tbl.gz
 outpdf=$3
 outstat=$4
 
@@ -30,6 +30,11 @@ mkdir -p $tmpd
 # putting things in bins of size 10
 #ft extract --all - $inp \
 hck -z -F fiber_length $inp |
+    awk 'NR > 1' |
+    awk '$1 != "."' |
+    rev |
+    sed 's;,;;' |
+    rev |
     awk '{ $1=int($1/10); $1=$1*10; print $1 }' |
     sort -gk1,1 |
     uniq -c |

@@ -10,7 +10,7 @@ if [[ $# != 4 ]]; then
 fi
 
 samplenm=$1
-inp=$2 # "$ind/*_unaligned.fiberseq.bam"
+inp=$2 # fiber-all-table.tbl.gz
 outpdf=$3
 outstat=$4
 

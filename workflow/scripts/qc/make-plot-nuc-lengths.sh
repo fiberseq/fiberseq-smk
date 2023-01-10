@@ -6,7 +6,7 @@
 # report stats: median length of 80-220 bp nucs
 #               (#80-220bp)/(#250-450bp) mono vs. di-nucleosome ratio
 
-set -euo pipefail
+set -euox pipefail
 
 if [[ $# != 4 ]]; then
     printf "Expect $0 <sample-name> <input-file> <output-pdf> <output-stat.txt>\n"
@@ -14,7 +14,7 @@ if [[ $# != 4 ]]; then
 fi
 
 samplenm=$1
-inp=$2 # *_unaligned.nuc.bed.gz
+inp=$2 # fiber-all-table.tbl.gz
 outpdf=$3
 outstat=$4
 
@@ -32,8 +32,12 @@ mkdir -p $tmpd
 mkdir -p $(dirname "${outpdf}")
 
 # in some fiberseq-smk runs, there are 'nucleosomes' of size 1 that are the first and last listed always.  I am throwing out size=1 nucleosomes.
-zcat $inp |
-    awk '{ print $(NF-1) }' |
+hck -z -F nuc_lengths $inp |
+    awk 'NR > 1' |
+    awk '$1 != "."' |
+    rev |
+    sed 's;,;;' |
+    rev |
     awk 'BEGIN {OFS="\t"; vals[-1]=-1; delete vals[-1]} ; { \
           lng=split($0, a, ","); \
           for ( i=1; i<=lng; ++i ) { \

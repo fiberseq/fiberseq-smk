@@ -16,7 +16,7 @@ if [[ $# != 4 ]]; then
 fi
 
 samplenm=$1
-inp=$2 # "*_unaligned.fiberseq.bam"
+inp=$2 # fiber-all-table.tbl.gz
 outpdf=$3
 outstat=$4
 
@@ -35,6 +35,11 @@ mkdir -p $tmpd
 mkdir -p $(dirname "${outpdf}")
 
 hck -F fiber_length -F nuc_starts -z $inp |
+    awk 'NR > 1' |
+    awk '$1 != "."' |
+    rev |
+    sed 's;,;;' |
+    rev |
     awk '{ lng=gsub(/,/, "", $2); if ( lng > 1 ) { print int($1/lng) } }' \
         >$tmpd/$samplenm.$ftype
 

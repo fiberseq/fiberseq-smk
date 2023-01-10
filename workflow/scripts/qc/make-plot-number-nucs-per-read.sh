@@ -13,7 +13,7 @@ if [ $# != 4 ]; then
 fi
 
 samplenm=$1
-inp=$2 # "*_unaligned.nuc.bed.gz"
+inp=$2 # fiber-all-table.tbl.gz
 outpdf=$3
 outstat=$4
 
@@ -30,8 +30,13 @@ fi
 mkdir -p $tmpd
 mkdir -p $(dirname "${outpdf}")
 
-zcat $inp |
-    awk '{ print split($(NF-1), a, ",") }' |
+hck -z -F nuc_lengths $inp |
+    awk 'NR > 1' |
+    awk '$1 != "."' |
+    rev |
+    sed 's;,;;' |
+    rev |
+    awk '{ print split($1, a, ",") }' |
     sort -gk1,1 |
     uniq -c |
     awk '{ print $2"\t"$1 }' \
