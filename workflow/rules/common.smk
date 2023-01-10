@@ -106,6 +106,7 @@ def get_bam_type(bam_path):
             return "CCS"
         elif "READTYPE=SUBREAD" in DS:
             return "SUBREAD"
+    bam.close()
 
 
 def check_input_bams_against_input_type():
