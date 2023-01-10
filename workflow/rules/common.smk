@@ -1,6 +1,7 @@
 #
 # shared utilites for the pipeline
 #
+import pysam
 
 
 def get_chunk(wc):
@@ -95,6 +96,27 @@ def is_tool(name):
             f"Cannot find {name} in PATH. Please see the README for installation instructions."
         )
     return which(name)
+
+
+def get_bam_type(bam_path):
+    bam = pysam.AlignmentFile(bam_path, check_sq=False)
+    for read_group in bam.header["RG"]:
+        DS = read_group.get("DS", "")
+        if "READTYPE=CCS" in DS:
+            return "CCS"
+        elif "READTYPE=SUBREAD" in DS:
+            return "SUBREAD"
+
+
+def check_input_bams_against_input_type():
+    for sample, input_bam in config.items():
+        bam_type = get_bam_type(input_bam)
+        if (input_type.upper() in CCS_NAMES and bam_type != "CCS") or (
+            input_type.upper() in SUBREAD_NAMES and bam_type != "SUBREAD"
+        ):
+            raise Exception(
+                f"Input bam file ({input_bam}) does not match the specified input type ({input_type.upper()})."
+            )
 
 
 def check_input_bams():

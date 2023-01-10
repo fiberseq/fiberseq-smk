@@ -59,11 +59,8 @@ check_for_reference()
 # make sure pbi files exist for the input bams
 check_input_bams_for_index()
 
-# define number of chunks based on input file sizes
-# default_n_chunks = get_number_of_chunks()
-# scattergather:
-#    chunks=default_n_chunks,
-# n_chunks = len(scatter.chunks("temp/{scatteritem}.fake"))
+# check that the bams are the right input type
+check_input_bams_against_input_type()
 
 
 # rules for running ccs
