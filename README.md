@@ -3,7 +3,8 @@
 [![Snakemake](https://img.shields.io/badge/snakemake-≥7.8.0-brightgreen.svg)](https://snakemake.github.io)
 [![GitHub actions status](https://github.com/StergachisLab/fiberseq-smk/workflows/Tests/badge.svg?branch=main)](https://github.com/StergachisLab/fiberseq-smk/actions?query=branch%3Amain+workflow%3ATests)
 
-
+# Alpha warning!
+This code is in an alpha state and will be changing without notice or versioning.
 
 # Installation
 
