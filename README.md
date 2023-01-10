@@ -50,9 +50,8 @@ You can run data using the following command, read the comments to learn more ab
 snakemake \
   --profile profile/local `# sets up where and how jobs are submitted` \
   --config \
-    input_type=subreads `# choose between subreads or ccs` \
     env="fiberseq-smk" `# sets the conda env for the jobs, always the same` \
-    test=.test/subreads.bam `# path to the subreads, and the key sets the sample name` \
+    test=.test/ccs.bam `# path to the ccs reads with HiFi kinetics, and the key sets the sample name` \
     ref=.test/ref.fa `# reference to align results to`  
 ```
 If you find this too verbose you can instead include the config options in a configuration file:
