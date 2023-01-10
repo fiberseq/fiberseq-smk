@@ -1,10 +1,35 @@
 #
 # these rules are only run for the make_beds pipeline
 #
+rule joint_fiber_table:
+    input:
+        bam=get_input_bam,
+    output:
+        tbl="results/{sm}/{sm}.fiberseq.tbl.gz",
+    conda:
+        env
+    log:
+        "logs/{sm}/joint_fiber_table/all_extract_bed.log",
+    resources:
+        disk_mb=8 * 1024,
+        mem_mb=16 * 1024,
+        time=240,
+    threads: 8
+    benchmark:
+        "benchmarks/{sm}/joint_fiber_table/all_extract_bed.tbl"
+    priority: 300
+    shell:
+        """
+        (samtools view -@ {threads} -u -F 2304 {input.bam} \
+            | ft -v --threads {threads} extract --all - \
+            | bgzip -@ {threads} > {output.tbl} \
+        ) 2> {log}
+        """
+
+
 rule make_beds:
     input:
         bam=get_input_bam,
-        #bam=rules.merge.output.bam,
     output:
         cpg=temp("temp/{sm}/{aligned}.cpg.bed"),
         msp=temp("temp/{sm}/{aligned}.msp.bed"),

@@ -1,7 +1,6 @@
 rule qc_msp:
     input:
         tbl=rules.fiber_table.output.tbl,
-        #bed="results/{sm}/bed/{sm}.unaligned.msp.bed.gz",
     output:
         pdf="results/{sm}/qc/{sm}.qc_msp_lengths.pdf",
         txt=temp("temp/{sm}/qc_msp.intermediate.stat.txt"),
@@ -24,7 +23,6 @@ rule qc_msp:
 rule qc_nuc:
     input:
         tbl=rules.fiber_table.output.tbl,
-        #bed="results/{sm}/bed/{sm}.unaligned.nuc.bed.gz",
     output:
         pdf="results/{sm}/qc/{sm}.qc_nuc_lengths.pdf",
         txt=temp("temp/{sm}/qc_nuc.intermediate.stat.txt"),
@@ -70,7 +68,6 @@ rule qc_m6a:
 rule qc_nucs_per_read:
     input:
         tbl=rules.fiber_table.output.tbl,
-        #bed="results/{sm}/bed/{sm}.unaligned.nuc.bed.gz",
     output:
         pdf="results/{sm}/qc/{sm}.qc_number_nucs_per_read.pdf",
         txt=temp("temp/{sm}/qc_number_nucs_per_read.intermediate.stat.txt"),
