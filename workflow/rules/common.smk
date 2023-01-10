@@ -157,6 +157,8 @@ def check_for_tools():
     is_tool("fibertools")
     if not predict_with_hifi:
         is_tool("ipdSummary")
+    if make_beds:
+        is_tool("bedToBigBed")
 
 
 def check_for_old_outputs():

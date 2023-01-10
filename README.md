@@ -10,13 +10,6 @@ A Snakemake workflow for making **fiberseq** calls.
 # Installation
 
 ## Install dependencies
-### UCSC tools
-Make sure you have UCSC tools installed and in your path.  You can get them from here: [https://hgdownload.soe.ucsc.edu/admin/exe/](https://hgdownload.soe.ucsc.edu/admin/exe/)
-
-If you are on `hyak` you can add my copy to your path by adding this to your `.bashrc`:
-```
-PATH=$PATH:/mmfs1/home/mvollger/software/ucsc_bin
-```
 ### `fibertools-rs`
 See the [fibertools-rs install instructions](https://github.com/mrvollger/fibertools-rs#install) and make sure `ft` is in your path.
 
@@ -93,6 +86,46 @@ If you want to use `ipdSummary` for m6A predictions, you can add the following t
 
 # Output files
 Example output files if your sample name is `test`:
+```bash
+# aligned bam files 
+results/test/test.fiberseq.bam
+# fiber table 
+results/test/test.fiberseq.all.tbl.gz 
+# Quality control directory with figures and html reports
+results/test/qc/
+```
+
+## Added bam tags and definitions.
+- MSP: methylation sensitive patch, defined as being any stretch of sequence between nucleosomes that has methylation.
+- as: A bam tag with an array of MSP start sites
+- al: A bam tag with an array of MSP lengths
+- ns: A bam tag with an array of nucleosome start sites
+- nl: A bam tag with an array of nucleosome lengths
+- MM/ML: Bam tags for sorting m6a and 5mC methylation information. See the SAM spec for details.
+
+# Making bed files to supplement your fiberdata
+This optional step allows you to make some common bed files for fiberseq data.  These bed files are not required for the pipeline to run, but they are useful for visualizing your data. 
+## Dependencies
+For this pipeline the only additional dependency is UCSC tools, so make sure you have UCSC tools installed and in your path.  You can get them from here: [https://hgdownload.soe.ucsc.edu/admin/exe/](https://hgdownload.soe.ucsc.edu/admin/exe/)
+If you are on `hyak` you can add my copy to your path by adding this to your `.bashrc`:
+```
+PATH=$PATH:/mmfs1/home/mvollger/software/ucsc_bin
+```
+## Generating bed files
+To run the bed file generation pipeline grab your fiberseq bam file and the reference it was aligned to. Then you can run the pipeline with a command based on this example:
+```bash
+snakemake \
+  --profile profile/local `# sets up where and how jobs are submitted` \
+  --config \
+    make_beds=True `# Tells the pipeline to make bed files instead of a fiberseq bam` \
+    env="fiberseq-smk" `# sets the conda env for the jobs, always the same` \
+    GM12878=GM12878.fiberseq.bam `# path to the fiberseq bam, and the key sets the sample name` \
+    ref=hg38.fa `# reference that the fiberseq.bam`  
+```
+Separating these bed steps into their own pipeline allows you to merge multiple SMRT cells of fiberseq data from the same sample before making bed files. Which is the more common use case.
+
+## Outputs of the bed pipeline
+Example output files if your sample name is `test`:
 <table>
 <tr>
 <th> Unaligned outputs </th>
@@ -112,8 +145,6 @@ results/test/bed/test.unaligned.nuc.bed.gz
 <td>
 
 ```bash
-# aligned bam files 
-results/test/test.fiberseq.bam
 # aligned bed files
 results/test/bed/test.aligned.cpg.bed.gz
 results/test/bed/test.aligned.m6a.bed.gz
@@ -137,14 +168,6 @@ All the bed output files are [bed12 format](https://genome.ucsc.edu/FAQ/FAQforma
 - `nuc`: Uses the block starts and block lengths in bed12 format to describe the start and end of nucleosomes
 
 For all records in all the bed files the first and last block position do not reflect real data, they are only there because bed12 format requires the first and last block to match the first and last position of the entire read.
-
-## Added bam tags and definitions.
-- MSP: methylation sensitive patch, defined as being any stretch of sequence between nucleosomes that has methylation.
-- as: A bam tag with an array of MSP start sites
-- al: A bam tag with an array of MSP lengths
-- ns: A bam tag with an array of nucleosome start sites
-- nl: A bam tag with an array of nucleosome lengths
-- MM/ML: Bam tags for sorting m6a and 5mC methylation information. See the SAM spec for details.
 
 # TODO
 - [ ] Add a sample tag to the bam header.
