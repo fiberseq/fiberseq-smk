@@ -92,14 +92,17 @@ def get_scattered_bams(wc):
 
 def is_tool(name):
     """Check whether `name` is on PATH and marked as executable."""
-    # from whichcraft import which
-    from shutil import which
+    if no_check:
+        return True
+    else:
+        # from whichcraft import which
+        from shutil import which
 
-    if which(name) is None:
-        raise Exception(
-            f"Cannot find {name} in PATH. Please see the README for installation instructions."
-        )
-    return which(name)
+        if which(name) is None:
+            raise Exception(
+                f"Cannot find {name} in PATH. Please see the README for installation instructions."
+            )
+        return which(name)
 
 
 def get_bam_type(bam_path):
