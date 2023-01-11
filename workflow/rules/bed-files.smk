@@ -124,8 +124,7 @@ rule bigwig:
         """
         # bedtools genomecov is slow with -split, so we do it in parallel
         (cut -f 1 {input.fai} \
-            | parallel -n 1 -k \
-                'grep -w "^{{}}" {input.bed} | bedtools genomecov -split -bg -g {input.fai} -i -'
+            | parallel -n 1 -k $'grep -w "^{{}}" {input.bed} | bedtools genomecov -split -bg -g {input.fai} -i -'
             | sort -S 4G --parallel={threads} -k1,1 -k2,2n \
             > {output.bed} \
         ) 2> {log} 
