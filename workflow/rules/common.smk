@@ -1,7 +1,6 @@
 #
 # shared utilites for the pipeline
 #
-import pysam
 import os
 
 
@@ -104,14 +103,19 @@ def is_tool(name):
 
 
 def get_bam_type(bam_path):
-    bam = pysam.AlignmentFile(bam_path, check_sq=False)
-    for read_group in bam.header["RG"]:
-        DS = read_group.get("DS", "")
-        if "READTYPE=CCS" in DS:
-            return "CCS"
-        elif "READTYPE=SUBREAD" in DS:
-            return "SUBREAD"
-    bam.close()
+    if no_check:
+        return "CCS"
+    else:
+        import pysam
+
+        bam = pysam.AlignmentFile(bam_path, check_sq=False)
+        for read_group in bam.header["RG"]:
+            DS = read_group.get("DS", "")
+            if "READTYPE=CCS" in DS:
+                return "CCS"
+            elif "READTYPE=SUBREAD" in DS:
+                return "SUBREAD"
+        bam.close()
 
 
 def check_input_bams_against_input_type():

@@ -21,6 +21,7 @@ gff = config.pop("gff", False)
 process_first_n = config.pop("process_first_n", None)
 min_ml_score = config.pop("min_ml_score", 200)
 bigwig = config.pop("bigwig", False)
+no_check = config.pop("no_check", False)
 # use the fibertool-rs prediction instead of ipdSummary
 use_ipdsummary = config.pop("ipdsummary", False)
 predict_with_hifi = False if use_ipdsummary else True
