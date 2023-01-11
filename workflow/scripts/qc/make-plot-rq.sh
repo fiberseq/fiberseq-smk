@@ -5,35 +5,34 @@
 set -euo pipefail
 
 if [[ $# != 4 ]]; then
-  printf "Expect $0 <sample-name> <input-file> <output-pdf> <output-stat.txt>\n"
-  exit -1
+    printf "Expect $0 <sample-name> <input-file> <output-pdf> <output-stat.txt>\n"
+    exit 1
 fi
 
 samplenm=$1
-inp=$2 # "$ind/*_unaligned.fiberseq.bam"
+inp=$2 # fiber-all-table.tbl.gz
 outpdf=$3
 outstat=$4
 
 ftype=rq
-tmpd=/tmp/`whoami`/$$
+tmpd=/tmp/$(whoami)/$$
 
 if [ -s $tmpd ]; then
-  rm -rf $tmpd
+    rm -rf $tmpd
 fi
 mkdir -p $tmpd
 mkdir -p $(dirname "${outpdf}")
 
 if [ ! -s $inp ]; then
-  printf "Problem finding 1 file: %s\n" 
-  exit -1
+    printf "Problem finding 1 file: %s\n"
+    exit 1
 fi
 
-ft extract --all - $inp \
-  | cutnm rq \
-  | awk '(NR>1)' \
-  > $tmpd/$samplenm.$ftype
+hck -F rq -z $inp |
+    awk '(NR>1)' \
+        >$tmpd/$samplenm.$ftype
 
-R --no-save --quiet << __R__
+R --no-save --quiet <<__R__
   # 0.0 <= quantile <= 1.0
   fast_kth <- function(array_2d, lower_b, upper_b, quantile) {
     reads <- subset(array_2d, V1>=lower_b & V1<=upper_b)

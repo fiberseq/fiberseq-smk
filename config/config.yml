@@ -1,1 +1,11 @@
-m54329U_210326_192251: /mmfs1/gscratch/stergachislab/data/GM12878/m54329U_210326_192251/m54329U_210326_192251.subreads.bam
+And then specify the options in the `config.yaml`, for example:
+```yaml
+# sets the conda env for the jobs, always the same
+env: fiberseq-smk
+# choose between subreads or ccs
+input_type: subreads
+# choose any sample name followed by a path to the subreads
+test: .test/subreads.bam
+# optional path to a reference fasta to align the results to
+ref: .test/hg38.analysisSet.fa
+```

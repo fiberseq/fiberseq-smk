@@ -108,3 +108,35 @@ rule lima:
             --hifi-prefix {params.symmetric} \
             {input.bam} {input.barcodes} {output.bam} \
         """
+
+
+rule align:
+    input:
+        bam=rules.merge.output.bam,
+        ref=ref,
+    output:
+        bam="results/{sm}/{sm}.aligned.fiberseq.bam",
+        bai="results/{sm}/{sm}.aligned.fiberseq.bam.bai",
+    conda:
+        env
+    log:
+        "logs/{sm}/align/align.log",
+    resources:
+        disk_mb=8000,
+        time=240,
+        mem_mb=32 * 1024,
+    threads: max_threads
+    benchmark:
+        "benchmarks/{sm}/align/align.tbl"
+    priority: 200
+    shell:
+        """
+        pbmm2 align \
+            -j {threads} \
+            --preset CCS --sort \
+            --sort-memory 2G \
+            --log-level INFO \
+            --unmapped \
+            {input.ref} {input.bam} {output.bam} \
+        2> {log}
+        """

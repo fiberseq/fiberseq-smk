@@ -6,20 +6,32 @@ min_version("7.8")
 
 version: "0.1.0"
 
+SUBREAD_NAMES = ["SUBREADS", "SUBREAD"]
+CCS_NAMES = ["CCS", "CCSREADS", "CCSREAD", "HIFI"]
+
 # process the input configuration file/options.
 scatter_threads = config.pop("scatter_threads", 8)
 max_threads = config.pop("max_threads", 24)
-input_ccs = config.pop("ccs", None)
+input_type = config.pop("input_type", "ccs")
 env = config.pop("env", "envs/env.yml")
 ref = config.pop("ref", None)
 gmm_model = config.pop("gmm_model", False)
 save_ipd = config.pop("save_ipd", False)
 gff = config.pop("gff", False)
 process_first_n = config.pop("process_first_n", None)
+min_ml_score = config.pop("min_ml_score", 200)
+bigwig = config.pop("bigwig", False)
+# use the fibertool-rs prediction instead of ipdSummary
+use_ipdsummary = config.pop("ipdsummary", False)
+predict_with_hifi = False if use_ipdsummary else True
 # max ipdsummary coverage
 max_coverage = config.pop("max_coverage", 20)
 # max number of alignments to load in 1 kbp window for ipdsummary
 max_alignments = config.pop("max_alignments", 100)
+# instead of running the pipeline make bed files with the input bam file(s)
+make_beds = config.pop("make_beds", False)
+if make_beds:
+    bigwig = True
 # list of input samples
 samples = list(config.keys())
 
@@ -28,74 +40,29 @@ output_types = ["m6a", "cpg", "nuc", "msp"]
 aligned = ["aligned", "unaligned"]
 
 
-# check for old version of the pipeline and warn users to update outputs.
-move_count = 0
-error_message = (
-    "\033[93m"
-    + "Results from an older version of the pipeline exist. "
-    + "To continue and avoid rerunning steps please move these files:\n\033[96m"
-)
-for sm in samples:
-    for aln in aligned:
-        old_out = f"results/{sm}/{aln}.fiberseq.bam"
-        new_out = f"results/{sm}/{sm}.{aln}.fiberseq.bam"
-
-        index_type = "bai"
-        if aln == "unaligned":
-            index_type = "pbi"
-
-        # check ref
-        if os.path.exists(old_out):
-            move_count += 1
-            error_message += f"\tmv {old_out} {new_out}\n"
-        # check index
-        if os.path.exists(f"{old_out}.{index_type}"):
-            move_count += 1
-            error_message += f"\tmv {old_out}.{index_type} {new_out}.{index_type}\n"
-if move_count > 0:
-    sys.exit(f"{error_message}\033[91m")
-
-# make sure there is an existing index if ccs data is passed
-if input_ccs is not None:
-    assert os.path.exists(f"{input_ccs}.pbi"), f"pbi for {input_ccs} does not exist"
-
-# force the reference to exist.
-if ref is None:
-    sys.exit(
-        "Please provide a reference genome in the config file:\n"
-        + "\te.g. ref:/path/to/ref.fa\n"
-        + "Or in the command line under after --config:\n"
-        + "\te.g. --config ref=/path/to/ref.fa"
-    )
-    assert os.path.exists(
-        f"{ref}.fai"
-    ), f"Missing index for the ref: {ref}.fai\nCreate an index for {ref}:\n samtools faidx {ref}"
-
-
-# make sure all subreads have an index
-for sample, subreads in config.items():
-    assert os.path.exists(f"{subreads}.pbi"), f"pbi for {subreads} does not exist"
-
-
-# Two chunks per GB in the subreads
-default_n_chunks = min(
-    [
-        int(2 * os.path.getsize(subreads) / 1024**3) + 1
-        for sample, subreads in config.items()
-    ]
-)
-
-
-scattergather:
-    chunks=default_n_chunks,
-
-
-# number of chunks used in scatter gather
-n_chunks = len(scatter.chunks("temp/{scatteritem}.fake"))
-
-
 # functions used across the workflow
 include: "rules/common.smk"
+
+
+# check that the required tools are installed
+check_for_tools()
+
+# make sure bams are the right format
+check_input_bams()
+
+# check for old version of the pipeline and warn users to update outputs.
+check_for_old_outputs()
+
+# force the reference to exist.
+check_for_reference()
+
+# make sure pbi files exist for the input bams
+check_input_bams_for_index()
+
+# check that the bams are the right input type
+check_input_bams_against_input_type()
+
+
 # rules for running ccs
 include: "rules/ccs.smk"
 # pacbio tools: actc, ipdSummary, primrose
@@ -103,7 +70,7 @@ include: "rules/pacbio-tools.smk"
 # make the fiberseq bam
 include: "rules/fiberseq-bam.smk"
 # make bed files from the fiberseq bam
-include: "rules/bedfiles.smk"
+include: "rules/bed-files.smk"
 # run qc on the fiberseq bam
 include: "rules/qc.smk"
 # make data from ML models for calling m6A (optional)
@@ -114,29 +81,74 @@ wildcard_constraints:
     sm="|".join(samples),
     data="|".join(output_types),
     aligned="|".join(aligned),
+    scatteritem="\d+-of-\d+",
 
 
-rule all:
+if not make_beds:  # run standard fiberseq-smk
+
+    rule all:
+        input:
+            # fiberseq bam
+            expand(rules.merge.output.bam, sm=samples),
+            expand(rules.index_merge.output.pbi, sm=samples),
+            # aligned fiberseq bam
+            align_results(samples),
+            # QC results
+            expand(rules.qc_results.input, sm=samples),
+            # get ipdSummary files if requested
+            get_ipd_results(samples),
+
+
+else:  # run bed making pipeline
+
+    rule all:
+        input:
+            # fiber table 
+            expand(
+                rules.joint_fiber_table.output,
+                sm=samples,
+            ),
+            # bed
+            expand(
+                "results/{sm}/bed/{sm}.{aligned}.{data}.bed.gz",
+                aligned=aligned,
+                sm=samples,
+                data=output_types,
+            ),
+            # bigbed
+            expand(
+                rules.bigbed.output.bb,
+                sm=samples,
+                data=output_types,
+            ),
+            # get bigwig files if requested
+            bigwig_results(bigwig),
+
+
+localrules:
+    help_benchmark,
+    benchmarks,
+
+
+rule help_benchmark:
     input:
-        # fiberseq bam
-        expand(rules.merge.output.bam, sm=samples),
-        expand(rules.index_merge.output.pbi, sm=samples),
-        # aligned fiberseq bam
-        align_results(samples),
-        # QC results
-        expand(rules.qc_results.input, sm=samples),
-        # bed
-        expand(
-            "results/{sm}/bed/{sm}.{aligned}.{data}.bed.gz",
-            aligned=aligned,
-            sm=samples,
-            data=output_types,
-        ),
-        # bigbed
-        expand(
-            "results/{sm}/bigbed/{sm}.aligned.{data}.bed.bb",
-            sm=samples,
-            data=output_types,
-        ),
-        # get ipdSummary files if requested
-        get_ipd_results(samples),
+        unpack(help_benchmark_input),
+    output:
+        "results/{sm}/{sm}.runtimes.txt",
+    run:
+        out = summarise_runtimes(input, wildcards.sm)
+        with open(output[0], "w") as f:
+            f.write(out)
+
+
+
+
+rule benchmarks:
+    input:
+        expand(rules.help_benchmark.output, sm=samples),
+    shell:
+        """
+        (echo "Sample\tJob\tWall-hours\tCPU-hours\tCount"; \
+            cat {input} | sort -k 1,1 -k4,4g
+        ) | column -t
+        """

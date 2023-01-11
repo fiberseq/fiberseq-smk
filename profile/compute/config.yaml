@@ -16,16 +16,16 @@ cluster:
     --output=cluster_logs/{rule}/{rule}-{wildcards}-%j.out
     --export=all
     --parsable # Required to pass job IDs to scancel
-jobs: 1000
+jobs: 2000
 rerun-incomplete: True
 rerun-triggers: mtime 
 cluster-cancel: scancel
-cluster-cancel-nargs: 5000
+cluster-cancel-nargs: 500 # cancel 500 jobs at a time, all will still be canceled
 restart-times: 2
 printshellcmds: True
 reason: True
 use-conda: True
 show-failed-logs: True 
 latency-wait: 30
-max-jobs-per-second: 50
-cluster-status: ../extras/status-sacct.sh
+max-jobs-per-second: 100
+cluster-status: status-sacct.sh

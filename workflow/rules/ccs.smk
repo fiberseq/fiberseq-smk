@@ -1,7 +1,7 @@
 # NO CCS FILE PROVIDED SO WE MUST GENERATE ONE
 rule ccs:
     input:
-        bam=get_subreads,
+        bam=get_input_bam,
     output:
         bam=temp("temp/{sm}/ccs.{scatteritem}.bam"),
         pbi=temp("temp/{sm}/ccs.{scatteritem}.bam.pbi"),
@@ -9,6 +9,8 @@ rule ccs:
         txt=temp("temp/{sm}/ccs.{scatteritem}.ccs_report.txt"),
     resources:
         mem_mb=16 * 1024,
+        disk_mb=16 * 1024,
+        time=200,
     threads: scatter_threads
     conda:
         env
@@ -34,20 +36,28 @@ rule ccs:
 # TODO check that there are hifi kenetics files for each subfile
 rule ccs_zmws:
     input:
-        bam=get_input_ccs,
+        bam=get_input_bam,
     output:
         txt=temp("temp/{sm}/ccs_zmws/ccs_zmws.txt"),
-    threads: 1
     conda:
         env
     log:
         "logs/{sm}/ccs_zmws/ccs_zmws.log",
     benchmark:
         "benchmarks/{sm}/ccs_zmws/ccs_zmws.tbl"
+    threads: 8
     priority: 20
     shell:
         """
-        bamsieve --show-zmws {input.bam} > {output.txt} 2> {log}
+        (samtools view -F 2304 -@ {threads} {input.bam} \
+            | cut -f 1 \
+            | sed 's#/ccs##g' \
+            | sed 's#/$##g' \
+            | sed 's#.*/##g' \
+            | sort -g -S 1G --parallel 8 \
+            > {output.txt} \
+        ) 2> {log}
+        #bamsieve --show-zmws {input.bam} > {output.txt} 2> {log}
         """
 
 
@@ -55,30 +65,28 @@ rule split_ccs_zmws:
     input:
         txt=rules.ccs_zmws.output.txt,
     output:
-        txt=temp(
-            scatter.chunks(
-                "temp/{sm}/split_ccs_zmws/{scatteritem}.txt", allow_missing=True
-            )
-        ),
+        txt=temp("temp/{sm}/split_ccs_zmws/{scatteritem}.txt"),
+    log:
+        "logs/{sm}/split_ccs_zmws/{scatteritem}.log",
+    benchmark:
+        "benchmarks/{sm}/split_ccs_zmws/{scatteritem}.tbl"
+    priority: 20
+    params:
+        split_zmws=workflow.source_path("../scripts/split_zmws.py"),
     threads: 1
     conda:
         env
-    log:
-        "logs/{sm}/split_ccs_zmws/split_ccs_zmws.log",
-    benchmark:
-        "benchmarks/{sm}/split_ccs_zmws/split_ccs_zmws.tbl"
-    params:
-        split_zmws=workflow.source_path("../scripts/split_zmws.py"),
-    priority: 20
     shell:
         """
-        python {params.split_zmws} {input.txt} -o {output.txt} 2> {log}
+        python {params.split_zmws} \
+            --scatteritem {wildcards.scatteritem} \
+            {input.txt} -o {output.txt} 2> {log}
         """
 
 
 rule split_ccs:
     input:
-        bam=get_input_ccs,
+        bam=get_input_bam,
         pbi=get_input_pbi,
         txt="temp/{sm}/split_ccs_zmws/{scatteritem}.txt",
     output:

@@ -1,6 +1,6 @@
 rule qc_msp:
     input:
-        bed="results/{sm}/bed/{sm}.unaligned.msp.bed.gz",
+        tbl=rules.fiber_table.output.tbl,
     output:
         pdf="results/{sm}/qc/{sm}.qc_msp_lengths.pdf",
         txt=temp("temp/{sm}/qc_msp.intermediate.stat.txt"),
@@ -16,13 +16,13 @@ rule qc_msp:
     priority: 20
     shell:
         """
-        sh {params.script} {wildcards.sm} {input.bed} {output.pdf} {output.txt} 2> {log}
+        sh {params.script} {wildcards.sm} {input.tbl} {output.pdf} {output.txt} 2> {log}
         """
 
 
 rule qc_nuc:
     input:
-        bed="results/{sm}/bed/{sm}.unaligned.nuc.bed.gz",
+        tbl=rules.fiber_table.output.tbl,
     output:
         pdf="results/{sm}/qc/{sm}.qc_nuc_lengths.pdf",
         txt=temp("temp/{sm}/qc_nuc.intermediate.stat.txt"),
@@ -38,13 +38,13 @@ rule qc_nuc:
     priority: 20
     shell:
         """
-        sh {params.script} {wildcards.sm} {input.bed} {output.pdf} {output.txt} 2> {log}
+        sh {params.script} {wildcards.sm} {input.tbl} {output.pdf} {output.txt} 2> {log}
         """
 
 
 rule qc_m6a:
     input:
-        bam="results/{sm}/{sm}.unaligned.fiberseq.bam",
+        tbl=rules.fiber_table.output.tbl,
     output:
         pdf="results/{sm}/qc/{sm}.qc_m6a_per_read.pdf",
         ccs_pdf="results/{sm}/qc/{sm}.qc_ccs_passes.pdf",
@@ -61,13 +61,13 @@ rule qc_m6a:
     priority: 20
     shell:
         """
-        sh {params.script} {wildcards.sm} {input.bam} {output.pdf} {output.ccs_pdf} {output.txt} 2> {log}
+        sh {params.script} {wildcards.sm} {input.tbl} {output.pdf} {output.ccs_pdf} {output.txt} 2> {log}
         """
 
 
 rule qc_nucs_per_read:
     input:
-        bed="results/{sm}/bed/{sm}.unaligned.nuc.bed.gz",
+        tbl=rules.fiber_table.output.tbl,
     output:
         pdf="results/{sm}/qc/{sm}.qc_number_nucs_per_read.pdf",
         txt=temp("temp/{sm}/qc_number_nucs_per_read.intermediate.stat.txt"),
@@ -83,13 +83,13 @@ rule qc_nucs_per_read:
     priority: 20
     shell:
         """
-        sh {params.script} {wildcards.sm} {input.bed} {output.pdf} {output.txt} 2> {log}
+        sh {params.script} {wildcards.sm} {input.tbl} {output.pdf} {output.txt} 2> {log}
         """
 
 
 rule qc_readlength_per_nuc:
     input:
-        bam="results/{sm}/{sm}.unaligned.fiberseq.bam",
+        tbl=rules.fiber_table.output.tbl,
     output:
         pdf="results/{sm}/qc/{sm}.qc_readlength_per_nuc.pdf",
         txt=temp("temp/{sm}/qc_readlength_per_nuc.intermediate.stat.txt"),
@@ -105,13 +105,13 @@ rule qc_readlength_per_nuc:
     priority: 20
     shell:
         """
-        sh {params.script} {wildcards.sm} {input.bam} {output.pdf} {output.txt} 2> {log}
+        sh {params.script} {wildcards.sm} {input.tbl} {output.pdf} {output.txt} 2> {log}
         """
 
 
 rule qc_readlengths:
     input:
-        bam="results/{sm}/{sm}.unaligned.fiberseq.bam",
+        tbl=rules.fiber_table.output.tbl,
     output:
         pdf="results/{sm}/qc/{sm}.qc_readlengths.pdf",
         txt=temp("temp/{sm}/qc_readlengths.intermediate.stat.txt"),
@@ -127,13 +127,13 @@ rule qc_readlengths:
     priority: 20
     shell:
         """
-        sh {params.script} {wildcards.sm} {input.bam} {output.pdf} {output.txt} 2> {log}
+        sh {params.script} {wildcards.sm} {input.tbl} {output.pdf} {output.txt} 2> {log}
         """
 
 
 rule qc_rq:
     input:
-        bam="results/{sm}/{sm}.unaligned.fiberseq.bam",
+        tbl=rules.fiber_table.output.tbl,
     output:
         pdf="results/{sm}/qc/{sm}.qc_readquality.pdf",
         txt=temp("temp/{sm}/qc_readquality.intermediate.stat.txt"),
@@ -149,7 +149,7 @@ rule qc_rq:
     priority: 20
     shell:
         """
-        sh {params.script} {wildcards.sm} {input.bam} {output.pdf} {output.txt} 2> {log}
+        sh {params.script} {wildcards.sm} {input.tbl} {output.pdf} {output.txt} 2> {log}
         """
 
 

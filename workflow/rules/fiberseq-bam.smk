@@ -1,8 +1,10 @@
-
+#
+# RUN IF WE ARE USING THE IPDSUMMARY + GMM MODEL
+#
 rule train_gmm:
     input:
-        bam=f"temp/{{sm}}/primrose.1-of-{n_chunks}.bam",
-        csv=f"temp/{{sm}}/ipdSummary.1-of-{n_chunks}.csv",
+        bam=train_gmm_input_bam,
+        csv=train_gmm_input_csv,
     output:
         model="results/{sm}/{sm}.gmm_model.pkl",
     conda:
@@ -18,7 +20,7 @@ rule train_gmm:
         mem_mb=16 * 1024,
         time=200,
     threads: 4
-    priority: 60
+    priority: 1000
     shell:
         """
         python {params.gmm} -v --threads {threads} \
@@ -39,6 +41,7 @@ rule gmm:
     threads: 4
     resources:
         mem_mb=16 * 1024,
+        time=120,
     conda:
         env
     log:
@@ -58,17 +61,43 @@ rule gmm:
         """
 
 
+#
+# RUN IF WE ARE USING THE FIBERTOOLS-RS MODEL
+#
+rule predict_m6a_with_fibertools_rs:
+    input:
+        ccs=rules.primrose.output.bam,
+        pbi=rules.primrose.output.pbi,
+    output:
+        bam=temp("temp/{sm}/ft.{scatteritem}.bam"),
+    threads: 8
+    resources:
+        gpus=1,
+        mem_mb=16 * 1024,
+    conda:
+        env
+    log:
+        "logs/{sm}/predict_m6a_with_fibertools_rs/{scatteritem}.log",
+    benchmark:
+        "benchmarks/{sm}/predict_m6a_with_fibertools_rs/{scatteritem}.tbl"
+    params:
+        keep="" if input_type.upper() in CCS_NAMES else "--keep",
+    priority: 1000
+    shell:
+        """
+        ft predict-m6a -v --threads {threads} {params.keep} -s {input.ccs} {output.bam} 2> {log}
+        """
+
+
 rule train_hmm:
     input:
-        bam=f"temp/{{sm}}/gmm.1-of-{n_chunks}.bam",
+        bam=get_first_m6a_bam,
     output:
         model=temp("temp/{sm}/hmm_model.json"),
     conda:
         env
     log:
         "logs/{sm}/train_hmm/train.log",
-    params:
-        nuc=workflow.source_path("../scripts/add_nucleosomes.py"),
     benchmark:
         "benchmarks/{sm}/train_hmm/train.tbl"
     resources:
@@ -79,13 +108,13 @@ rule train_hmm:
     priority: 2000
     shell:
         """
-        python {params.nuc} --threads {threads} {input.bam} {output.model} 2> {log}
+        fibertools -t {threads} add-nucleosomes -i {input.bam} -o {output.model} 2> {log}
         """
 
 
 rule nucleosome:
     input:
-        bam=rules.gmm.output.bam,
+        bam=get_m6a_bam,
         model=rules.train_hmm.output.model,
     output:
         bam=temp("temp/{sm}/nuc.{scatteritem}.bam"),
@@ -93,25 +122,57 @@ rule nucleosome:
         env
     log:
         "logs/{sm}/nucleosome/{scatteritem}.log",
-    params:
-        nuc=workflow.source_path("../scripts/add_nucleosomes.py"),
     benchmark:
         "benchmarks/{sm}/nucleosome/{scatteritem}.tbl"
     threads: 4
     resources:
         disk_mb=16 * 1024,
-    priority: 70
+        time=80,
+    priority: 100
     shell:
         """
-        python {params.nuc} -m {input.model} --threads {threads} {input.bam} {output.bam} 2> {log}
+        fibertools -t {threads} add-nucleosomes -m {input.model} -i {input.bam} -o {output.bam} 2> {log}
+        """
+
+
+rule align:
+    input:
+        bam=rules.nucleosome.output.bam,
+        ref=ref,
+    output:
+        bam=temp("temp/{sm}/align.{scatteritem}.bam"),
+        bai=temp("temp/{sm}/align.{scatteritem}.bam.bai"),
+    conda:
+        env
+    log:
+        "logs/{sm}/align/align.{scatteritem}.log",
+    resources:
+        disk_mb=8000,
+        time=40,
+        mem_mb=32 * 1024,
+    threads: 8
+    benchmark:
+        "benchmarks/{sm}/align/align.{scatteritem}.tbl"
+    priority: 100
+    shell:
+        """
+        pbmm2 align \
+            -j {threads} \
+            --preset CCS --sort \
+            --sort-memory 1G \
+            --log-level INFO \
+            --unmapped \
+            {input.ref} {input.bam} {output.bam} \
+        2> {log}
         """
 
 
 rule merge:
     input:
-        bam=get_nucleosome_bam,
+        bams=get_scattered_bams,
     output:
-        bam="results/{sm}/{sm}.unaligned.fiberseq.bam",
+        bam=protected("results/{sm}/{sm}.fiberseq.bam"),
+        bai=protected("results/{sm}/{sm}.fiberseq.bam.bai"),
     conda:
         env
     log:
@@ -119,13 +180,17 @@ rule merge:
     resources:
         disk_mb=8000,
         time=120,
-    threads: 4
+    threads: 12
     benchmark:
-        "benchmarks/{sm}/merge/samtools.cat.tbl"
-    priority: 100
+        "benchmarks/{sm}/merge/samtools.merge.tbl"
+    priority: 3000
     shell:
         """
-        samtools cat -@ {threads} -o {output.bam} {input.bam} 2> {log}
+        samtools merge -c \
+            -@ {threads} --write-index \
+            -o {output.bam}##idx##{output.bai} \
+            {input.bams} \
+            2> {log}
         """
 
 
@@ -148,33 +213,29 @@ rule index_merge:
         """
 
 
-rule align:
+rule fiber_table:
     input:
         bam=rules.merge.output.bam,
-        ref=ref,
     output:
-        bam="results/{sm}/{sm}.aligned.fiberseq.bam",
-        bai="results/{sm}/{sm}.aligned.fiberseq.bam.bai",
+        tbl="results/{sm}/{sm}.fiberseq.all.tbl.gz",
     conda:
         env
     log:
-        "logs/{sm}/align/align.log",
+        "logs/{sm}/fiber_table/all_extract_bed.log",
     resources:
-        disk_mb=8000,
+        disk_mb=8 * 1024,
+        mem_mb=16 * 1024,
         time=240,
-        mem_mb=32 * 1024,
-    threads: max_threads
+    threads: 8
+    params:
+        min_ml_score=min_ml_score,
     benchmark:
-        "benchmarks/{sm}/align/align.tbl"
-    priority: 200
+        "benchmarks/{sm}/fiber_table/all_extract_bed.tbl"
+    priority: 300
     shell:
         """
-        pbmm2 align \
-            -j {threads} \
-            --preset CCS --sort \
-            --sort-memory 2G \
-            --log-level INFO \
-            --unmapped \
-            {input.ref} {input.bam} {output.bam} \
-        2> {log}
+        (samtools view -@ {threads} -u -F 2304 {input.bam} \
+            | ft -v --threads {threads} extract -m {params.min_ml_score} --all - \
+            | bgzip -@ {threads} > {output.tbl} \
+        ) 2> {log}
         """

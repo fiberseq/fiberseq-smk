@@ -3,7 +3,7 @@ rule actc:
     input:
         ccs=get_ccs_bam,
         pbi=get_ccs_pbi,
-        subreads=get_subreads,
+        subreads=get_input_bam,
     output:
         bam=temp("temp/{sm}/actc.{scatteritem}.bam"),
         fasta=temp("temp/{sm}/actc.{scatteritem}.fasta"),
@@ -100,8 +100,8 @@ rule ipdSummary:
 
 rule compress_ipdSummary:
     input:
-        gff=rules.ipdSummary.output.csv,
-        csv=rules.ipdSummary.output.gff,
+        csv=rules.ipdSummary.output.csv,
+        gff=rules.ipdSummary.output.gff,
     output:
         csv="results/{sm}/ipdSummary/{sm}.{scatteritem}.csv.gz",
         gff="results/{sm}/ipdSummary/{sm}.{scatteritem}.gff.gz",
@@ -112,11 +112,11 @@ rule compress_ipdSummary:
         "logs/{sm}/compress_ipdSummary/{scatteritem}.log",
     benchmark:
         "benchmarks/{sm}/compress_ipdSummary/{scatteritem}.tbl"
-    priority: 10
+    priority: 900
     shell:
         """
-        bgzip -@ {threads} {input.csv} &> {log}
-        bgzip -@ {threads} {input.gff} &>> {log}
+        bgzip -@ {threads} -c {input.csv} > {output.csv} 2> {log}
+        bgzip -@ {threads} -c {input.gff} > {output.gff} 2>> {log}
         """
 
 
