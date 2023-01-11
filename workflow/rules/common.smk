@@ -2,6 +2,7 @@
 # shared utilites for the pipeline
 #
 import pysam
+import os
 
 
 def get_chunk(wc):
@@ -11,6 +12,10 @@ def get_chunk(wc):
 
 def get_input_bam(wc):
     return config[wc.sm]
+
+
+def get_input_bed_bam(wc):
+    return os.path.abspath(config[wc.sm])
 
 
 def get_input_pbi(wc):

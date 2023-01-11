@@ -3,7 +3,7 @@
 #
 rule joint_fiber_table:
     input:
-        bam=get_input_bam,
+        bam=get_input_bed_bam,
     output:
         tbl="results/{sm}/{sm}.fiberseq.tbl.gz",
     conda:
@@ -29,7 +29,7 @@ rule joint_fiber_table:
 
 rule make_beds:
     input:
-        bam=get_input_bam,
+        bam=get_input_bed_bam,
     output:
         cpg=temp("temp/{sm}/{aligned}.cpg.bed"),
         msp=temp("temp/{sm}/{aligned}.msp.bed"),
