@@ -84,27 +84,6 @@ def get_scattered_bams(wc):
     return custom_gather(fmt, sm=wc.sm)
 
 
-# if process_first_n is None:
-#    return gather.chunks(fmt, allow_missing=True)
-# scatteritems = [f"{i+1}-of-{n_chunks}" for i in range(process_first_n)]
-# return expand(fmt, scatteritem=scatteritems, allow_missing=True)
-
-
-def is_tool(name):
-    """Check whether `name` is on PATH and marked as executable."""
-    if no_check:
-        return True
-    else:
-        # from whichcraft import which
-        from shutil import which
-
-        if which(name) is None:
-            raise Exception(
-                f"Cannot find {name} in PATH. Please see the README for installation instructions."
-            )
-        return which(name)
-
-
 def get_bam_type(bam_path):
     if no_check:
         return "CCS"
@@ -160,6 +139,21 @@ def get_number_of_chunks(sample):
         elif input_type.upper() in CCS_NAMES:
             return 10 * int(GB_size) + 1
     raise Exception(f"Unknown input type: {input_type}")
+
+
+def is_tool(name):
+    """Check whether `name` is on PATH and marked as executable."""
+    if no_check:
+        return True
+    else:
+        # from whichcraft import which
+        from shutil import which
+
+        if which(name) is None:
+            raise Exception(
+                f"Cannot find {name} in PATH. Please see the README for installation instructions."
+            )
+        return which(name)
 
 
 def check_for_tools():
