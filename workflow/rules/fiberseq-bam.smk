@@ -81,7 +81,7 @@ rule predict_m6a_with_fibertools_rs:
     benchmark:
         "benchmarks/{sm}/predict_m6a_with_fibertools_rs/{scatteritem}.tbl"
     params:
-        keep="" if input_type.upper() in CCS_NAMES else "--keep",
+        keep="--keep" if input_type.upper() in CCS_NAMES else "--keep",
     priority: 1000
     shell:
         """
