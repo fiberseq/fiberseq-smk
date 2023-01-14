@@ -48,7 +48,7 @@ rule make_beds:
         "benchmarks/{sm}/make_beds/{aligned}_extract_bed.tbl"
     params:
         aligned=lambda wc: "-r" if wc.aligned == "aligned" else "",
-        samflags=lambda wc: "-F 4" if wc.aligned == "aligned" else "-F 2304",
+        samflags=lambda wc: "-F 2308" if wc.aligned == "aligned" else "-F 2304",
         min_ml_score=min_ml_score,
     priority: 300
     shell:
