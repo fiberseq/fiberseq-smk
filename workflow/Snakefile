@@ -50,23 +50,29 @@ aligned = ["aligned", "unaligned"]
 include: "rules/common.smk"
 
 
-# check that the required tools are installed
-check_for_tools()
+onstart:
+    # check that the required tools are installed
+    check_for_tools()
+    # make sure bams are the right format
+    check_input_bams()
+    # check for old version of the pipeline and warn users to update outputs.
+    check_for_old_outputs()
+    # force the reference to exist.
+    check_for_reference()
+    # make sure pbi files exist for the input bams
+    check_input_bams_for_index()
+    # check that the bams are the right input type
+    check_input_bams_against_input_type()
 
-# make sure bams are the right format
-check_input_bams()
 
-# check for old version of the pipeline and warn users to update outputs.
-check_for_old_outputs()
+onsuccess:
+    print("Workflow finished without errors!")
 
-# force the reference to exist.
-check_for_reference()
 
-# make sure pbi files exist for the input bams
-check_input_bams_for_index()
-
-# check that the bams are the right input type
-check_input_bams_against_input_type()
+onerror:
+    print(
+        "An error occurred. Please check the log files of the failed runs specfically in addition to the primary log file."
+    )
 
 
 # rules for running ccs
