@@ -149,7 +149,7 @@ rule align:
     resources:
         disk_mb=8000,
         time=40,
-        mem_mb=32 * 1024,
+        mem_mb=align_mb,
     threads: 8
     benchmark:
         "benchmarks/{sm}/align/align.{scatteritem}.tbl"

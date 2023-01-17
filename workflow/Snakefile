@@ -28,6 +28,8 @@ no_check = config.pop("no_check", False)
 # use the fibertool-rs prediction instead of ipdSummary
 use_ipdsummary = config.pop("ipdsummary", False)
 predict_with_hifi = False if use_ipdsummary else True
+# align mb
+align_mb = config.pop("align_mb", 32 * 1024)
 # max ipdsummary coverage
 max_coverage = config.pop("max_coverage", 20)
 # max number of alignments to load in 1 kbp window for ipdsummary
