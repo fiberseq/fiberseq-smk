@@ -1,7 +1,6 @@
 #
 # shared utilites for the pipeline
 #
-import pysam
 import os
 
 
@@ -85,33 +84,20 @@ def get_scattered_bams(wc):
     return custom_gather(fmt, sm=wc.sm)
 
 
-# if process_first_n is None:
-#    return gather.chunks(fmt, allow_missing=True)
-# scatteritems = [f"{i+1}-of-{n_chunks}" for i in range(process_first_n)]
-# return expand(fmt, scatteritem=scatteritems, allow_missing=True)
-
-
-def is_tool(name):
-    """Check whether `name` is on PATH and marked as executable."""
-    # from whichcraft import which
-    from shutil import which
-
-    if which(name) is None:
-        raise Exception(
-            f"Cannot find {name} in PATH. Please see the README for installation instructions."
-        )
-    return which(name)
-
-
 def get_bam_type(bam_path):
-    bam = pysam.AlignmentFile(bam_path, check_sq=False)
-    for read_group in bam.header["RG"]:
-        DS = read_group.get("DS", "")
-        if "READTYPE=CCS" in DS:
-            return "CCS"
-        elif "READTYPE=SUBREAD" in DS:
-            return "SUBREAD"
-    bam.close()
+    if no_check:
+        return "CCS"
+    else:
+        import pysam
+
+        bam = pysam.AlignmentFile(bam_path, check_sq=False)
+        for read_group in bam.header["RG"]:
+            DS = read_group.get("DS", "")
+            if "READTYPE=CCS" in DS:
+                return "CCS"
+            elif "READTYPE=SUBREAD" in DS:
+                return "SUBREAD"
+        bam.close()
 
 
 def check_input_bams_against_input_type():
@@ -153,6 +139,21 @@ def get_number_of_chunks(sample):
         elif input_type.upper() in CCS_NAMES:
             return 10 * int(GB_size) + 1
     raise Exception(f"Unknown input type: {input_type}")
+
+
+def is_tool(name):
+    """Check whether `name` is on PATH and marked as executable."""
+    if no_check:
+        return True
+    else:
+        # from whichcraft import which
+        from shutil import which
+
+        if which(name) is None:
+            raise Exception(
+                f"Cannot find {name} in PATH. Please see the README for installation instructions."
+            )
+        return which(name)
 
 
 def check_for_tools():

@@ -13,7 +13,10 @@ CCS_NAMES = ["CCS", "CCSREADS", "CCSREAD", "HIFI"]
 scatter_threads = config.pop("scatter_threads", 8)
 max_threads = config.pop("max_threads", 24)
 input_type = config.pop("input_type", "ccs")
-env = config.pop("env", "envs/env.yml")
+env = config.pop("env", "../envs/env.yml")
+snakefile_env = env
+if env == "../envs/env.yml":
+    snakefile_env = "envs/env.yml"
 ref = config.pop("ref", None)
 gmm_model = config.pop("gmm_model", False)
 save_ipd = config.pop("save_ipd", False)
@@ -21,9 +24,12 @@ gff = config.pop("gff", False)
 process_first_n = config.pop("process_first_n", None)
 min_ml_score = config.pop("min_ml_score", 200)
 bigwig = config.pop("bigwig", False)
+no_check = config.pop("no_check", False)
 # use the fibertool-rs prediction instead of ipdSummary
 use_ipdsummary = config.pop("ipdsummary", False)
 predict_with_hifi = False if use_ipdsummary else True
+# align mb
+align_mb = config.pop("align_mb", 32 * 1024)
 # max ipdsummary coverage
 max_coverage = config.pop("max_coverage", 20)
 # max number of alignments to load in 1 kbp window for ipdsummary
@@ -44,23 +50,29 @@ aligned = ["aligned", "unaligned"]
 include: "rules/common.smk"
 
 
-# check that the required tools are installed
-check_for_tools()
+onstart:
+    # check that the required tools are installed
+    check_for_tools()
+    # make sure bams are the right format
+    check_input_bams()
+    # check for old version of the pipeline and warn users to update outputs.
+    check_for_old_outputs()
+    # force the reference to exist.
+    check_for_reference()
+    # make sure pbi files exist for the input bams
+    check_input_bams_for_index()
+    # check that the bams are the right input type
+    check_input_bams_against_input_type()
 
-# make sure bams are the right format
-check_input_bams()
 
-# check for old version of the pipeline and warn users to update outputs.
-check_for_old_outputs()
+onsuccess:
+    print("Workflow finished without errors!")
 
-# force the reference to exist.
-check_for_reference()
 
-# make sure pbi files exist for the input bams
-check_input_bams_for_index()
-
-# check that the bams are the right input type
-check_input_bams_against_input_type()
+onerror:
+    print(
+        "An error occurred. Please check the log files of the failed runs specfically in addition to the primary log file."
+    )
 
 
 # rules for running ccs
@@ -135,17 +147,20 @@ rule help_benchmark:
         unpack(help_benchmark_input),
     output:
         "results/{sm}/{sm}.runtimes.txt",
+    log:
+        "logs/{sm}/help_benchmarks/help_benchmarks.log",
     run:
         out = summarise_runtimes(input, wildcards.sm)
-        with open(output[0], "w") as f:
-            f.write(out)
-
-
+        open(output[0], "w").write(out)
 
 
 rule benchmarks:
     input:
         expand(rules.help_benchmark.output, sm=samples),
+    conda:
+        snakefile_env
+    log:
+        "logs/{sm}/benchmarks/benchmarks.log",
     shell:
         """
         (echo "Sample\tJob\tWall-hours\tCPU-hours\tCount"; \
