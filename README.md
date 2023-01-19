@@ -18,7 +18,8 @@ PATH=$PATH:/mmfs1/gscratch/stergachislab/mvollger/projects/large_home/.cargo/bin
 ```
 You will also need to add my PyTorch lib to your environment:
 ```bash
-export LIBTORCH=/mmfs1/gscratch/stergachislab/mvollger/projects/large_home/libs/libtorch_1.12.0_cu116
+export LIBTORCH=/mmfs1/gscratch/stergachislab/mvollger/projects/large_home/libs/libtorch-static-with-deps-1.13.0_cu116
+export LIBTORCH_CXX11_ABI=0
 export LD_LIBRARY_PATH=${LIBTORCH}/lib:$LD_LIBRARY_PATH
 export DYLD_LIBRARY_PATH=${LIBTORCH}/lib:$LD_LIBRARY_PATH
 ```
