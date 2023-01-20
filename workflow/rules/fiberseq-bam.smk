@@ -128,10 +128,15 @@ rule nucleosome:
     resources:
         disk_mb=16 * 1024,
         time=80,
+    params:
+        nuc_size_cutoff=nuc_size_cutoff,
     priority: 100
     shell:
         """
-        fibertools -t {threads} add-nucleosomes -m {input.model} -i {input.bam} -o {output.bam} 2> {log}
+        fibertools -t {threads} add-nucleosomes \
+                -m {input.model} --cutoff {params.nuc_size_cutoff} \
+                -i {input.bam} -o {output.bam} \
+                2> {log}
         """
 
 

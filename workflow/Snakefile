@@ -28,6 +28,8 @@ no_check = config.pop("no_check", False)
 # use the fibertool-rs prediction instead of ipdSummary
 use_ipdsummary = config.pop("ipdsummary", False)
 predict_with_hifi = False if use_ipdsummary else True
+# min nucleosome size
+nuc_size_cutoff = config.pop("nuc_size_cutoff", 85)
 # align mb
 align_mb = config.pop("align_mb", 32 * 1024)
 # max ipdsummary coverage
