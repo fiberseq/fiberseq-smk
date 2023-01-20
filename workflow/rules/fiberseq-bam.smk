@@ -134,7 +134,7 @@ rule nucleosome:
     shell:
         """
         fibertools -t {threads} add-nucleosomes \
-                -m {input.model} --cutoff {params.nuc_size_cutoff} \
+                -m {input.model} --nuc-size-cutoff {params.nuc_size_cutoff} \
                 -i {input.bam} -o {output.bam} \
                 2> {log}
         """
