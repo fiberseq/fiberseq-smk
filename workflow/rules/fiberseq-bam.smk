@@ -184,8 +184,8 @@ rule merge:
         "logs/{sm}/merge/samtools.cat.log",
     resources:
         disk_mb=8000,
-        time=120,
-    threads: 12
+        time=240,
+    threads: 16
     benchmark:
         "benchmarks/{sm}/merge/samtools.merge.tbl"
     priority: 3000
