@@ -51,7 +51,7 @@ rule ccs_zmws:
         """
         (pbindexdump {input.bam}.pbi --format cpp \
             | grep basicData.holeNumber_ \
-            | sed 's/basicData.holeNumber_ = {//;s/};//' \
+            | sed 's/basicData.holeNumber_ = {{//;s/}};//' \
             | tr ',' '\n' \
             | uniq \
             > {output.txt} \
