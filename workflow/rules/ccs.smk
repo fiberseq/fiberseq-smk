@@ -49,15 +49,13 @@ rule ccs_zmws:
     priority: 20
     shell:
         """
-        (samtools view -F 2304 -@ {threads} {input.bam} \
-            | cut -f 1 \
-            | sed 's#/ccs##g' \
-            | sed 's#/$##g' \
-            | sed 's#.*/##g' \
-            | sort -g -S 1G --parallel 8 \
+        (pbindexdump {input.bam}.pbi --format cpp \
+            | grep basicData.holeNumber_ \
+            | sed 's/basicData.holeNumber_ = {//;s/};//' \
+            | tr ',' '\n' \
+            | uniq \
             > {output.txt} \
         ) 2> {log}
-        #bamsieve --show-zmws {input.bam} > {output.txt} 2> {log}
         """
 
 
