@@ -191,7 +191,7 @@ rule merge:
     priority: 3000
     shell:
         """
-        samtools merge -c \
+        samtools merge -c -p \
             -@ {threads} --write-index \
             -o {output.bam}##idx##{output.bai} \
             {input.bams} \
