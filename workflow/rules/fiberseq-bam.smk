@@ -210,7 +210,11 @@ rule index_merge:
         "logs/{sm}/index_merge/index.tbl",
     benchmark:
         "benchmarks/{sm}/index_merge/index.tbl"
-    threads: 1
+    resources:
+        disk_mb=8 * 1024,
+        mem_mb=16 * 1024,
+        time=240,
+    threads: 16
     priority: 100
     shell:
         """
@@ -231,7 +235,7 @@ rule fiber_table:
         disk_mb=8 * 1024,
         mem_mb=16 * 1024,
         time=240,
-    threads: 8
+    threads: 16
     params:
         min_ml_score=min_ml_score,
     benchmark:
