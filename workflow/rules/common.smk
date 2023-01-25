@@ -121,6 +121,8 @@ def check_input_bams():
 
 
 def check_input_bams_for_index():
+    if make_beds:
+        return
     for sample, input_bam in config.items():
         assert os.path.exists(f"{input_bam}.pbi"), f"pbi for {input_bam} does not exist"
 
