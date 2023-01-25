@@ -17,7 +17,7 @@ rule joint_fiber_table:
     threads: 8
     benchmark:
         "benchmarks/{sm}/joint_fiber_table/all_extract_bed.tbl"
-    priority: 300
+    priority: 100
     shell:
         """
         (samtools view -@ {threads} -u -F 2304 {input.bam} \
@@ -44,6 +44,7 @@ rule make_beds:
         mem_mb=16 * 1024,
         time=240,
     threads: 16
+    priority: 200
     benchmark:
         "benchmarks/{sm}/make_beds/{aligned}_extract_bed.tbl"
     params:
@@ -93,7 +94,7 @@ rule bigbed:
         "logs/{sm}/bigbed/{data}.log",
     benchmark:
         "benchmarks/{sm}/bigbed/{data}.tbl"
-    priority: 300
+    priority: 400
     shell:
         """
         sort -k1,1 -k2,2n {input.bed} > {output.bed} 2> {log}
@@ -119,7 +120,7 @@ rule bigwig:
         mem_mb=16 * 1024,
         time=240,
     threads: 8
-    priority: 300
+    priority: 100
     shell:
         """
         # bedtools genomecov is slow with -split, so we do it in parallel
