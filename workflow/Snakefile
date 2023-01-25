@@ -38,8 +38,8 @@ max_coverage = config.pop("max_coverage", 20)
 max_alignments = config.pop("max_alignments", 100)
 # instead of running the pipeline make bed files with the input bam file(s)
 make_beds = config.pop("make_beds", False)
-if make_beds:
-    bigwig = True
+# if make_beds:
+#    bigwig = True
 # list of input samples
 samples = list(config.keys())
 
