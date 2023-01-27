@@ -1,7 +1,9 @@
 # `fiberseq-smk`: A Snakemake workflow for making **fiberseq** data
 
-[![Snakemake](https://img.shields.io/badge/snakemake-≥7.8.0-brightgreen.svg)](https://snakemake.github.io)
+[![Snakemake](https://img.shields.io/badge/snakemake-≥7.20-brightgreen.svg)](https://snakemake.github.io)
 [![GitHub actions status](https://github.com/StergachisLab/fiberseq-smk/workflows/Tests/badge.svg?branch=main)](https://github.com/StergachisLab/fiberseq-smk/actions?query=branch%3Amain+workflow%3ATests)
+
+This is a Snakemake workflow for making fully annotated **fiberseq** bam files from PacBio HiFi data. This pipeline creates and extends the standard fiberseq bam available through [fibertools-rs](https://github.com/mrvollger/fibertools-rs) by adding nucleosome calls, MSP (methylation sensitive patch) calls, options to distribute compute across a cluster, and options to make auxiliary bed files, in addition to the standard m6A calls. 
 
 # Alpha warning!
 This code is in an alpha state and will be changing without notice or versioning.
@@ -10,7 +12,7 @@ This code is in an alpha state and will be changing without notice or versioning
 See [docs/INSTALL.md](docs/INSTALL.md) for installation instructions.
 
 # Input data
-The input data is a `ccs` bam file(s) **with HiFi kinetics**. You can generate this file from PacBio subreads using `pbccs`. 
+The input data is a `ccs` bam file(s) **with HiFi kinetics**. You can generate this file from PacBio subreads using `pbccs`. The input data can be either an aligned or unaligned bam file.
 
 ### Multiplexed ccs data
 If the data is multiplexed you must first process it with `lima` and pass in demultiplexed bam file(s).
@@ -27,7 +29,6 @@ snakemake \
     test=.test/ccs.bam `# path to the ccs reads with HiFi kinetics, and the key sets the sample name` \
     ref=.test/ref.fa `# reference to align results to`  
 ```
-
 # Running on a cluster with distributed resources
 You can configure `fiberseq-smk` to run on a distributed resource manager (e.g. SLURM, PBS, SGE, etc.) by creating a [snakemake profile](https://snakemake.readthedocs.io/en/stable/executing/cli.html#profiles). An example configuration for a SLURM cluster is included in the [profile/compute](profile/compute) directory. To use this profile you can add the following to your command:
 ```bash
@@ -64,4 +65,4 @@ See [docs/bed.md](docs/bed.md) for instructions on how to make bed files from yo
 
 # TODO
 - [ ] Add a pipeline version to the bam header (git commit).
-- [ ] Add env version to the output somewhere. 
+- [ ] Add env version to the output. 
