@@ -44,9 +44,9 @@ You can find examples of running the pipeline in [docs/EXAMPLES.md](docs/EXAMPLE
 # Output files
 Example output files if your sample name is `test`:
 ```bash
-# aligned bam files 
+# Aligned fiberseq bam file
 results/test/test.fiberseq.bam
-# fiber table 
+# Plain text fiberseq output with m6A calls, nucleosome calls, MSP calls, and 5mC calls 
 results/test/test.fiberseq.all.tbl.gz 
 # Quality control directory with figures and html reports
 results/test/qc/
