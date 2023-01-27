@@ -63,6 +63,9 @@ results/test/qc/
 # Making bed files to supplement your fiberdata
 See [docs/bed.md](docs/bed.md) for instructions on how to make bed files from your fiberseq bam(s).
 
+# Resource usage
+`fiberseq-smk` aims to distribute the process of making fiberseq data into many small jobs that complete quickly (<30 minutes), and in general `fiberseq-smk` will create one job for every GB of input HiFi data. 
+Each job will use at most 16 threads and 32 GB of memory, but on average uses much less.
 # TODO
 - [ ] Add a pipeline version to the bam header (git commit).
 - [ ] Add env version to the output. 
