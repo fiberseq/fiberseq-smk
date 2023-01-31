@@ -27,6 +27,15 @@ PATH=$PATH:/gscratch/stergachislab/install_dir/smrtlink/smrtcmds/bin/
 ```
 
 ## Install the workflow
+First make sure you channel priorities are set correctly according to the [bioconda documentation](https://bioconda.github.io/#usage):
+```bash
+conda config --add channels defaults
+conda config --add channels bioconda
+conda config --add channels conda-forge
+conda config --set channel_priority strict
+```
+
+Then install the conda environment used by the workflow:
 ```bash
 git clone https://github.com/StergachisLab/fiberseq-smk
 cd fiberseq-smk
