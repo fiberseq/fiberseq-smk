@@ -19,6 +19,7 @@ If the data is multiplexed you must first process it with `lima` and pass in dem
 
 ### Subread input (deprecated)
 You can pass subread bam(s) to `fiberseq-smk` by adding `input_type=subreads` to your config options. This will run `pbccs` on the subreads and then run the rest of the pipeline. This feature is deprecated and will be removed in the future.
+
 # Usage
 You can run data using the following command, read the comments to learn more about the config options:
 ```bash
@@ -61,7 +62,7 @@ results/test/qc/
 - MM/ML: Bam tags for sorting m6a and 5mC methylation information. See the SAM spec for details.
 
 # Making bed files to supplement your fiberdata
-See [docs/bed.md](docs/bed.md) for instructions on how to make bed files from your fiberseq bam(s).
+See [docs/BED.md](docs/BED.md) for instructions on how to make bed files from your fiberseq bam(s).
 
 # Resource usage
 `fiberseq-smk` aims to distribute the process of making fiberseq data into many small jobs that complete quickly (<30 minutes), and in general `fiberseq-smk` will create one job for every GB of input HiFi data. 
