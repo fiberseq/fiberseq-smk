@@ -3,7 +3,7 @@
 [![Snakemake](https://img.shields.io/badge/snakemake-≥7.20-brightgreen.svg)](https://snakemake.github.io)
 [![GitHub actions status](https://github.com/StergachisLab/fiberseq-smk/workflows/Tests/badge.svg?branch=main)](https://github.com/StergachisLab/fiberseq-smk/actions?query=branch%3Amain+workflow%3ATests)
 
-This is a Snakemake workflow for making fully annotated **fiberseq** bam files from PacBio HiFi data. This pipeline creates and extends the standard fiberseq bam available through [fibertools-rs](https://github.com/mrvollger/fibertools-rs) by adding nucleosome calls, MSP (methylation sensitive patch) calls, options to distribute compute across a cluster, and options to make auxiliary bed files, in addition to the standard m6A calls. 
+This is a Snakemake workflow for making fully annotated **fiberseq** bam files from PacBio HiFi data. This pipeline creates and extends the standard fiberseq bam available through [fibertools-rs](https://github.com/fiberseq/fibertools-rs) by adding nucleosome calls, MSP (methylation sensitive patch) calls, options to distribute compute across a cluster, and options to make auxiliary bed files, in addition to the standard m6A calls. 
 
 # Alpha warning!
 This code is in an alpha state and will be changing without notice or versioning.
