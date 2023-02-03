@@ -1,5 +1,6 @@
 # Generating bed files from fiberseq bam(s)
 This optional step allows you to make some common bed files for fiberseq data.  These bed files are not required for the pipeline to run, but they are useful for visualizing your data. 
+
 ## Dependencies
 For this pipeline the only additional dependency is UCSC tools, so make sure you have UCSC tools installed and in your path.  You can get them from here: [https://hgdownload.soe.ucsc.edu/admin/exe/](https://hgdownload.soe.ucsc.edu/admin/exe/)
 If you are on `hyak` you can add my copy to your path by adding this to your `.bashrc`:
