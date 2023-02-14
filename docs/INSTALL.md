@@ -9,7 +9,7 @@ conda config --set channel_priority strict
 ```
 Then install the conda environment used by the workflow with these commands:
 ```bash
-git clone https://github.com/StergachisLab/fiberseq-smk
+git clone https://github.com/fiberseq/fiberseq-smk
 cd fiberseq-smk
 conda create -n fiberseq-smk
 mamba env update -n fiberseq-smk --file workflow/envs/env.yml 
