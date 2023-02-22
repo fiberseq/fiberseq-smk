@@ -101,7 +101,7 @@ rule density_results:
         dens2gz="results/{sm}/density/{sm}.msp.bed.gz",
         dens3gz="results/{sm}/density/{sm}.dinuc.bed.gz",
     log:
-        "logs/{sm}/density/aggregate.{sm}.log",
+        "logs/{sm}/density/zip.{sm}.log",
     shell:
         """
         bgzip -f -@ 4 {input.dens0} > {output.dens0gz} 2> {log}
