@@ -7,6 +7,8 @@ rule cpg_dinucleotide:
         env,
     log:
         "logs/{sm}/density/CpG.{sm}.dinucleotide.log",
+    resources:
+        time=60,
     params:
         script=workflow.source_path("../scripts/density/cpg-reference.sh"),
     benchmark:
@@ -20,7 +22,7 @@ rule cpg_dinucleotide:
 
 rule density_methylation:
     input:
-        tbl=rules.fiber_table.output.tbl,
+        tbl=rules.joint_fiber_table.output.tbl,
         cpg_ref=rules.cpg_dinucleotide.output.bed,
     output:
         bed="results/{sm}/density/{sm}.CpG.bed",
@@ -28,6 +30,8 @@ rule density_methylation:
         env,
     log:
         "logs/{sm}/density/CpG.{sm}.log",
+    resources:
+        time=60,
     params:
         script=workflow.source_path("../scripts/density/cpg-methylation-proportion.sh"),
     benchmark:
@@ -42,13 +46,15 @@ rule density_methylation:
 rule density_dinucleosome:
     input:
         fai=f"{ref}.fai",
-        tbl=rules.fiber_table.output.tbl,
+        tbl=rules.joint_fiber_table.output.tbl,
     output:
         bed="results/{sm}/density/{sm}.dinuc.bed",
     conda:
         env,
     log:
         "logs/{sm}/density/dinuc.{sm}.log",
+    resources:
+        time=60,
     params:
         script=workflow.source_path("../scripts/density/di-nucleosome-proportion.sh"),
     benchmark:
@@ -63,13 +69,15 @@ rule density_dinucleosome:
 rule density_msp:
     input:
         fai=f"{ref}.fai",
-        tbl=rules.fiber_table.output.tbl,
+        tbl=rules.joint_fiber_table.output.tbl,
     output:
         bed="results/{sm}/density/{sm}.msp.bed",
     conda:
         env,
     log:
         "logs/{sm}/density/msp.{sm}.log",
+    resources:
+        time=60,
     params:
         script=workflow.source_path("../scripts/density/msp-proportion.sh"),
     benchmark:
@@ -82,7 +90,23 @@ rule density_msp:
         """
 
 rule density_results:
-     input:
-         dens0=rules.density_methylation.output.bed,
-         dens1=rules.density_msp.output.bed,
-         dens2=rules.density_dinucleosome.output.bed,
+    input:
+        dens0=rules.cpg_dinucleotide.output.bed,
+        dens1=rules.density_methylation.output.bed,
+        dens2=rules.density_msp.output.bed,
+        dens3=rules.density_dinucleosome.output.bed,
+    output:
+        dens0gz="results/{sm}/density/{sm}.CpG.reference.bed.gz",
+        dens1gz="results/{sm}/density/{sm}.CpG.bed.gz",
+        dens2gz="results/{sm}/density/{sm}.msp.bed.gz",
+        dens3gz="results/{sm}/density/{sm}.dinuc.bed.gz",
+    log:
+        "logs/{sm}/density/aggregate.{sm}.log",
+    shell:
+        """
+        bgzip -f -@ 4 {input.dens0} > {output.dens0gz} 2> {log}
+        bgzip -f -@ 4 {input.dens1} > {output.dens1gz} 2> {log}
+        bgzip -f -@ 4 {input.dens2} > {output.dens2gz} 2> {log}
+        bgzip -f -@ 4 {input.dens3} > {output.dens3gz} 2> {log}
+        rm -f input.dens0 input.dens1 input.dens2 input.dens3
+        """
