@@ -85,6 +85,8 @@ include: "rules/pacbio-tools.smk"
 include: "rules/fiberseq-bam.smk"
 # make bed files from the fiberseq bam
 include: "rules/bed-files.smk"
+# compute densities/proportions
+include: "rules/density.smk"
 # run qc on the fiberseq bam
 include: "rules/qc.smk"
 # make data from ML models for calling m6A (optional)
@@ -109,6 +111,8 @@ if not make_beds:  # run standard fiberseq-smk
             align_results(samples),
             # QC results
             expand(rules.qc_results.input, sm=samples),
+            # CpG,Nuc,MSP proportions
+            expand(rules.density_results.input, sm=samples),
             # get ipdSummary files if requested
             get_ipd_results(samples),
 
