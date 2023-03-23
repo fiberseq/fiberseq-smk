@@ -62,7 +62,7 @@ results/test/qc/
 - MM/ML: Bam tags for sorting m6a and 5mC methylation information. See the SAM spec for details.
 
 # Making bed files to supplement your fiberdata
-See [docs/BED.md](docs/BED.md) for instructions on how to make bed files from your fiberseq bam(s).
+See [docs/bed.md](docs/bed.md) for instructions on how to make bed files from your fiberseq bam(s).
 
 # Resource usage
 `fiberseq-smk` aims to distribute the process of making fiberseq data into many small jobs that complete quickly (<30 minutes), and in general `fiberseq-smk` will create one job for every GB of input HiFi data. 
