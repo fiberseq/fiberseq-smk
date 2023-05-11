@@ -37,14 +37,14 @@ hck -z -F \#ct -F st -F en -F fiber -F ref_5mC ${exp_cpg} \
 # ignore last comma
 awk 'BEGIN {OFS="\t"} ; { \
       lng=split($NF,a,","); \
-      for(i=2;i<lng;++i) { \
+      for(i=1;i<lng;++i) { \
         if ( a[i] >= 0 ) { \
           print $1, a[i], a[i]+1; \
         } \
       } \
     }' ${tmpd}/f \
   | sort-bed --max-mem 25G - \
-  | bedmap --faster --sweep-all --ec --delim "\t" --echo --count ${tmp_ref_cpg} - \
+  | bedmap --faster --sweep-all --delim "\t" --echo --count ${tmp_ref_cpg} - \
   | paste - ${tmpd}/g \
   | awk 'BEGIN {OFS="\t"} ; { \
       if ( $5 > 0 ) { print $1, $2, $3, $4"/"$5, $4/$5; } \
