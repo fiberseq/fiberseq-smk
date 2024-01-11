@@ -1,3 +1,6 @@
+# Repo Archived
+**This project has been replaced by [ft](https://github.com/fiberseq/fibertools-rs) which is a binary that replaces this pipeline in a single command**!
+
 # `fiberseq-smk`: A Snakemake workflow for making **fiberseq** data
 
 [![Snakemake](https://img.shields.io/badge/snakemake-≥7.20-brightgreen.svg)](https://snakemake.github.io)
